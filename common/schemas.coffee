@@ -1,6 +1,3 @@
-###
-# AddressBook
-###
 ReactionCore.Schemas.Location = new SimpleSchema
   _id:
     type: String
