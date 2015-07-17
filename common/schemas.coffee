@@ -36,10 +36,12 @@ ReactionCore.Schemas.Location = new SimpleSchema
   'coords.x':
     label: 'Longitude'
     type: Number
+    decimal: true
     optional: true
   'coords.y'
     label: 'Latitude'
     type: Number
+    decimal: true
     optional: true
   metafields:
     type: [ReactionCore.Schemas.Metafield]
@@ -63,7 +65,7 @@ ReactionCore.Schemas.rentalProductVariant = new SimpleSchema([
     currentLocationn:
       type: ReactionCore.Schemas.Location
       optional: true
-    events:
+    events:  # A place to store rental and service history
       type: [Object]
       optional: true
     'events.$.startDate':
@@ -74,6 +76,19 @@ ReactionCore.Schemas.rentalProductVariant = new SimpleSchema([
       type: String
     'events.$.location':
       type: ReactionCore.Schemas.Location
+      optional: true
+    # rentalPrice:
+    #   type: [ReactionCore.Schemas.PriceBucket]
+    pricePerDay:
+      label: 'Daily Rate'
+      type: Number
+      decimal: true
+      min: 0
+    pricePerWeek:
+      label: 'Weekly Rate'
+      type: Number
+      decimal: true
+      min: 0
       optional: true
   }
 ])
