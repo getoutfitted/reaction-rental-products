@@ -1,11 +1,14 @@
-###
-# AddressBook
-###
+ReactionCore.Schemas.Coordinates = new SimpleSchema
+  x:
+    label: 'Longitude'
+    type: Number
+    decimal: true
+  y:
+    label: 'Latitude'
+    type: Number
+    decimal: true
+
 ReactionCore.Schemas.Location = new SimpleSchema
-  _id:
-    type: String
-    defaultValue: Random.id()
-    optional: true
   address1:
     label: "Address 1"
     type: String
@@ -31,27 +34,33 @@ ReactionCore.Schemas.Location = new SimpleSchema
     label: "Country"
     optional: true
   coords:
-    type: Object
-    optional: true
-  'coords.x':
-    label: 'Longitude'
-    type: Number
-    decimal: true
-    optional: true
-  'coords.y'
-    label: 'Latitude'
-    type: Number
-    decimal: true
+    type: ReactionCore.Schemas.Coordinates
     optional: true
   metafields:
     type: [ReactionCore.Schemas.Metafield]
     optional: true
 
-ReactionCore.Schemas.rentalProductVariant = new SimpleSchema([
+ReactionCore.Schemas.ProductEvent = new SimpleSchema
+  _id:
+    type: String
+    defaultValue: Random.id()
+  createdAt:
+    type: Date
+  title:
+    type: String
+  location:
+    type: ReactionCore.Schemas.Location
+    optional: true
+  description:
+    type: String
+    optional: true
+
+ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
   ReactionCore.Schemas.ProductVariant
   {
     active:
       type: Boolean
+      optional: true
       defaultValue: true
       index: 1
     unavailableDates:
@@ -62,40 +71,42 @@ ReactionCore.Schemas.rentalProductVariant = new SimpleSchema([
     status:
       type: String
       optional: true
-    currentLocationn:
+    currentLocation:
       type: ReactionCore.Schemas.Location
       optional: true
     events:  # A place to store rental and service history
-      type: [Object]
+      type: [ReactionCore.Schemas.ProductEvent]
       optional: true
-    'events.$.startDate':
-      type: Date
-    'events.$.endDate':
-      type: Date
-    'events.$.event':
-      type: String
-    'events.$.location':
-      type: ReactionCore.Schemas.Location
-      optional: true
+      defaultValue: [
+        _id: Random.id()
+        createdAt: new Date
+        title: 'Inbounded'
+        description: 'Added to Inventory'
+      ]
     # rentalPrice:
     #   type: [ReactionCore.Schemas.PriceBucket]
     pricePerDay:
       label: 'Daily Rate'
       type: Number
+      defaultValue: 0.0
       decimal: true
       min: 0
+      optional: true
     pricePerWeek:
       label: 'Weekly Rate'
       type: Number
+      defaultValue: 0.0
       decimal: true
       min: 0
       optional: true
   }
 ])
 
-ReactionCore.Schemas.rentalProduct = new SimpleSchema([
+ReactionCore.Schemas.RentalProduct = new SimpleSchema([
   ReactionCore.Schemas.Product
   {
+    variants:
+      type: [ReactionCore.Schemas.RentalProductVariant]
     productType:
       type: String
       defaultValue: 'rental'
@@ -104,3 +115,7 @@ ReactionCore.Schemas.rentalProduct = new SimpleSchema([
       optional: true
   }
 ])
+
+ReactionCore.Collections.Products.attachSchema(
+  ReactionCore.Schemas.RentalProduct)
+  
