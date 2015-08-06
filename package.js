@@ -18,8 +18,6 @@ Package.onUse(function (api, where) {
   api.use('meteor-platform@1.2.1');
   api.use('reactioncommerce:core@0.6.0', ['client', 'server']);
   
-  api.imply('dburles:factory');
-  api.imply('matb33:collection-hooks');
   api.imply('momentjs:moment');
   
   api.addFiles([
