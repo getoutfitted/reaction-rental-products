@@ -46,6 +46,7 @@ ReactionCore.Schemas.ProductEvent = new SimpleSchema
     defaultValue: Random.id()
   createdAt:
     type: Date
+    defaultValue: new Date()
   title:
     type: String
   location:

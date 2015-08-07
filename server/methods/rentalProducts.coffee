@@ -1,35 +1,44 @@
-#
-#
-#
-#
-# Meteor.methods
-#
-#   ###
-#   # initializes empty rental variant template (all others are clones)
-#   # should only be seen when all variants have been deleted from a product.
-#   ###
-#   createRentalVariant: (productId, newVariant) ->
-#     check productId, String
-#     check newVariant, Match.Optional Object
-#     unless ReactionCore.hasPermission('createProduct')
-#       throw new Meteor.Error 403, 'Access Denied'
-#     @unblock()
-#
-#     #create variant
-#     newVariantId = Random.id()
-#     if newVariant
-#       newVariant._id = newVariantId
-#       check(newVariant, ReactionCore.Schemas.RentalProductVariant)
-#     else
-#       newVariant =
-#         '_id': newVariantId
-#         'active': true
-#         'title': ''
-#         'price': 0.00
-#         'pricePerDay': '0.00'
-#         'pricePerWeek': '0.00'
-#         'type': 'rentalVariant'
-#         events: []
-#     Products.update({'_id': productId},
-#       {$addToSet: {'variants': newVariant}}, {validate: false})
-#     return newVariantId
+Meteor.methods
+  ###
+  # Push an event to a specific variant
+  # only need to supply updated information
+  ###
+  createProductEvent: (variantId, eventDoc) ->
+    check variantId, String
+    check eventDoc, {
+      title: String,
+      location: Match.Optional({
+        address1: Match.Optional(String),
+        address2: Match.Optional(String),
+        city: Match.Optional(String),
+        region: Match.Optional(String),
+        postal: Match.Optional(String),
+        country: Match.Optional(String),
+        coords: {
+          x: Match.Optional(Number),
+          y: Match.Optional(Number)
+        },
+        metafields: Match.Optional(Object)
+      }),
+      description: Match.Optional(String)
+    }
+    
+    unless ReactionCore.hasPermission('createProductEvent')
+      throw new Meteor.Error 403, "Access Denied"
+    @unblock()
+
+    _.defaults(eventDoc,
+      _id: Random.id()
+      createdAt: new Date()
+    )
+
+    Products = ReactionCore.Collections.Products
+    
+    product = Products.findOne "variants._id":variantId
+    if product?.variants
+      Products.update(
+        { "_id":product._id,"variants._id": variantId },
+        { $push: { "variants.$.events": eventDoc }},
+        { validate: false })
+    else
+      throw new Meteor.Error 400, "Variant " + variantId + " not found"

@@ -100,3 +100,39 @@ describe 'getoutfitted:reaction-rental-products methods', ->
       expect(variant.events[0].title).toEqual 'Inbounded'
       expect(variant.active).toEqual true
       done()
+
+  describe 'createProductEvent', ->
+    productEvents = {}
+    
+    beforeEach ->
+      Products.remove {}
+      productEvents.ex1 =
+        title: 'Left Warehouse'
+        description: 'Picked up by FedEx. Tracking #123456'
+    
+    it 'should 403 error by non permissioned user', (done) ->
+      spyOn(Roles, 'userIsInRole').and.returnValue false
+      product = Factory.create 'product'
+      spyOn(Products, 'update')
+      
+      expect(-> Meteor.call(
+        'createProductEvent', product.variants[0]._id, productEvents.ex1)
+      ).toThrow(new Meteor.Error 403, 'Access Denied')
+      
+      expect(Products.update).not.toHaveBeenCalled()
+      done()
+
+
+    it 'should insert a new event for a given variant', (done) ->
+      spyOn(Roles, 'userIsInRole').and.returnValue true
+      product = Factory.create 'rentalProduct'
+      variant = product.variants[0]
+      
+      Meteor.call 'createProductEvent', variant._id, productEvents.ex1
+      updatedProduct = Products.findOne(product._id)
+      updatedVariant = updatedProduct.variants[0]
+      
+      console.log(updatedVariant.events)
+      expect(updatedVariant.events.length).toEqual 2
+      expect(updatedVariant.events[1].title).toEqual 'Left Warehouse'
+      done()
