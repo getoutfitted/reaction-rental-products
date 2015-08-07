@@ -26,11 +26,14 @@ Package.onUse(function (api, where) {
   
   api.addFiles([
     'server/factories.coffee',
-    'server/methods/rentalProducts.coffee'
+    'server/methods/rentalProducts.coffee',
+    'server/methods/cart.coffee'
+    
   ], ['server']);
   
   api.addFiles([
-    'common/schemas.coffee', // Schema for rental products
+    'common/schemas/rentalProducts.coffee', // Schema for rental products
+    'common/schemas/cart.coffee',
     'common/hooks.coffee'
   ],['client', 'server']);
   });

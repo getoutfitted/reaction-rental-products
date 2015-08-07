@@ -14,10 +14,10 @@ Meteor.methods
         region: Match.Optional(String),
         postal: Match.Optional(String),
         country: Match.Optional(String),
-        coords: {
-          x: Match.Optional(Number),
-          y: Match.Optional(Number)
-        },
+        coords: Match.Optional({
+          x: Number,
+          y: Number
+        }),
         metafields: Match.Optional(Object)
       }),
       description: Match.Optional(String)
@@ -42,3 +42,11 @@ Meteor.methods
         { validate: false })
     else
       throw new Meteor.Error 400, "Variant " + variantId + " not found"
+
+
+  checkInventoryAvailability: (variantId, reservationRequest) ->
+    check variantId, String
+    check reservationRequest, {
+      startTime: Date,
+      endTime: Date
+    }

@@ -109,6 +109,18 @@ describe 'getoutfitted:reaction-rental-products methods', ->
       productEvents.ex1 =
         title: 'Left Warehouse'
         description: 'Picked up by FedEx. Tracking #123456'
+      productEvents.ex2 =
+        title: 'Delivered'
+        description: 'Delivered to Hotel'
+        location:
+          address1: '564 Main Street'
+          address2: 'C/O Resort Hotel Guest in Room 123'
+          city: 'Telluride'
+          region: 'CO'
+          postal: '81435'
+          metafields:
+            key: 'hotel'
+            value: 'Resort Hotel'
     
     it 'should 403 error by non permissioned user', (done) ->
       spyOn(Roles, 'userIsInRole').and.returnValue false
@@ -121,18 +133,40 @@ describe 'getoutfitted:reaction-rental-products methods', ->
       
       expect(Products.update).not.toHaveBeenCalled()
       done()
-
-
-    it 'should insert a new event for a given variant', (done) ->
+      
+    it 'should insert a new basic event for a given variant', (done) ->
       spyOn(Roles, 'userIsInRole').and.returnValue true
       product = Factory.create 'rentalProduct'
-      variant = product.variants[0]
+      variantId = product.variants[0]._id
       
-      Meteor.call 'createProductEvent', variant._id, productEvents.ex1
+      Meteor.call 'createProductEvent', variantId, productEvents.ex1
       updatedProduct = Products.findOne(product._id)
-      updatedVariant = updatedProduct.variants[0]
+      variant = updatedProduct.variants[0]
       
-      console.log(updatedVariant.events)
-      expect(updatedVariant.events.length).toEqual 2
-      expect(updatedVariant.events[1].title).toEqual 'Left Warehouse'
+      expect(variant.events.length).toEqual 2
+      expect(variant.events[1].title).toEqual 'Left Warehouse'
       done()
+
+    it 'should insert a new complete event for a given variant', (done) ->
+      spyOn(Roles, 'userIsInRole').and.returnValue true
+      product = Factory.create 'rentalProduct'
+      variantId = product.variants[0]._id
+      
+      Meteor.call 'createProductEvent', variantId, productEvents.ex2
+      updatedProduct = Products.findOne(product._id)
+      variant = updatedProduct.variants[0]
+      event = variant.events[1]
+      
+      expect(variant.events.length).toEqual 2
+      expect(event.title).toEqual
+      expect(event.location.city).toEqual 'Telluride'
+      done()
+
+  # describe 'reserveItem', ->
+  #   it 'should error if variant is unavailable on dates requested', (done) ->
+  #   done()
+  #
+  #   it 'should insert dates reserved', (done) ->
+  #   done()
+  #
+  #
