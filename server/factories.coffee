@@ -51,3 +51,14 @@ Factory.define 'rentalProduct',
       scope: "socialMessages"
     ]
   ])
+
+Factory.define 'rentalCart',
+  ReactionCore.Collections.Cart, Factory.extend('order',
+  startTime: new Date
+  endTime: new Date)
+
+Factory.define 'rentalOrder',
+  ReactionCore.Collections.Orders, Factory.extend('order',
+  
+  startTime: new Date
+  endTime: new Date)
