@@ -16,7 +16,7 @@ describe 'getoutfitted:reaction-rental-products methods', ->
         new Meteor.Error 403, 'Access Denied')
       expect(Products.insert).not.toHaveBeenCalled()
       done()
-      
+
     it 'should have rental variant properties', (done) ->
       spyOn(Roles, 'userIsInRole').and.returnValue true
       product = Factory.create 'rentalProduct'

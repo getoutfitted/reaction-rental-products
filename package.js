@@ -35,6 +35,7 @@ Package.onUse(function (api, where) {
   api.addFiles([
     'common/schemas/rentalProducts.coffee', // Schema for rental products
     'common/schemas/cart.coffee',
+    'common/collections.coffee',
     'common/hooks.coffee'
   ],['client', 'server']);
   });
