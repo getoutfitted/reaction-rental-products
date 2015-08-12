@@ -116,7 +116,3 @@ ReactionCore.Schemas.RentalProduct = new SimpleSchema([
       optional: true
   }
 ])
-
-ReactionCore.Collections.Products.attachSchema(
-  ReactionCore.Schemas.RentalProduct)
-  
