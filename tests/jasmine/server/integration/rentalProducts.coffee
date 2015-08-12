@@ -158,15 +158,66 @@ describe 'getoutfitted:reaction-rental-products methods', ->
       event = variant.events[1]
       
       expect(variant.events.length).toEqual 2
-      expect(event.title).toEqual
       expect(event.location.city).toEqual 'Telluride'
       done()
 
-  # describe 'reserveItem', ->
-  #   it 'should error if variant is unavailable on dates requested', (done) ->
-  #   done()
-  #
-  #   it 'should insert dates reserved', (done) ->
-  #   done()
-  #
-  #
+  describe 'checkVariantAvailability', ->
+    
+    beforeEach ->
+      Products.remove {}
+      
+    it 'should return array of available inventory variants', (done) ->
+      product = Factory.create 'rentalProductWithInventory'
+      variant = product.variants[0]
+      expect(product.variants.length).toEqual 7
+      expect(product.variants[3].parentId).toEqual(product.variants[0]._id)
+      inventoryAvailable = Meteor.call(
+        'checkInventoryAvailability',
+        product._id,
+        variant._id,
+        {
+          startTime: moment().startOf('day').add(3, 'days').toDate(),
+          endTime: moment().startOf('day').add(5, 'days').toDate()
+        },
+        1)
+      console.log(inventoryAvailable)
+      expect(inventoryAvailable.length).toEqual 1
+      done()
+      
+    it 'should be return empty array if requested dates are booked', (done) ->
+      product = Factory.create 'rentalProductWithInventory'
+      variant = product.variants[0]
+      expect(product.variants.length).toEqual 7
+      expect(product.variants[3].parentId).toEqual(product.variants[0]._id)
+      inventoryAvailable = Meteor.call(
+        'checkInventoryAvailability',
+        product._id,
+        variant._id,
+        {
+          startTime: moment().startOf('day').add(10, 'days').toDate(),
+          endTime: moment().startOf('day').add(16, 'days').toDate()
+        },
+        1)
+      console.log(inventoryAvailable)
+      expect(inventoryAvailable.length).toEqual 0
+      done()
+  
+    it 'should be return empty array if
+      requested dates are partially booked ', (done) ->
+
+      product = Factory.create 'rentalProductWithInventory'
+      variant = product.variants[0]
+      expect(product.variants.length).toEqual 7
+      expect(product.variants[3].parentId).toEqual(product.variants[0]._id)
+      inventoryAvailable = Meteor.call(
+        'checkInventoryAvailability',
+        product._id,
+        variant._id,
+        {
+          startTime: moment().startOf('day').add(4, 'days').toDate(),
+          endTime: moment().startOf('day').add(10, 'days').toDate()
+        },
+        1)
+      console.log(inventoryAvailable)
+      expect(inventoryAvailable.length).toEqual 0
+      done()

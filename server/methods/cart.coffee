@@ -15,20 +15,35 @@ Meteor.methods
     datesToReserve = []
     
     while iter.hasNext()
-      datesReserved.push(iter.next().format())
+      datesToReserve.push(iter.next().format())
     
-    for product in order.items
-      if product.type == 'rental'
+    for orderProduct in order.items
+      product = Products.findOne(orderProduct.productId)
+      if product.productType == 'rental'
         # push start date minus pre-buffer days
         # loop through adding one day to array
         # stop when we get to end day + trailing buffer
-        Products.update {
-          _id: product.productId,
-          "variants._id": product.variants._id
-        }, {$push: {"variants.$.unavailableDates": {$each: datesToReserve}}}
+        
+        # Get ordered list of reservedDates
+        reservedDates = Products.findOne({
+          _id: orderProduct.productId,
+          'variants._id': orderProduct.variants._id
+        }, {'variants.$.unavailableDates'})
+        
+        # find the position that we should insert the resevedDates
+        positionToInsert = _.sortedIndex(reservedDates, datesToReserve[0])
+
+        # insert datesToReserve into the correct variant at the correct position
+        Products.update({
+          _id: orderProduct.productId,
+          "variants._id": orderProduct.variants._id
+        }, {$push: {
+          "variants.$.unavailableDates": {
+            $each: datesToReserve,
+            $position: positionToInsert}}})
       else
         Products.update {
           _id: product.productId,
           "variants._id": product.variants._id
-        }, {$inc: {"variants.$.inventoryQuantity": -product.quantity }}
+        }, {$inc: {"variants.$.inventoryQuantity": -orderProduct.quantity }}
     return
