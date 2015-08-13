@@ -166,9 +166,10 @@ describe 'getoutfitted:reaction-rental-products methods', ->
     beforeEach ->
       Products.remove {}
       
-    it 'should return array of available inventory variants', (done) ->
+    it 'should return array of available inventory variant ids', (done) ->
       product = Factory.create 'rentalProductWithInventory'
       variant = product.variants[0]
+      quantity = _.random(1,5)
       expect(product.variants.length).toEqual 7
       expect(product.variants[3].parentId).toEqual(product.variants[0]._id)
       inventoryAvailable = Meteor.call(
@@ -179,12 +180,31 @@ describe 'getoutfitted:reaction-rental-products methods', ->
           startTime: moment().startOf('day').add(3, 'days').toDate(),
           endTime: moment().startOf('day').add(5, 'days').toDate()
         },
-        1)
-      console.log(inventoryAvailable)
-      expect(inventoryAvailable.length).toEqual 1
+        quantity)
+      expect(inventoryAvailable.length).toEqual quantity
       done()
       
-    it 'should be return empty array if requested dates are booked', (done) ->
+    it 'should return array of available inventory variant ids
+      up to the max inventory available', (done) ->
+      product = Factory.create 'rentalProductWithInventory'
+      variant = product.variants[0]
+      quantity = 8
+      expect(product.variants.length).toEqual 7
+      expect(product.variants[3].parentId).toEqual(product.variants[0]._id)
+      inventoryAvailable = Meteor.call(
+        'checkInventoryAvailability',
+        product._id,
+        variant._id,
+        {
+          startTime: moment().startOf('day').add(3, 'days').toDate(),
+          endTime: moment().startOf('day').add(5, 'days').toDate()
+        },
+        8)
+      expect(inventoryAvailable.length).toEqual 5
+      done()
+      
+    it 'should be return empty array if requested dates are booked
+      for all inventory variants', (done) ->
       product = Factory.create 'rentalProductWithInventory'
       variant = product.variants[0]
       expect(product.variants.length).toEqual 7
@@ -198,12 +218,12 @@ describe 'getoutfitted:reaction-rental-products methods', ->
           endTime: moment().startOf('day').add(16, 'days').toDate()
         },
         1)
-      console.log(inventoryAvailable)
       expect(inventoryAvailable.length).toEqual 0
       done()
   
     it 'should be return empty array if
-      requested dates are partially booked ', (done) ->
+      requested dates are partially booked
+      for all inventory variants', (done) ->
 
       product = Factory.create 'rentalProductWithInventory'
       variant = product.variants[0]
@@ -218,6 +238,5 @@ describe 'getoutfitted:reaction-rental-products methods', ->
           endTime: moment().startOf('day').add(10, 'days').toDate()
         },
         1)
-      console.log(inventoryAvailable)
       expect(inventoryAvailable.length).toEqual 0
       done()
