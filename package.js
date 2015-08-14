@@ -28,12 +28,13 @@ Package.onUse(function (api, where) {
   api.addFiles([
     'server/factories.coffee',
     'server/methods/rentalProducts.coffee',
-    'server/methods/cart.coffee'
+    'server/methods/orders.coffee'
     
   ], ['server']);
   
   api.addFiles([
     'common/schemas/rentalProducts.coffee', // Schema for rental products
+    'common/schemas/orders.coffee',
     'common/schemas/cart.coffee',
     'common/collections.coffee',
     'common/hooks.coffee'
@@ -55,6 +56,6 @@ Package.onTest(function(api) {
   api.use('reactioncommerce:bootstrap-theme');
 
   api.addFiles('tests/jasmine/server/integration/rentalProducts.coffee', 'server');
-  api.addFiles('tests/jasmine/server/integration/cart.coffee', 'server');
+  api.addFiles('tests/jasmine/server/integration/orders.coffee', 'server');
   
 });
