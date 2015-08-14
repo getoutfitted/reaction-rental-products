@@ -79,7 +79,7 @@ Meteor.methods
   ###
   checkInventoryAvailability: (
     productId, variantId, reservationRequest, quantity) ->
-      
+
     check productId, String
     check variantId, String
     check reservationRequest, {
@@ -102,7 +102,7 @@ Meteor.methods
     product = Products.findOne(productId)
     variant = _.findWhere(product.variants, {_id: variantId})
     inventoryVariants = _.where(product.variants, {parentId: variantId})
-    if inventoryVariants
+    if inventoryVariants.length > 0
       for item in inventoryVariants
         # Check to see if any of the dates requested are unavailable
         # if so, this item is unavailable for this time period.
@@ -113,7 +113,7 @@ Meteor.methods
             break
 
     else
-      if _.isEmpty(_.intersection(variant.unavailableDates, requestedDates))
+      if checkAvailability(variant.unavailableDates, requestedDates)
         requestedVariants.push(variant._id)
       
     return requestedVariants

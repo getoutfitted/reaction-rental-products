@@ -15,7 +15,7 @@ Meteor.methods
     datesToReserve = []
     
     while iter.hasNext()
-      datesToReserve.push(iter.next().format())
+      datesToReserve.push(iter.next().toDate())
     
     for orderProduct in order.items
       product = Products.findOne(orderProduct.productId)
@@ -24,23 +24,36 @@ Meteor.methods
         # loop through adding one day to array
         # stop when we get to end day + trailing buffer
         
-        # Get ordered list of reservedDates
-        reservedDates = Products.findOne({
-          _id: orderProduct.productId,
-          'variants._id': orderProduct.variants._id
-        }, {'variants.$.unavailableDates'})
+        variantIds = Meteor.call 'checkInventoryAvailability',
+          product._id,
+          orderProduct.variants._id,
+          {endTime: order.endTime, startTime: order.startTime},
+          orderProduct.quantity
         
-        # find the position that we should insert the resevedDates
-        positionToInsert = _.sortedIndex(reservedDates, datesToReserve[0])
+        unless variantIds.length == orderProduct.quantity
+          new Meteor.Error 403, 'Available inventory and quantity
+            requested do not match'
 
-        # insert datesToReserve into the correct variant at the correct position
-        Products.update({
-          _id: orderProduct.productId,
-          "variants._id": orderProduct.variants._id
-        }, {$push: {
-          "variants.$.unavailableDates": {
-            $each: datesToReserve,
-            $position: positionToInsert}}})
+        # Not using $in because we need to determine the correct position
+        # to insert the new dates separately for each inventoryVariant
+        for variantId in variantIds
+          # Get ordered list of reservedDates
+          reservedDates = Products.findOne({
+            _id: orderProduct.productId,
+            'variants._id': variantId
+          }, {'variants.$.unavailableDates'})
+          
+          # find the position that we should insert the resevedDates
+          positionToInsert = _.sortedIndex(reservedDates, datesToReserve[0])
+          # insert datesToReserve into the correct variants
+          # at the correct position
+          Products.update({
+            _id: orderProduct.productId,
+            "variants._id": variantId
+          }, {$push: {
+            "variants.$.unavailableDates": {
+              $each: datesToReserve,
+              $position: positionToInsert}}})
       else
         Products.update {
           _id: product.productId,
