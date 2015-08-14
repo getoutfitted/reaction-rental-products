@@ -1,20 +1,3 @@
-# dateBinarySearch = (dates, date) ->
-#   min = 0
-#   max = dates.length -1
-#
-#   while min <= max
-#     guess = Math.floor((min + max) / 2)
-#
-#     if +dates[guess] == +date
-#       return guess
-#     else
-#       if +dates[guess] < +date
-#         min = guess + 1
-#       else
-#         max = guess - 1
-#
-#   return -1
-
 # Helper function to see if any of the requestedDates are already reserved.
 # reservedDates is an array of sorted dates that
 #   is not guaranteed to be consecutive
@@ -128,46 +111,9 @@ Meteor.methods
           requestedVariants.push(item._id)
           if requestedVariants.length >= quantity
             break
-            # return {
-            #   variants: requestedVariants,
-            #   quantity: requestedVariants.length,
-            #   message: 'available'
-            # }
-      # if we get to the end of the loop and have more than one requested
-      # variants available, but less than the quantity requested.
-      # if requestedVariants.length >= 1
-      #   return {
-      #     variants: requestedVariants,
-      #     quantity: requestedVariants.length,
-      #     message: 'available'
-      #   }
+
     else
       if _.isEmpty(_.intersection(variant.unavailableDates, requestedDates))
         requestedVariants.push(variant._id)
-        # if requestedVariants.length >= quantity
-        #   return {
-        #     variants: requestedVariants,
-        #     quantity: quantity,
-        #     message: 'available'
-        #   }
-
-    # if requestedVariants.length == quantity
-    #   message = 'available'
-    # else if requestedVariants.length >= 1
-    #   message = 'partial availability'
-    # else
-    #   message = 'unavailable'
       
     return requestedVariants
-          
-          
-    #  If variant has inventoryChildren
-      #  Loop through children
-        #  If inventory variant has availibility
-          #  push it into reserveUIDs
-          #  if reserveUIDs.length is == quantity
-            #  break out of loop
-    # Else
-      # if variant has availibility
-        # push variant into reserveUIDs
-        
