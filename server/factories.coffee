@@ -80,6 +80,13 @@ Factory.define 'rentalProductWithInventory',
     randomVariant('inventory', sharedId)
     randomVariant('inventory', sharedId)
     randomVariant('inventory', sharedId)
+    randomVariant('inventory', sharedId)
+    randomVariant('inventory', sharedId)
+    randomVariant('inventory', sharedId)
+    randomVariant('inventory', sharedId)
+    randomVariant('inventory', sharedId)
+    randomVariant('inventory', sharedId)
+    randomVariant('inventory', sharedId)
     randomVariant('random', '')
   ])
 

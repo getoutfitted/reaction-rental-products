@@ -170,7 +170,7 @@ describe 'getoutfitted:reaction-rental-products methods', ->
       product = Factory.create 'rentalProductWithInventory'
       variant = product.variants[0]
       quantity = _.random(1,5)
-      expect(product.variants.length).toEqual 7
+      expect(product.variants.length).toEqual 14
       expect(product.variants[3].parentId).toEqual(product.variants[0]._id)
       inventoryAvailable = Meteor.call(
         'checkInventoryAvailability',
@@ -188,8 +188,9 @@ describe 'getoutfitted:reaction-rental-products methods', ->
       up to the max inventory available', (done) ->
       product = Factory.create 'rentalProductWithInventory'
       variant = product.variants[0]
-      quantity = 8
-      expect(product.variants.length).toEqual 7
+      quantity = 15
+      quantityAvailable = 12
+      expect(product.variants.length).toEqual 14
       expect(product.variants[3].parentId).toEqual(product.variants[0]._id)
       inventoryAvailable = Meteor.call(
         'checkInventoryAvailability',
@@ -199,15 +200,15 @@ describe 'getoutfitted:reaction-rental-products methods', ->
           startTime: moment().startOf('day').add(3, 'days').toDate(),
           endTime: moment().startOf('day').add(5, 'days').toDate()
         },
-        8)
-      expect(inventoryAvailable.length).toEqual 5
+        quantity)
+      expect(inventoryAvailable.length).toEqual quantityAvailable
       done()
       
     it 'should be return empty array if requested dates are booked
       for all inventory variants', (done) ->
       product = Factory.create 'rentalProductWithInventory'
       variant = product.variants[0]
-      expect(product.variants.length).toEqual 7
+      expect(product.variants.length).toEqual 14
       expect(product.variants[3].parentId).toEqual(product.variants[0]._id)
       inventoryAvailable = Meteor.call(
         'checkInventoryAvailability',
@@ -227,7 +228,7 @@ describe 'getoutfitted:reaction-rental-products methods', ->
 
       product = Factory.create 'rentalProductWithInventory'
       variant = product.variants[0]
-      expect(product.variants.length).toEqual 7
+      expect(product.variants.length).toEqual 14
       expect(product.variants[3].parentId).toEqual(product.variants[0]._id)
       inventoryAvailable = Meteor.call(
         'checkInventoryAvailability',

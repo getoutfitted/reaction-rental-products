@@ -1,4 +1,4 @@
-describe 'getoutfitted:reaction-rental-products cart methods', ->
+describe 'getoutfitted:reaction-rental-products orders methods', ->
   describe 'rentalInventoryAdjust', ->
     beforeEach ->
       Products.remove {}
