@@ -14,7 +14,7 @@ ReactionCore.Collections.Products.before.update(function (userId, product, field
   let variants = null;
   let length = null;
 
-  if (modifier.$addToSet !== null) {
+  if (modifier.$addToSet) {
     variants = modifier.$addToSet.variants;
   }
 

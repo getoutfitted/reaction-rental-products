@@ -27,9 +27,9 @@ Meteor.methods({
    *   variantId - the id of the variant to which we are adding a product event
    *   eventDoc - An object containing the information for the event
    */
-  createProductEvent: function(variantId, eventDoc) {
-    var Products, product;
+  createProductEvent: function (variantId, eventDoc) {
     check(variantId, String);
+
     check(eventDoc, {
       title: String,
       location: Match.Optional({
@@ -47,32 +47,31 @@ Meteor.methods({
       }),
       description: Match.Optional(String)
     });
+
     if (!ReactionCore.hasPermission('createProductEvent')) {
-      throw new Meteor.Error(403, "Access Denied");
+      throw new Meteor.Error(403, 'Access Denied');
     }
+
     this.unblock();
+
     _.defaults(eventDoc, {
       _id: Random.id(),
       createdAt: new Date()
     });
+
     Products = ReactionCore.Collections.Products;
-    product = Products.findOne({
-      "variants._id": variantId
+
+    const product = Products.findOne({
+      'variants._id': variantId
     });
-    if (product != null ? product.variants : void 0) {
-      return Products.update({
-        "_id": product._id,
-        "variants._id": variantId
-      }, {
-        $push: {
-          "variants.$.events": eventDoc
-        }
-      }, {
-        validate: false
-      });
-    } else {
-      throw new Meteor.Error(400, "Variant " + variantId + " not found");
+
+    if (product && product.variants) {
+      return Products.update(
+        {'_id': product._id, 'variants._id': variantId },
+        { $push: { 'variants.$.events': eventDoc } }, { validate: false });
     }
+
+    throw new Meteor.Error(400, 'Variant ' + variantId + ' not found');
   },
 
   /*
@@ -81,47 +80,44 @@ Meteor.methods({
   #
    * returns array of available (inventory) variant ids
    */
-  checkInventoryAvailability: function(productId, variantId, reservationRequest, quantity) {
-    var i, inventoryVariants, item, iter, len, message, product, requestedDates, requestedVariants, variant;
+  checkInventoryAvailability: function (productId, variantId, reservationRequest, quantity = 1) {
     check(productId, String);
     check(variantId, String);
     check(reservationRequest, {
       startTime: Date,
       endTime: Date
     });
-    check(quantity, Match.Optional(Number));
-    quantity = quantity || 1;
-    requestedVariants = [];
-    requestedDates = [];
-    message = '';
-    iter = moment(reservationRequest.startTime).twix(reservationRequest.endTime, {
+    check(quantity, Number);
+
+    let requestedVariants = [];
+    let requestedDates = [];
+    let iter = moment(reservationRequest.startTime).twix(reservationRequest.endTime, {
       allDay: true
     }).iterate('days');
-    while (iter.hasNext()) {
-      requestedDates.push(iter.next().toDate());
-    }
-    product = Products.findOne(productId);
-    variant = _.findWhere(product.variants, {
-      _id: variantId
-    });
-    inventoryVariants = _.where(product.variants, {
-      parentId: variantId
-    });
+
+    while (iter.hasNext()) { requestedDates.push(iter.next().toDate()); }
+
+    let product = Products.findOne(productId);
+    let variant = _.findWhere(product.variants, { _id: variantId });
+    let inventoryVariants = _.where(product.variants, { parentId: variantId });
+
     if (inventoryVariants.length > 0) {
-      for (i = 0, len = inventoryVariants.length; i < len; i++) {
-        item = inventoryVariants[i];
-        if (checkAvailability(item.unavailableDates, requestedDates)) {
+      // if this variant has multiple inventory
+      for (let item of inventoryVariants) {
+        // Check to see if any of the dates requested are unavailable
+        // if so, this item is unavailable for requested time period
+        if  (checkAvailability(item.unavailableDates, requestedDates)) {
           requestedVariants.push(item._id);
           if (requestedVariants.length >= quantity) {
             break;
           }
         }
       }
-    } else {
-      if (checkAvailability(variant.unavailableDates, requestedDates)) {
-        requestedVariants.push(variant._id);
-      }
+    } else if (checkAvailability(variant.unavailableDates, requestedDates)) {
+      // else if there is only one of this variant
+      requestedVariants.push(variant._id);
     }
+    // return requested variants array - array of variantId
     return requestedVariants;
   }
 });
