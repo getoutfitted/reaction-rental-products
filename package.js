@@ -21,7 +21,7 @@ Package.onUse(function (api) {
   api.use('dburles:factory@0.3.10');
   api.use('matb33:collection-hooks');
   api.use('meteor-platform@1.2.1');
-  api.use('reactioncommerce:core@0.8.0', ['client', 'server']);
+  api.use('reactioncommerce:core@0.9.0', ['client', 'server']);
 
   api.imply('momentjs:moment'); // Make moment available to all packages
   api.imply('momentjs:twix'); // Make moment twix available to all packages

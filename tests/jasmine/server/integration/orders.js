@@ -23,16 +23,16 @@ describe('getoutfitted:reaction-rental-products orders methods', function () {
           }
         ]
       });
-      const preInventoryAvailable = Meteor.call('checkInventoryAvailability', product._id, variant._id, {
+      const preInventoryAvailable = Meteor.call('rentalProducts/checkInventoryAvailability', product._id, variant._id, {
         startTime: moment().startOf('day').add(daysTilRental, 'days').toDate(),
         endTime: moment().startOf('day').add(daysTilRental + rentalLength, 'days').toDate()
       }, quantity);
 
-      Meteor.call('rentalInventoryAdjust', order._id);
+      Meteor.call('rentalProducts/rentalInventoryAdjust', order._id);
       const updatedProduct = Products.findOne(product._id);
       const updatedVariant = product.variants[0];
       expect(updatedVariant.unavailableDates.length).toEqual(rentalLength + 1);
-      postInventoryAvailable = Meteor.call('checkInventoryAvailability', updatedProduct._id, updatedVariant._id, {
+      postInventoryAvailable = Meteor.call('rentalProducts/checkInventoryAvailability', updatedProduct._id, updatedVariant._id, {
         startTime: moment().startOf('day').add(daysTilRental, 'days').toDate(),
         endTime: moment().startOf('day').add(daysTilRental + rentalLength, 'days').toDate()
       }, quantity);

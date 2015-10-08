@@ -27,7 +27,7 @@ Meteor.methods({
    *   variantId - the id of the variant to which we are adding a product event
    *   eventDoc - An object containing the information for the event
    */
-  createProductEvent: function (variantId, eventDoc) {
+  'rentalProducts/createProductEvent': function (variantId, eventDoc) {
     check(variantId, String);
 
     check(eventDoc, {
@@ -80,7 +80,7 @@ Meteor.methods({
   #
    * returns array of available (inventory) variant ids
    */
-  checkInventoryAvailability: function (productId, variantId, reservationRequest, quantity = 1) {
+  'rentalProducts/checkInventoryAvailability': function (productId, variantId, reservationRequest, quantity = 1) {
     check(productId, String);
     check(variantId, String);
     check(reservationRequest, {

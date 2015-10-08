@@ -3,7 +3,7 @@ Meteor.methods({
   /*
    * adjust inventory when an order is placed
    */
-  rentalInventoryAdjust: function (orderId) {
+  'rentalProducts/inventoryAdjust': function (orderId) {
     // var datesToReserve, i, iter, j, len, len1, order, orderProduct, positionToInsert, product, ref, reservedDates, variantId, variantIds;
     check(orderId, String);
 
@@ -21,7 +21,7 @@ Meteor.methods({
          * loop through adding one day to array
          * stop when we get to end day + trailing buffer
          */
-        let variantIds = Meteor.call('checkInventoryAvailability',
+        let variantIds = Meteor.call('rentalProducts/checkInventoryAvailability',
                                       product._id,
                                       orderProduct.variants._id,
                                       {endTime: order.endTime, startTime: order.startTime},
