@@ -1,0 +1,34 @@
+machine:
+  node:
+    version: 0.10.40
+  services:
+    - docker
+  pre:
+    - meteor update || curl https://install.meteor.com | /bin/sh
+    - npm install velocity-cli -g
+
+dependencies:
+  cache_directories:
+    - "~/.meteor"
+
+  override:
+    - cd $HOME/reaction
+    - chmod +x bin/clone-packages.sh
+    - ./bin/clone-packages.sh
+    - git clone https://github.com/getoutfitted/reaction-rental-products packages/reaction-rental-products
+    - meteor update
+    - docker build -t reactioncommerce/prequel .
+
+test:
+  override:
+    - cd $HOME/reaction
+    - velocity test-package getoutfitted:reaction-rental-products
+    - docker run -d -p :80:80 reactioncommerce/prequel; sleep 10
+    - curl --retry 10 --retry-delay 5 -v http://localhost
+
+deployment:
+  hub:
+    branch: development
+    commands:
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - docker push reactioncommerce/prequel
