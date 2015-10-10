@@ -1,10 +1,8 @@
 Meteor.methods({
-
   /*
    * adjust inventory when an order is placed
    */
   'rentalProducts/inventoryAdjust': function (orderId) {
-    // var datesToReserve, i, iter, j, len, len1, order, orderProduct, positionToInsert, product, ref, reservedDates, variantId, variantIds;
     check(orderId, String);
 
     const order = Orders.findOne(orderId);

@@ -33,7 +33,8 @@ Package.onUse(function (api) {
   api.addFiles([
     'server/methods/rentalProducts.js',
     'server/methods/orders.js',
-    'server/factories.js'
+    'server/factories.js',
+    'server/hooks.js'
   ], ['server']);
 
   api.addFiles([
