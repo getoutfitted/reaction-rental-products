@@ -14,13 +14,8 @@ ReactionCore.registerPackage({
       provides: 'settings',
       container: 'dashboard'
     }, {
-      route: 'rentals',
-      label: 'Rentals',
-      provides: 'shortcut',
-      icon: 'fa fa-plus'
-    }, {
       route: 'createRentalType',
-      label: 'Create Rental Type',
+      label: 'Create Rental Product',
       icon: 'fa fa-plus',
       provides: 'shortcut'
     }

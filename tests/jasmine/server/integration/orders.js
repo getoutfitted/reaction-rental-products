@@ -1,5 +1,5 @@
 describe('getoutfitted:reaction-rental-products orders methods', function () {
-  describe('rentalInventoryAdjust', function () {
+  describe('rentalProducts/inventoryAdjust', function () {
     beforeEach(function () {
       Products.remove({});
       return Orders.remove({});
@@ -28,9 +28,9 @@ describe('getoutfitted:reaction-rental-products orders methods', function () {
         endTime: moment().startOf('day').add(daysTilRental + rentalLength, 'days').toDate()
       }, quantity);
 
-      Meteor.call('rentalProducts/rentalInventoryAdjust', order._id);
+      Meteor.call('rentalProducts/inventoryAdjust', order._id);
       const updatedProduct = Products.findOne(product._id);
-      const updatedVariant = product.variants[0];
+      const updatedVariant = updatedProduct.variants[0];
       expect(updatedVariant.unavailableDates.length).toEqual(rentalLength + 1);
       postInventoryAvailable = Meteor.call('rentalProducts/checkInventoryAvailability', updatedProduct._id, updatedVariant._id, {
         startTime: moment().startOf('day').add(daysTilRental, 'days').toDate(),
