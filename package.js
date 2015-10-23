@@ -62,4 +62,5 @@ Package.onTest(function (api) {
 
   api.addFiles('tests/jasmine/server/integration/rentalProducts.js', 'server');
   api.addFiles('tests/jasmine/server/integration/orders.js', 'server');
+  api.addFiles('tests/jasmine/server/integration/cart.js', 'server');
 });
