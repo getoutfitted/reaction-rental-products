@@ -152,7 +152,7 @@
     }],
     "new-cap": [2, { // http://eslint.org/docs/rules/new-cap
       "newIsCap": true,
-      "capIsNewExceptions": ["Optional"],
+      "capIsNewExceptions": ["Optional", "Match", "OneOf"],
     }],
     "no-multiple-empty-lines": [2, { // http://eslint.org/docs/rules/no-multiple-empty-lines
       "max": 2

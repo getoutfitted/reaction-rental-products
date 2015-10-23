@@ -1,7 +1,7 @@
 Package.describe({
   summary: 'Reaction Rental Products - Enable rental and for-hire products',
   name: 'getoutfitted:reaction-rental-products',
-  version: '0.0.1',
+  version: '0.0.2',
   git: 'https://github.com/getoutfitted/reaction-rental-products.git'
 });
 
@@ -33,6 +33,7 @@ Package.onUse(function (api) {
   api.addFiles([
     'server/methods/rentalProducts.js',
     'server/methods/orders.js',
+    'server/methods/cart.js',
     'server/factories.js',
     'server/hooks.js'
   ], ['server']);
