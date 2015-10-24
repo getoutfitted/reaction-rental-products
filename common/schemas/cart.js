@@ -28,6 +28,26 @@ ReactionCore.Schemas.RentalCart = new SimpleSchema([
       type: Date,
       optional: true
     },
+    rentalMonths: {
+      type: Number,
+      optional: true
+    },
+    rentalWeeks: {
+      type: Number,
+      optional: true
+    },
+    rentalDays: {
+      type: Number,
+      optional: true
+    },
+    rentalHours: {
+      type: Number,
+      optional: true
+    },
+    rentalMinutes: {
+      type: Number,
+      optional: true
+    },
     items: {
       type: [ReactionCore.Schemas.RentalCartItem],
       optional: true
