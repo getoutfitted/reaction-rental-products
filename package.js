@@ -22,6 +22,7 @@ Package.onUse(function (api) {
   api.use('matb33:collection-hooks');
   api.use('meteor-platform@1.2.1');
   api.use('reactioncommerce:core@0.9.0', ['client', 'server']);
+  api.use('rajit:bootstrap3-datepicker@1.4.1', ['client']);
 
   api.imply('momentjs:moment'); // Make moment available to all packages
   api.imply('momentjs:twix'); // Make moment twix available to all packages
@@ -43,8 +44,14 @@ Package.onUse(function (api) {
     'common/schemas/orders.js',
     'common/schemas/cart.js',
     'common/collections.js',
-    'common/hooks.js'
+    'common/hooks.js',
+    'common/routes.js'
   ], ['client', 'server']);
+
+  api.addFiles([
+    'client/datepicker.html',
+    'client/datepicker.js'
+  ], ['client']);
 });
 
 Package.onTest(function (api) {
