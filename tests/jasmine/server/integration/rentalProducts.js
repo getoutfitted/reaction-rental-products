@@ -1,4 +1,60 @@
 describe('getoutfitted:reaction-rental-products methods', function () {
+  describe('rentalProducts/setProductTypeToRental', function () {
+    beforeEach(function () {
+      Products.remove({});
+    });
+
+    it('should throw 403 error by non admin', function (done) {
+      spyOn(Roles, 'userIsInRole').and.returnValue(false);
+      const product = Factory.create('product');
+      spyOn(Products, 'update');
+
+      expect(function () {
+        Meteor.call('rentalProducts/setProductTypeToRental', product._id);
+      }).toThrow(new Meteor.Error(403, 'Access Denied'));
+
+      expect(Products.update).not.toHaveBeenCalled();
+      done();
+    });
+
+    it('should set product type to rental by admin', function (done) {
+      spyOn(Roles, 'userIsInRole').and.returnValue(true);
+      const product = Factory.create('product');
+
+      expect(_.size(product.variants)).toEqual(1);
+      Meteor.call('rentalProducts/setProductTypeToRental', product._id);
+
+      const updatedProduct = Products.findOne(product._id);
+      expect(updatedProduct.type).toEqual('rental');
+      done();
+    });
+
+    it('should initialize unavailable dates for variants', function (done) {
+      spyOn(Roles, 'userIsInRole').and.returnValue(true);
+      const product = Factory.create('product');
+
+      expect(_.size(product.variants)).toEqual(1);
+      Meteor.call('rentalProducts/setProductTypeToRental', product._id);
+
+      const updatedProduct = Products.findOne(product._id);
+      expect(updatedProduct.variants[0].unavailableDates).toEqual([]);
+      done();
+    });
+
+    it('should initialize pricePerDay for variants', function (done) {
+      spyOn(Roles, 'userIsInRole').and.returnValue(true);
+      const product = Factory.create('product');
+
+      expect(_.size(product.variants)).toEqual(1);
+      Meteor.call('rentalProducts/setProductTypeToRental', product._id);
+
+      const updatedProduct = Products.findOne(product._id);
+      expect(updatedProduct.variants[0].pricePerDay).toEqual(product.variants.price);
+      done();
+    });
+  });
+
+  // TODO: depricate this in favor of rentalProducts/cloneVariant method
   describe('cloneRentalVariant', function () {
     beforeEach(function () {
       Products.remove({});
@@ -118,7 +174,8 @@ describe('getoutfitted:reaction-rental-products methods', function () {
     });
   });
 
-  describe('createProductEvent', function () {
+// TODO: Depricate this in favor of advanced fulfillment solution.
+  describe('rentalProducts/createProductEvent', function () {
     let productEvents = {};
 
     beforeEach(function () {
@@ -186,7 +243,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
     });
   });
 
-  return describe('checkVariantAvailability', function () {
+  return describe('rentalProducts/checkVariantAvailability', function () {
     beforeEach(function () {
       Products.remove({});
     });
