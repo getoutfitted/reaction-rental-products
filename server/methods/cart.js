@@ -8,7 +8,6 @@ Meteor.methods({
       return false;
     }
     const rental = moment(startTime).twix(endTime);
-    ReactionCore.Log.info('Days: ' + rental.count('days'));
     Cart.update({
       _id: cartId
     }, {
