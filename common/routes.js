@@ -14,6 +14,6 @@ RentalProductsController = ShopController.extend({
 
 Router.route('datepicker', {
   path: 'datepicker',
-  template: 'rentalProducts-datepicker',
+  template: 'rentalProductsDatepicker',
   controller: RentalProductsController
 });

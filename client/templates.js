@@ -1,0 +1,1 @@
+Template.rentalCartDrawer.replaces('cartDrawer');
