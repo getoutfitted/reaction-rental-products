@@ -21,6 +21,33 @@ function checkAvailability(reservedDates, requestedDates) {
 }
 
 Meteor.methods({
+  /**
+   * rentalProducts/setProductTypeToRental
+   * @param   {String} productId - Product Id to update
+   * @returns {undefined} - on the client
+   */
+
+  'rentalProducts/setProductTypeToRental': function (productId) {
+    check(productId, String);
+    // user needs create product permission to change type.
+    if (!ReactionCore.hasPermission('createProduct')) {
+      throw new Meteor.Error(403, 'Access Denied');
+    }
+
+    const product = ReactionCore.Collections.Products.findOne(productId);
+    let variants = product.variants;
+    _.each(variants, function (variant) {
+      if (variant.type !== 'inventory') {
+        _.defaults(variant, {pricePerDay: variant.price, unavailableDates: []});
+        if (variant.pricePerDay === 0) {
+          variant.pricePerDay = variant.price;
+        }
+      }
+    });
+
+    return ReactionCore.Collections.Products.update({_id: productId}, {$set: {type: 'rental', variants: variants}});
+  },
+
   /*
    * Push an event to a specific variant
    * params:
