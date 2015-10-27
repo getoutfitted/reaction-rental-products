@@ -16,10 +16,26 @@ Template.rentalProductsDatepicker.helpers({
     return '';
   },
 
+  startDateHuman: function () {
+    let cart = ReactionCore.Collections.Cart.findOne();
+    if (cart && cart.startTime) {
+      return moment(cart.startTime).format('MMM DD, YYYY');
+    }
+    return '';
+  },
+
   endDate: function () {
     let cart = ReactionCore.Collections.Cart.findOne();
     if (cart && cart.endTime) {
       return moment(cart.endTime).format('MM/DD/YYYY');
+    }
+    return '';
+  },
+
+  endDateHuman: function () {
+    let cart = ReactionCore.Collections.Cart.findOne();
+    if (cart && cart.endTime) {
+      return moment(cart.endTime).format('MMM DD, YYYY');
     }
     return '';
   },
@@ -35,8 +51,8 @@ Template.rentalProductsDatepicker.helpers({
 
 Template.rentalProductsDatepicker.events({
   'changeDate .start': function (event) {
-    let cart = ReactionCore.Collections.Cart.findOne();
-    let startDate = moment(event.currentTarget.value, 'MM/DD/YYYY');
+    const cart = ReactionCore.Collections.Cart.findOne();
+    const startDate = moment(event.currentTarget.value, 'MM/DD/YYYY');
     let endDate;
     if (cart.endTime) {
       endDate = moment(cart.endTime);
@@ -45,9 +61,10 @@ Template.rentalProductsDatepicker.events({
     }
 
     if (+startDate !== +cart.startTime || +endDate !== +cart.endTime) {
-      let cartRentalLength = moment(startDate).twix(endDate).count('days');
+      const cartRentalLength = moment(startDate).twix(endDate).count('days');
       Session.set('cartRentalLength', cartRentalLength);
       Meteor.call('rentalProducts/setRentalPeriod', cart._id, startDate.toDate(), endDate.toDate());
+      $('#datepicker .end').datepicker('show');
     }
   },
 
@@ -65,5 +82,13 @@ Template.rentalProductsDatepicker.events({
       Session.set('cartRentalLength', cartRentalLength);
       Meteor.call('rentalProducts/setRentalPeriod', cart._id, startDate.toDate(), endDate.toDate());
     }
+  },
+
+  'click .startHuman': function () {
+    $('#datepicker .start').datepicker('show');
+  },
+
+  'click .endHuman': function () {
+    $('#datepicker .end').datepicker('show');
   }
 });
