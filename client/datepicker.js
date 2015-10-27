@@ -43,14 +43,10 @@ Template.rentalProductsDatepicker.events({
     } else {
       endDate = moment(startDate);
     }
-    console.log('hit');
+
     if (+startDate !== +cart.startTime || +endDate !== +cart.endTime) {
       let cartRentalLength = moment(startDate).twix(endDate).count('days');
       Session.set('cartRentalLength', cartRentalLength);
-
-      console.log('hit start');
-      console.log('stored start date?', +startDate === +cart.startTime);
-      console.log('stored end date?', +endDate === +cart.endTime);
       Meteor.call('rentalProducts/setRentalPeriod', cart._id, startDate.toDate(), endDate.toDate());
     }
   },
@@ -67,10 +63,6 @@ Template.rentalProductsDatepicker.events({
     if (+startDate !== +cart.startTime || +endDate !== +cart.endTime) {
       let cartRentalLength = moment(startDate).twix(endDate).count('days');
       Session.set('cartRentalLength', cartRentalLength);
-
-      console.log('hit end');
-      console.log('stored start date?', +startDate.toDate() === +cart.startTime);
-      console.log('stored end date?', +endDate.toDate() === +cart.endTime);
       Meteor.call('rentalProducts/setRentalPeriod', cart._id, startDate.toDate(), endDate.toDate());
     }
   }
