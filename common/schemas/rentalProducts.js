@@ -119,7 +119,6 @@ ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
     pricePerWeek: {
       label: 'Weekly Rate',
       type: Number,
-      defaultValue: 0.0,
       decimal: true,
       min: 0,
       optional: true

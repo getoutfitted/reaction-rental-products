@@ -10,13 +10,13 @@ let takenDates = [
   moment().startOf('day').add(16, 'days').toDate()
 ];
 
-function randomVariant(type, variantSharedId, variantTakenDates) {
-  return {
-    _id: type === 'parent' ? variantSharedId : Random.id(),
-    parentId: type === 'parent' ? '' : variantSharedId,
-    type: type === 'inventory' ? 'inventory' : 'rentalVariant',
+function randomVariant(options = {}) {
+  defaults = {
+    _id: Random.id(),
+    parentId: '',
+    type: 'inventory',
     active: true,
-    unavailableDates: type === 'inventory' ? variantTakenDates : [],
+    unavailableDates: [],
     status: 'En Route',
     currentLocation: {
       coords: {
@@ -69,6 +69,8 @@ function randomVariant(type, variantSharedId, variantTakenDates) {
       }
     ]
   };
+
+  return _.defaults(options, defaults);
 }
 
 Factory.define('rentalProduct', ReactionCore.Collections.Products, Factory.extend('product', {
@@ -76,7 +78,7 @@ Factory.define('rentalProduct', ReactionCore.Collections.Products, Factory.exten
   preparationBuffer: 3,
   variants: function () {
     return [
-      randomVariant('random', '')
+      randomVariant()
     ];
   }
 }));
@@ -84,20 +86,31 @@ Factory.define('rentalProduct', ReactionCore.Collections.Products, Factory.exten
 Factory.define('rentalProductWithInventory', ReactionCore.Collections.Products, Factory.extend('rentalProduct', {
   variants: function () {
     return [
-      randomVariant('parent', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('random', '')
+      randomVariant({_id: sharedId}),
+      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
+      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
+      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
+      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
+      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
+      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
+      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
+      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
+      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
+      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
+      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
+      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
+      randomVariant()
+    ];
+  }
+}));
+
+Factory.define('theProductFormerlyKnownAsRental', ReactionCore.Collections.Products, Factory.extend('product', {
+  productType: 'simple',
+  preparationBuffer: 3,
+  variants: function () {
+    return [
+      randomVariant({_id: sharedId}),
+      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates})
     ];
   }
 }));

@@ -20,7 +20,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
     it('should set product type to rental by admin', function (done) {
       spyOn(Roles, 'userIsInRole').and.returnValue(true);
       const product = Factory.create('product');
-
+      expect(product.type).toEqual('simple');
       expect(_.size(product.variants)).toEqual(1);
       Meteor.call('rentalProducts/setProductTypeToRental', product._id);
 
@@ -35,7 +35,6 @@ describe('getoutfitted:reaction-rental-products methods', function () {
 
       expect(_.size(product.variants)).toEqual(1);
       Meteor.call('rentalProducts/setProductTypeToRental', product._id);
-
       const updatedProduct = Products.findOne(product._id);
       expect(updatedProduct.variants[0].unavailableDates).toEqual([]);
       done();
@@ -49,7 +48,46 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       Meteor.call('rentalProducts/setProductTypeToRental', product._id);
 
       const updatedProduct = Products.findOne(product._id);
-      expect(updatedProduct.variants[0].pricePerDay).toEqual(product.variants.price);
+      expect(updatedProduct.variants[0].pricePerDay).toEqual(product.variants[0].price);
+      done();
+    });
+
+    it('should not initialize inventory variants', function (done) {
+      spyOn(Roles, 'userIsInRole').and.returnValue(true);
+      const product = Factory.create('theProductFormerlyKnownAsRental');
+      expect(product.type).toEqual('simple');
+      expect(product.variants.length).toEqual(2);
+
+      Meteor.call('rentalProducts/setProductTypeToRental', product._id);
+      const updatedProduct = Products.findOne(product._id);
+      expect(updatedProduct.type).toEqual('rental');
+      expect(updatedProduct.variants[1].rentalPrice).toBeUndefined();
+      done();
+    });
+
+    it('should not update previously set variant price per day', function (done) {
+      spyOn(Roles, 'userIsInRole').and.returnValue(true);
+      const product = Factory.create('theProductFormerlyKnownAsRental');
+      expect(product.type).toEqual('simple');
+      expect(product.variants.length).toEqual(2);
+
+      Meteor.call('rentalProducts/setProductTypeToRental', product._id);
+      const updatedProduct = Products.findOne(product._id);
+      expect(updatedProduct.type).toEqual('rental');
+      expect(updatedProduct.variants[0].rentalPrice).toEqual(product.variants[0].rentalPrice);
+      done();
+    });
+
+    it('should not update previously set variant unavailable dates', function (done) {
+      spyOn(Roles, 'userIsInRole').and.returnValue(true);
+      const product = Factory.create('theProductFormerlyKnownAsRental');
+      expect(product.type).toEqual('simple');
+      expect(product.variants.length).toEqual(2);
+
+      Meteor.call('rentalProducts/setProductTypeToRental', product._id);
+      const updatedProduct = Products.findOne(product._id);
+      expect(updatedProduct.type).toEqual('rental');
+      expect(updatedProduct.variants[0].unavailableDates).toEqual(product.variants[0].unavailableDates);
       done();
     });
   });
