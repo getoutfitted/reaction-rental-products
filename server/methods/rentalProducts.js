@@ -27,25 +27,31 @@ Meteor.methods({
    * @returns {undefined} - on the client
    */
 
-  'rentalProducts/setProductTypeToRental': function (productId) {
+  'rentalProducts/setProductType': function (productId, productType) {
     check(productId, String);
+    check(productType, String);
     // user needs create product permission to change type.
     if (!ReactionCore.hasPermission('createProduct')) {
       throw new Meteor.Error(403, 'Access Denied');
     }
 
     const product = ReactionCore.Collections.Products.findOne(productId);
-    let variants = product.variants;
-    _.each(variants, function (variant) {
-      if (variant.type !== 'inventory') {
-        _.defaults(variant, {pricePerDay: variant.price, unavailableDates: []});
-        if (variant.pricePerDay === 0) {
-          variant.pricePerDay = variant.price;
+    ReactionCore.Log.info('Set product type to ' + productType);
+    // if product type is rental, setup variants.
+    if (productType === 'rental') {
+      let variants = product.variants;
+      _.each(variants, function (variant) {
+        if (variant.type !== 'inventory') {
+          _.defaults(variant, {pricePerDay: variant.price, unavailableDates: []});
+          if (variant.pricePerDay === 0) {
+            variant.pricePerDay = variant.price;
+          }
         }
-      }
-    });
+      });
+      return ReactionCore.Collections.Products.update({_id: productId}, {$set: {type: 'rental', variants: variants}});
+    }
 
-    return ReactionCore.Collections.Products.update({_id: productId}, {$set: {type: 'rental', variants: variants}});
+    return ReactionCore.Collections.Products.update({_id: productId}, {$set: {type: 'simple'}});
   },
 
   /*

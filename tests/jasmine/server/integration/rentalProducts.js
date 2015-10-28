@@ -1,5 +1,5 @@
 describe('getoutfitted:reaction-rental-products methods', function () {
-  describe('rentalProducts/setProductTypeToRental', function () {
+  describe('rentalProducts/setProductType', function () {
     beforeEach(function () {
       Products.remove({});
     });
@@ -10,7 +10,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       spyOn(Products, 'update');
 
       expect(function () {
-        Meteor.call('rentalProducts/setProductTypeToRental', product._id);
+        Meteor.call('rentalProducts/setProductType', product._id, 'rental');
       }).toThrow(new Meteor.Error(403, 'Access Denied'));
 
       expect(Products.update).not.toHaveBeenCalled();
@@ -22,7 +22,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       const product = Factory.create('product');
       expect(product.type).toEqual('simple');
       expect(_.size(product.variants)).toEqual(1);
-      Meteor.call('rentalProducts/setProductTypeToRental', product._id);
+      Meteor.call('rentalProducts/setProductType', product._id, 'rental');
 
       const updatedProduct = Products.findOne(product._id);
       expect(updatedProduct.type).toEqual('rental');
@@ -34,7 +34,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       const product = Factory.create('product');
 
       expect(_.size(product.variants)).toEqual(1);
-      Meteor.call('rentalProducts/setProductTypeToRental', product._id);
+      Meteor.call('rentalProducts/setProductType', product._id, 'rental');
       const updatedProduct = Products.findOne(product._id);
       expect(updatedProduct.variants[0].unavailableDates).toEqual([]);
       done();
@@ -45,7 +45,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       const product = Factory.create('product');
 
       expect(_.size(product.variants)).toEqual(1);
-      Meteor.call('rentalProducts/setProductTypeToRental', product._id);
+      Meteor.call('rentalProducts/setProductType', product._id, 'rental');
 
       const updatedProduct = Products.findOne(product._id);
       expect(updatedProduct.variants[0].pricePerDay).toEqual(product.variants[0].price);
@@ -58,7 +58,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       expect(product.type).toEqual('simple');
       expect(product.variants.length).toEqual(2);
 
-      Meteor.call('rentalProducts/setProductTypeToRental', product._id);
+      Meteor.call('rentalProducts/setProductType', product._id, 'rental');
       const updatedProduct = Products.findOne(product._id);
       expect(updatedProduct.type).toEqual('rental');
       expect(updatedProduct.variants[1].rentalPrice).toBeUndefined();
@@ -71,7 +71,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       expect(product.type).toEqual('simple');
       expect(product.variants.length).toEqual(2);
 
-      Meteor.call('rentalProducts/setProductTypeToRental', product._id);
+      Meteor.call('rentalProducts/setProductType', product._id, 'rental');
       const updatedProduct = Products.findOne(product._id);
       expect(updatedProduct.type).toEqual('rental');
       expect(updatedProduct.variants[0].rentalPrice).toEqual(product.variants[0].rentalPrice);
@@ -84,7 +84,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       expect(product.type).toEqual('simple');
       expect(product.variants.length).toEqual(2);
 
-      Meteor.call('rentalProducts/setProductTypeToRental', product._id);
+      Meteor.call('rentalProducts/setProductType', product._id, 'rental');
       const updatedProduct = Products.findOne(product._id);
       expect(updatedProduct.type).toEqual('rental');
       expect(updatedProduct.variants[0].unavailableDates).toEqual(product.variants[0].unavailableDates);
