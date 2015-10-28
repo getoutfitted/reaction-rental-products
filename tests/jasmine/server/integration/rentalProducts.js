@@ -122,8 +122,6 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       expect(_.size(updatedProduct.variants)).toEqual(2);
       expect(updatedProduct.variants[0].unavailableDates).toEqual([]);
       expect(updatedProduct.variants[1].unavailableDates).toEqual([]);
-      expect(updatedProduct.variants[0].active).toEqual(true);
-      expect(updatedProduct.variants[1].active).toEqual(true);
       done();
     });
 
@@ -207,7 +205,6 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       const variant = product.variants[0];
       expect(product.productType).toEqual('rental');
       expect(variant.events[0].title).toEqual('Inbounded');
-      expect(variant.active).toEqual(true);
       done();
     });
   });

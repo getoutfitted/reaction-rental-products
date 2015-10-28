@@ -2,7 +2,7 @@ describe('getoutfitted:reaction-rental-products orders methods', function () {
   describe('rentalProducts/inventoryAdjust', function () {
     beforeEach(function () {
       Products.remove({});
-      return Orders.remove({});
+      Orders.remove({});
     });
 
     it('should reserve dates requested', function (done) {
@@ -19,7 +19,8 @@ describe('getoutfitted:reaction-rental-products orders methods', function () {
             _id: faker.random.uuid(),
             productId: product._id,
             variants: variant,
-            quantity: quantity
+            quantity: quantity,
+            type: 'rental'
           }
         ]
       });

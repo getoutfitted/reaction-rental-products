@@ -63,4 +63,35 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
       done();
     });
   });
+
+  describe('before:cart/addToCart', function () {
+    beforeEach(function () {
+      Cart.remove({});
+      Products.remove({});
+    });
+
+    it('should have standard product price if product is "simple" type', function (done) {
+      const product = Factory.create('product');
+      const emptyCart = Factory.create('cart', {items: []});
+      Meteor.call('cart/addToCart', emptyCart._id, product._id, product.variants[0], '1');
+      const cart = Cart.findOne(emptyCart._id);
+      expect(cart.items[0].variants.price).toEqual(product.variants[0].price);
+      expect(cart.items[0].quantity).toEqual(1);
+      expect(cart.items.length).toEqual(1);
+      expect(cart.cartSubTotal()).toEqual(product.variants[0].price.toFixed(2));
+      done();
+    });
+
+    it('should calculate rental price if product is "rental" type', function (done) {
+      const product = Factory.create('rentalProductWithInventory');
+      const emptyCart = Factory.create('rentalCart', {items: []});
+      Meteor.call('cart/addToCart', emptyCart._id, product._id, product.variants[0], '1');
+      const cart = Cart.findOne(emptyCart._id);
+      expect(cart.items[0].variants.price).toEqual(product.variants[0].pricePerDay * cart.rentalDays);
+      expect(cart.items[0].quantity).toEqual(1);
+      expect(cart.items.length).toEqual(1);
+      expect(cart.cartSubTotal()).toEqual(Number(product.variants[0].pricePerDay * cart.rentalDays).toFixed(2));
+      done();
+    });
+  });
 });
