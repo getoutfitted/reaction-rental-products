@@ -51,6 +51,8 @@ Package.onUse(function (api) {
 
   api.addFiles([
     'client/templates/cart/cartDrawer/rentalCartDrawer.html',
+    'client/templates/products/productDetail/rentalProductDetail.html',
+    'client/templates/products/productDetail/rentalProductDetail.js',
     'client/datepicker.html',
     'client/datepicker.js',
     'client/templates.js'
