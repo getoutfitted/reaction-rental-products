@@ -53,6 +53,8 @@ Package.onUse(function (api) {
     'client/templates/cart/cartDrawer/rentalCartDrawer.html',
     'client/templates/products/productDetail/rentalProductDetail.html',
     'client/templates/products/productDetail/rentalProductDetail.js',
+    'client/templates/products/productDetail/variantForm/rentalVariantForm.html',
+    'client/templates/products/productDetail/variantForm/rentalVariantForm.js',
     'client/datepicker.html',
     'client/datepicker.js',
     'client/templates.js'
