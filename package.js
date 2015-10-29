@@ -50,6 +50,12 @@ Package.onUse(function (api) {
     'common/routes.js'
   ], ['client', 'server']);
 
+  // Helpers
+  api.addFiles([
+    'client/helpers/products.js'
+  ], ['client']);
+
+  // templates
   api.addFiles([
     'client/templates/cart/cartDrawer/rentalCartDrawer.html',
     'client/templates/products/productDetail/rentalProductDetail.html',
