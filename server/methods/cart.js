@@ -4,9 +4,25 @@ Meteor.methods({
     check(startTime, Date);
     check(endTime, Date);
     const cart = ReactionCore.Collections.Cart.findOne(cartId);
+    // Make sure that cart is owned by current user.
     if (cart.userId !== Meteor.userId()) {
       return false;
     }
+
+    // If cart has items in it - update the price for those items
+    if (cart.items.length > 0) {
+      // Update price of each item in cart based on rental lengthInDays
+      _.map(cart.items, function (item) {
+        if (item.type === 'rental') {
+          ReactionCore.Log.info('Updating item price');
+          ReactionCore.Log.info(item.variants.price);
+          item.variants.price = item.variants.pricePerDay * cart.rentalDays;
+          ReactionCore.Log.info(item.variants.price);
+        }
+        return item;
+      });
+    }
+
     const rental = moment(startTime).twix(endTime);
     Cart.update({
       _id: cartId

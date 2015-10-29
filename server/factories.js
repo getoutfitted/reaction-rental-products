@@ -86,27 +86,6 @@ Factory.define('rentalProduct', ReactionCore.Collections.Products, Factory.exten
   }
 }));
 
-// Factory.define('rentalProductWithAvailableInventory', ReactionCore.Collections.Products, Factory.extend('rentalProduct', {
-//   variants: function () {
-//     return [
-//       randomVariant({_id: sharedId}),
-//       randomVariant({type: 'inventory', parentId: sharedId}),
-//       randomVariant({type: 'inventory', parentId: sharedId}),
-//       randomVariant({type: 'inventory', parentId: sharedId}),
-//       randomVariant({type: 'inventory', parentId: sharedId}),
-//       randomVariant({type: 'inventory', parentId: sharedId}),
-//       randomVariant({type: 'inventory', parentId: sharedId}),
-//       randomVariant({type: 'inventory', parentId: sharedId}),
-//       randomVariant({type: 'inventory', parentId: sharedId}),
-//       randomVariant({type: 'inventory', parentId: sharedId}),
-//       randomVariant({type: 'inventory', parentId: sharedId}),
-//       randomVariant({type: 'inventory', parentId: sharedId}),
-//       randomVariant({type: 'inventory', parentId: sharedId}),
-//       randomVariant()
-//     ];
-//   }
-// }));
-
 Factory.define('rentalProductWithInventory', ReactionCore.Collections.Products, Factory.extend('rentalProduct', {
   variants: function () {
     return [
