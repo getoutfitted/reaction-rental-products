@@ -84,6 +84,54 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
       expect(updatedCart.cartSubTotal()).toEqual(Number(product.variants[0].pricePerDay * updatedCart.rentalDays).toFixed(2));
       done();
     });
+
+    it('should only update rental item prices if cart rental length changes', function (done) {
+      const rentalProduct = Factory.create('rentalProductWithInventory');
+      const product = Factory.create('product');
+      const emptyCart = Factory.create('rentalCart', {items: []});
+      const daysTilRental = _.random(7, 30);
+      const rentalLength = _.random(1, 14);
+      const startTime = moment().startOf('day').add(daysTilRental, 'days').toDate();
+      const endTime = moment().endOf('day').add(daysTilRental + rentalLength - 1, 'days').toDate();
+      const lengthInDays = moment(startTime).twix(endTime).count('days');
+
+      // add simple and rental products to cart
+      Meteor.call('cart/addToCart', emptyCart._id, rentalProduct._id, rentalProduct.variants[0], '1');
+      Meteor.call('cart/addToCart', emptyCart._id, product._id, product.variants[0], '1');
+      const cart = Cart.findOne(emptyCart._id);
+      expect(cart.cartSubTotal()).toEqual(
+        Number(rentalProduct.variants[0].pricePerDay * cart.rentalDays + product.variants[0].price).toFixed(2));
+
+      spyOn(Meteor, 'userId').and.returnValue(cart.userId);
+      Meteor.call('rentalProducts/setRentalPeriod', emptyCart._id, startTime, endTime);
+      const updatedCart = Cart.findOne(emptyCart._id);
+      expect(updatedCart.rentalDays).toEqual(lengthInDays);
+      expect(updatedCart.cartSubTotal()).toEqual(
+        Number(rentalProduct.variants[0].pricePerDay * updatedCart.rentalDays + product.variants[0].price).toFixed(2));
+      done();
+    });
+
+    it('should only update rental item prices if cart rental length changes', function (done) {
+      const product = Factory.create('product');
+      const emptyCart = Factory.create('rentalCart', {items: []});
+      const daysTilRental = _.random(7, 30);
+      const rentalLength = _.random(1, 14);
+      const startTime = moment().startOf('day').add(daysTilRental, 'days').toDate();
+      const endTime = moment().endOf('day').add(daysTilRental + rentalLength - 1, 'days').toDate();
+      const lengthInDays = moment(startTime).twix(endTime).count('days');
+
+      // Add simple product to cart
+      Meteor.call('cart/addToCart', emptyCart._id, product._id, product.variants[0], '1');
+      const cart = Cart.findOne(emptyCart._id);
+      expect(cart.cartSubTotal()).toEqual(product.variants[0].price.toFixed(2));
+
+      spyOn(Meteor, 'userId').and.returnValue(cart.userId);
+      Meteor.call('rentalProducts/setRentalPeriod', emptyCart._id, startTime, endTime);
+      const updatedCart = Cart.findOne(emptyCart._id);
+      expect(updatedCart.rentalDays).toEqual(lengthInDays);
+      expect(updatedCart.cartSubTotal()).toEqual(product.variants[0].price.toFixed(2));
+      done();
+    });
   });
 
   describe('before:cart/addToCart', function () {
