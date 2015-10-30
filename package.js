@@ -58,12 +58,16 @@ Package.onUse(function (api) {
   // templates
   api.addFiles([
     'client/templates/cart/cartDrawer/rentalCartDrawer.html',
+    'client/templates/products/productGrid/productGrid.html',
+    'client/templates/products/productGrid/productGrid.js',
     'client/templates/products/productDetail/rentalProductDetail.html',
     'client/templates/products/productDetail/rentalProductDetail.js',
-    'client/templates/products/productDetail/variantForm/rentalVariantForm.html',
-    'client/templates/products/productDetail/variantForm/rentalVariantForm.js',
-    'client/templates/products/productDetail/variantForm/childVariant/rentalChildVariant.html',
-    'client/templates/products/productDetail/variantForm/childVariant/rentalChildVariant.js',
+    'client/templates/products/productDetail/variant/variant.html',
+    'client/templates/products/productDetail/variant/variant.js',
+    'client/templates/products/productDetail/variant/variantForm/rentalVariantForm.html',
+    'client/templates/products/productDetail/variant/variantForm/rentalVariantForm.js',
+    'client/templates/products/productDetail/variant/variantForm/childVariant/rentalChildVariant.html',
+    'client/templates/products/productDetail/variant/variantForm/childVariant/rentalChildVariant.js',
     'client/datepicker.html',
     'client/datepicker.js',
     'client/templates.js'
