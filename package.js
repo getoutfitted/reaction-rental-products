@@ -23,6 +23,7 @@ Package.onUse(function (api) {
   api.use('meteor-platform@1.2.1');
   api.use('reactioncommerce:core@0.9.0', ['client', 'server']);
   api.use('aldeed:template-extension@3.4.3');
+  api.use('aldeed:autoform@5.7.1');
   api.use('rajit:bootstrap3-datepicker@1.4.1', ['client']);
 
   api.imply('momentjs:moment'); // Make moment available to all packages
@@ -49,10 +50,24 @@ Package.onUse(function (api) {
     'common/routes.js'
   ], ['client', 'server']);
 
+  // Helpers
+  api.addFiles([
+    'client/helpers/products.js'
+  ], ['client']);
+
+  // templates
   api.addFiles([
     'client/templates/cart/cartDrawer/rentalCartDrawer.html',
+    'client/templates/products/productGrid/productGrid.html',
+    'client/templates/products/productGrid/productGrid.js',
     'client/templates/products/productDetail/rentalProductDetail.html',
     'client/templates/products/productDetail/rentalProductDetail.js',
+    'client/templates/products/productDetail/variant/variant.html',
+    'client/templates/products/productDetail/variant/variant.js',
+    'client/templates/products/productDetail/variant/variantForm/rentalVariantForm.html',
+    'client/templates/products/productDetail/variant/variantForm/rentalVariantForm.js',
+    'client/templates/products/productDetail/variant/variantForm/childVariant/rentalChildVariant.html',
+    'client/templates/products/productDetail/variant/variantForm/childVariant/rentalChildVariant.js',
     'client/datepicker.html',
     'client/datepicker.js',
     'client/templates.js'

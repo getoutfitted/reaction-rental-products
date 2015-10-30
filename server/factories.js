@@ -10,11 +10,14 @@ let takenDates = [
   moment().startOf('day').add(16, 'days').toDate()
 ];
 
+let rentalLength = _.random(1, 12);
+let timeTilRental = _.random(1, 60);
+
 function randomVariant(options = {}) {
   defaults = {
     _id: Random.id(),
     parentId: '',
-    type: 'inventory',
+    type: 'variant',
     active: true,
     unavailableDates: [],
     status: 'En Route',
@@ -74,7 +77,7 @@ function randomVariant(options = {}) {
 }
 
 Factory.define('rentalProduct', ReactionCore.Collections.Products, Factory.extend('product', {
-  productType: 'rental',
+  type: 'rental',
   preparationBuffer: 3,
   variants: function () {
     return [
@@ -105,7 +108,7 @@ Factory.define('rentalProductWithInventory', ReactionCore.Collections.Products, 
 }));
 
 Factory.define('theProductFormerlyKnownAsRental', ReactionCore.Collections.Products, Factory.extend('product', {
-  productType: 'simple',
+  type: 'simple',
   preparationBuffer: 3,
   variants: function () {
     return [
@@ -115,12 +118,17 @@ Factory.define('theProductFormerlyKnownAsRental', ReactionCore.Collections.Produ
   }
 }));
 
-Factory.define('rentalCart', ReactionCore.Collections.Cart, Factory.extend('order', {
-  startTime: new Date,
-  endTime: new Date
+Factory.define('rentalCart', ReactionCore.Collections.Cart, Factory.extend('cart', {
+  startTime: moment(new Date()).add(timeTilRental, 'days').toDate(),
+  endTime: moment(new Date()).add(timeTilRental + rentalLength, 'days').toDate(),
+  rentalDays: rentalLength
+}));
+
+Factory.define('emptyCart', ReactionCore.Collections.Cart, Factory.extend('cart', {
+  items: undefined
 }));
 
 Factory.define('rentalOrder', ReactionCore.Collections.Orders, Factory.extend('order', {
-  startTime: new Date,
-  endTime: new Date
+  startTime: moment(new Date()).add(timeTilRental, 'days').toDate(),
+  endTime: moment(new Date()).add(timeTilRental + rentalLength, 'days').toDate()
 }));

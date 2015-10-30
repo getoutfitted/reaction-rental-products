@@ -14,7 +14,7 @@ Meteor.methods({
 
     for (let orderProduct of order.items) {
       let product = Products.findOne(orderProduct.productId);
-      if (product.productType === 'rental') {
+      if (product.type === 'rental') {
         /* push start date minus pre-buffer days
          * loop through adding one day to array
          * stop when we get to end day + trailing buffer

@@ -102,7 +102,7 @@ ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
       defaultValue: [
         {
           _id: Random.id(),
-          createdAt: new Date,
+          createdAt: new Date(),
           title: 'Inbounded',
           description: 'Added to Inventory'
         }
@@ -141,3 +141,6 @@ ReactionCore.Schemas.RentalProduct = new SimpleSchema([
     }
   }
 ]);
+
+// Update ProductVariant because it's checked against in core in certain methods.
+ReactionCore.Schemas.ProductVariant = ReactionCore.Schemas.RentalProductVariant;

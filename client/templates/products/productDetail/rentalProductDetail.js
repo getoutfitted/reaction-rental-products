@@ -7,6 +7,29 @@ Template.productDetail.helpers({
       }
     }
     return null;
+  },
+  actualRentalOrPurchasablePrice: function () {
+    let childVariants;
+    let purchasableOrRentable;
+    let current = selectedVariant();
+    let product = selectedProduct();
+    let priceType = product.type === 'rental' ? 'pricePerDay' : 'price';
+    if (product && current) {
+      childVariants = (function () {
+        let _results = [];
+        for (let variant of product.variants) {
+          if ((variant !== null ? variant.parentId : void 0) === current._id) {
+            _results.push(variant);
+          }
+        }
+        return _results;
+      })();
+      purchasableOrRentable = childVariants.length > 0 ? false : true;
+    }
+    if (purchasableOrRentable) {
+      return current[priceType];
+    }
+    return getProductPriceOrPricePerDayRange();
   }
 });
 
