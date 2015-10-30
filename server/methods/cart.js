@@ -12,14 +12,15 @@ Meteor.methods({
     check(startTime, Date);
     check(endTime, Date);
     const cart = ReactionCore.Collections.Cart.findOne(cartId);
+    ReactionCore.Log.info(Meteor.userId() + ' ' + cart.userId);
     // Make sure that cart is owned by current user.
     if (cart.userId !== Meteor.userId() && !ReactionCore.hasPermission('editUserCart')) {
-      return false;
+      throw new Meteor.Error('User Id and Cart userId don\'t match');
     }
     const rental = moment(startTime).twix(endTime);
 
     // If cart has items in it - update the price for those items
-    if (cart.items.length > 0) {
+    if (cart.items && cart.items.length > 0) {
       // Update price of each item in cart based on rental lengthInDays
       _.map(cart.items, function (item) {
         if (item.type === 'rental') {
@@ -27,6 +28,8 @@ Meteor.methods({
         }
         return item;
       });
+    } else {
+      cart.items = [];
     }
 
     Cart.update({

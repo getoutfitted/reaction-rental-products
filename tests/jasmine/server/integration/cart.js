@@ -35,6 +35,22 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
       done();
     });
 
+    it('should set rental length in days with empty cart', function (done) {
+      const cart = Factory.create('emptyCart');
+      const daysTilRental = _.random(7, 30);
+      const rentalLength = _.random(1, 14);
+      const startTime = moment().add(daysTilRental, 'days').toDate();
+      const endTime = moment().add(daysTilRental + rentalLength, 'days').toDate();
+      const lengthInDays = moment(startTime).twix(endTime).count('days');
+
+      spyOn(Meteor, 'userId').and.returnValue(cart.userId);
+      Meteor.call('rentalProducts/setRentalPeriod', cart._id, startTime, endTime);
+
+      const updatedCart = Cart.findOne(cart._id);
+      expect(updatedCart.rentalDays).toEqual(lengthInDays);
+      done();
+    });
+
     it('should set rental length in hours', function (done) {
       const cart = Factory.create('cart');
       const daysTilRental = _.random(7, 30);

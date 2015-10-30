@@ -124,6 +124,10 @@ Factory.define('rentalCart', ReactionCore.Collections.Cart, Factory.extend('cart
   rentalDays: rentalLength
 }));
 
+Factory.define('emptyCart', ReactionCore.Collections.Cart, Factory.extend('cart', {
+  items: undefined
+}));
+
 Factory.define('rentalOrder', ReactionCore.Collections.Orders, Factory.extend('order', {
   startTime: moment(new Date()).add(timeTilRental, 'days').toDate(),
   endTime: moment(new Date()).add(timeTilRental + rentalLength, 'days').toDate()
