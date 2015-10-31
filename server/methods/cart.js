@@ -12,7 +12,6 @@ Meteor.methods({
     check(startTime, Date);
     check(endTime, Date);
     const cart = ReactionCore.Collections.Cart.findOne(cartId);
-    ReactionCore.Log.info(Meteor.userId() + ' ' + cart.userId);
     // Make sure that cart is owned by current user.
     if (cart.userId !== Meteor.userId() && !ReactionCore.hasPermission('editUserCart')) {
       throw new Meteor.Error('User Id and Cart userId don\'t match');

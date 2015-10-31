@@ -10,18 +10,16 @@ Npm.depends({
 });
 
 Package.onUse(function (api) {
-  api.versionsFrom('METEOR@1.2');
+  api.versionsFrom('METEOR@1.2.1');
   api.use('templating');
-  api.use('coffeescript');
   api.use('underscore');
   api.use('ecmascript');
   api.use('random');
   api.use('momentjs:moment@2.10.6');
   api.use('momentjs:twix@0.7.0');
-  api.use('dburles:factory@0.3.10');
   api.use('matb33:collection-hooks');
   api.use('meteor-platform@1.2.1');
-  api.use('reactioncommerce:core@0.9.0', ['client', 'server']);
+  api.use('reactioncommerce:core@0.9.4', ['client', 'server']);
   api.use('aldeed:template-extension@3.4.3');
   api.use('aldeed:autoform@5.7.1');
   api.use('rajit:bootstrap3-datepicker@1.4.1', ['client']);
@@ -37,7 +35,6 @@ Package.onUse(function (api) {
     'server/methods/rentalProducts.js',
     'server/methods/orders.js',
     'server/methods/cart.js',
-    'server/factories.js',
     'server/hooks.js'
   ], ['server']);
 
@@ -75,19 +72,20 @@ Package.onUse(function (api) {
 });
 
 Package.onTest(function (api) {
-  api.use('coffeescript');
   api.use('underscore');
   api.use('random');
   api.use('momentjs:moment');
   api.use('momentjs:twix');
   api.use('sanjo:jasmine@0.15.2');
-  api.use('velocity:html-reporter@0.7.1');
-  api.use('velocity:console-reporter@0.1.2');
+  api.use('dburles:factory@0.3.10');
+  api.use('velocity:html-reporter@0.9.1');
+  api.use('velocity:console-reporter@0.1.4');
 
   api.use('reactioncommerce:core');
   api.use('reactioncommerce:bootstrap-theme');
   api.use('getoutfitted:reaction-rental-products'); // Add our own package as a dep for testing!
 
+  api.addFiles('server/factories.js', 'server');
   api.addFiles('tests/jasmine/server/integration/rentalProducts.js', 'server');
   api.addFiles('tests/jasmine/server/integration/orders.js', 'server');
   api.addFiles('tests/jasmine/server/integration/cart.js', 'server');

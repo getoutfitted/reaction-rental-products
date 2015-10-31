@@ -36,7 +36,6 @@ Meteor.methods({
     }
 
     const product = ReactionCore.Collections.Products.findOne(productId);
-    ReactionCore.Log.debug('Set product type to ' + productType);
     // if product type is rental, setup variants.
     if (productType === 'rental') {
       let variants = product.variants;
