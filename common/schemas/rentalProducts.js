@@ -135,8 +135,9 @@ ReactionCore.Schemas.RentalProduct = new SimpleSchema([
       type: String,
       defaultValue: 'rental'
     },
-    preparationBuffer: {
+    cleaningBuffer: {
       type: Number,
+      defaultValue: 0,
       optional: true
     }
   }

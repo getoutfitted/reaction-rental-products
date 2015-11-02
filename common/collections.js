@@ -3,3 +3,5 @@ ReactionCore.Collections.Products.attachSchema(ReactionCore.Schemas.RentalProduc
 ReactionCore.Collections.Cart.attachSchema(ReactionCore.Schemas.RentalCart);
 
 ReactionCore.Collections.Orders.attachSchema([ReactionCore.Schemas.RentalCart, ReactionCore.Schemas.RentalOrder]);
+
+ReactionCore.Collections.Shops.attachSchema(ReactionCore.Schemas.RentalShop);

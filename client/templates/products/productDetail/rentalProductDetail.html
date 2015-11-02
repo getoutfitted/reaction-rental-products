@@ -22,17 +22,6 @@
           <span id="product-management-alerts">{{>bootstrapAlerts placement="productManagement"}}</span>
         </div>
         {{/unless}}
-        
-        <div class="row">
-          <div class="col-sm-12 col-md-6 col-lg-2">
-            <label>Product Type:
-              <select class="form-control" id="productTypeSelect">
-                <option value="simple" selected={{isProductType 'simple'}}>simple</option>
-                <option value="rental" selected={{isProductType 'rental'}}>rental</option>
-              </select>
-            </label>
-          </div>
-        </div>
       {{/if}}
       {{!-- END Product Visibility Admin Block --}}
        <!-- Product Detail Page -->
@@ -97,6 +86,25 @@
               {{!-- Variants & Options --}}
               <div class="row options-add-to-cart">
               <h3 data-i18n="productDetail.options">Options</h3>
+              
+              {{# if hasPermission "createProduct" }}
+                <div class="row">
+                  <div class="col-sm-12 col-md-6 col-lg-3">
+                    <label>Product Type:
+                      <select class="form-control" id="productTypeSelect">
+                        <option value="simple" selected={{isProductType 'simple'}}>simple</option>
+                        <option value="rental" selected={{isProductType 'rental'}}>rental</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div class="col-sm-12 col-md-6 col-lg-3">
+                    <label class="control-label">Cleaning Buffer
+                      <input type="number" value="{{cleaningBuffer}}" class="form-control" placeholder="Buffer Days"/>
+                    </label>
+                  </div>
+                </div>
+              {{/if}}
+              
                 {{>variantList}}
               </div>
 
