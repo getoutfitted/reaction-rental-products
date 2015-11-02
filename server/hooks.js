@@ -2,6 +2,7 @@ ReactionCore.MethodHooks.beforeMethods({
   'cart/addToCart': function (options) {
     check(options.arguments, [Match.Any]);
     product = ReactionCore.Collections.Products.findOne(options.arguments[1]);
+
     // mutate price of object if rental
     if (product.type === 'rental') {
       cart = ReactionCore.Collections.Cart.findOne(options.arguments[0]);

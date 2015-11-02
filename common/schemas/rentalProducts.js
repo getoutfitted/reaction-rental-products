@@ -131,7 +131,7 @@ ReactionCore.Schemas.RentalProduct = new SimpleSchema([
     variants: {
       type: [ReactionCore.Schemas.RentalProductVariant]
     },
-    productType: {
+    type: {
       type: String,
       defaultValue: 'rental'
     },
