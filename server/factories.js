@@ -78,7 +78,7 @@ function randomVariant(options = {}) {
 
 Factory.define('rentalProduct', ReactionCore.Collections.Products, Factory.extend('product', {
   type: 'rental',
-  preparationBuffer: 3,
+  cleaningBuffer: 1,
   variants: function () {
     return [
       randomVariant()
@@ -109,7 +109,7 @@ Factory.define('rentalProductWithInventory', ReactionCore.Collections.Products, 
 
 Factory.define('theProductFormerlyKnownAsRental', ReactionCore.Collections.Products, Factory.extend('product', {
   type: 'simple',
-  preparationBuffer: 3,
+  cleaningBuffer: 1,
   variants: function () {
     return [
       randomVariant({_id: sharedId}),

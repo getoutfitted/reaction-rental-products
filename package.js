@@ -5,10 +5,6 @@ Package.describe({
   git: 'https://github.com/getoutfitted/reaction-rental-products.git'
 });
 
-Npm.depends({
-  faker: '3.0.1'
-});
-
 Package.onUse(function (api) {
   api.versionsFrom('METEOR@1.2.1');
   api.use('templating');
@@ -40,6 +36,7 @@ Package.onUse(function (api) {
 
   api.addFiles([
     'common/schemas/rentalProducts.js', // Schema for rental products
+    'common/schemas/rentalShops.js',
     'common/schemas/orders.js',
     'common/schemas/cart.js',
     'common/collections.js',
@@ -82,6 +79,7 @@ Package.onTest(function (api) {
   api.use('velocity:console-reporter@0.1.4');
 
   api.use('reactioncommerce:core');
+  api.use('reactioncommerce:reaction-factories');
   api.use('reactioncommerce:bootstrap-theme');
   api.use('getoutfitted:reaction-rental-products'); // Add our own package as a dep for testing!
 

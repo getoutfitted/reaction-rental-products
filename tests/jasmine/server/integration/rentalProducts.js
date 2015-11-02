@@ -203,7 +203,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       const prodId = Meteor.call('products/createProduct');
       const product = Products.findOne(prodId);
       const variant = product.variants[0];
-      expect(product.productType).toEqual('rental');
+      expect(product.type).toEqual('rental');
       expect(variant.events[0].title).toEqual('Inbounded');
       done();
     });
