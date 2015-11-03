@@ -51,6 +51,8 @@ Package.onUse(function (api) {
 
   // templates
   api.addFiles([
+    'client/templates/dashboard/settings/rentalShopSettings.html',
+    'client/templates/dashboard/settings/rentalShopSettings.js',
     'client/templates/cart/cartDrawer/rentalCartDrawer.html',
     'client/templates/products/productGrid/productGrid.html',
     'client/templates/products/productGrid/productGrid.js',
