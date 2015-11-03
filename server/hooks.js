@@ -7,7 +7,7 @@ ReactionCore.MethodHooks.beforeMethods({
     if (product.type === 'rental') {
       cart = ReactionCore.Collections.Cart.findOne(options.arguments[0]);
       if (!cart.rentalDays) {
-        throw new Meteor.Error('Rental length is undefined');
+        cart.rentalDays = 1;
       }
       options.arguments[2] = _.omit(options.arguments[2], ['unavailableDates', 'active']);
       options.arguments[2].price = options.arguments[2].pricePerDay * cart.rentalDays;

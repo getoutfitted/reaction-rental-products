@@ -17,3 +17,12 @@ Router.route('datepicker', {
   template: 'rentalProductsDatepicker',
   controller: RentalProductsController
 });
+
+Router.route('dashboard/rentalProducts', {
+  controller: ShopAdminController,
+  path: '/dashboard/rentalProducts',
+  template: 'rentalShopSettings',
+  waitOn: function () {
+    return ReactionCore.Collections.Shops;
+  }
+});
