@@ -1,0 +1,33 @@
+<template name="dashboardRentalProductAvailability">
+  {{!-- navbar --}}
+  <div class='container'>
+    <h1>{{title}}</h1>
+  </div>
+  <div class='container'>
+    <table class="table table-hover">
+      <thead>
+        <th>Title</th>
+        <th>ID</th>
+        <th>parentId</th>
+        <th>QTY</th>
+        <th>unavailableDates</th>
+      </thead>
+      <tbody>
+        {{#each variants}}
+          {{> dashboardVariantAvailability}}
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+</template>
+
+<template name="dashboardVariantAvailability">
+  {{! context is variant }}
+  <tr>
+    <th scope="row">{{title}}</th>
+    <td>{{_id}}</td>
+    <td>{{parentId}}</td>
+    <td>{{inventoryQuantity}}</td>
+    <td>{{unavailableDates}}</td>
+  </tr>
+</template>

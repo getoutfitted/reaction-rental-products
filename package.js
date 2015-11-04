@@ -15,7 +15,7 @@ Package.onUse(function (api) {
   api.use('momentjs:twix@0.7.0');
   api.use('matb33:collection-hooks');
   api.use('meteor-platform@1.2.1');
-  api.use('reactioncommerce:core@0.9.4', ['client', 'server']);
+  api.use('reactioncommerce:core@0.9.4');
   api.use('aldeed:template-extension@3.4.3');
   api.use('aldeed:autoform@5.7.1');
   api.use('rajit:bootstrap3-datepicker@1.4.1', ['client']);
@@ -54,8 +54,10 @@ Package.onUse(function (api) {
     // admin
     'client/templates/dashboard/settings/rentalShopSettings.html',
     'client/templates/dashboard/settings/rentalShopSettings.js',
-    'client/templates/dashboard/products/productList.html',
-    'client/templates/dashboard/products/productList.js',
+    'client/templates/dashboard/rentalProducts/productList.html',
+    'client/templates/dashboard/rentalProducts/productList.js',
+    'client/templates/dashboard/rentalProducts/availability/availability.html',
+    'client/templates/dashboard/rentalProducts/availability/availability.js',
     // customer facing
     'client/templates/cart/cartDrawer/rentalCartDrawer.html',
     'client/templates/products/productGrid/productGrid.html',

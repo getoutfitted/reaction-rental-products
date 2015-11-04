@@ -30,25 +30,42 @@ Router.route('datepicker', {
   controller: RentalProductsController
 });
 
-Router.route('dashboard/rentalProducts', {
+Router.route('dashboard/rentalShopSettings', {
   controller: ShopAdminController,
-  path: '/dashboard/rentalProducts',
+  path: '/dashboard/rentalShopSettings',
   template: 'rentalShopSettings',
   waitOn: function () {
     return ReactionCore.Collections.Shops;
   }
 });
 
-Router.route('dashboard/products', {
-  name: 'adminProductList',
+Router.route('dashboard/rentalProducts', {
+  name: 'dashboard.rentalProducts',
   controller: RentalProductsAdminController,
   template: 'dashboardRentalProducts',
   waitOn: function () {
     return this.subscribe('Products');
   },
   data: function () {
+    if (this.params.type) {
+      return {
+        rentalProducts: ReactionCore.Collections.Products.find({type: this.params.type})
+      };
+    }
     return {
       rentalProducts: ReactionCore.Collections.Products.find({type: 'rental'})
     };
+  }
+});
+
+Router.route('dashboard/rentalProducts/availability/:_id', {
+  name: 'dashboard.rentalProducts.availability',
+  controller: RentalProductsAdminController,
+  template: 'dashboardRentalProductAvailability',
+  waitOn: function () {
+    return this.subscribe('Product', this.params._id);
+  },
+  data: function () {
+    return ReactionCore.Collections.Products.findOne(this.params._id);
   }
 });

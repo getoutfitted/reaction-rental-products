@@ -5,22 +5,20 @@ ReactionCore.registerPackage({
     {
       provides: 'dashboard',
       label: 'Rental Products',
-      route: 'dashboard/rentalProducts',
+      route: 'dashboard.rentalProducts',
       description: 'Enables Rental / For Hire Products',
       icon: 'fa fa-calendar',
-      cycle: '3',
-      container: 'reaction-rental-products'
+      cycle: '3'
     }, {
       provides: 'settings',
-      route: 'dashboard/rentalProducts',
+      route: 'dashboard/rentalShopSettings',
       label: 'Rental Product Settings',
       container: 'reaction-rental-products',
       template: 'rentalShopSettings'
     }, {
-      route: 'createRentalType',
-      label: 'Create Rental Product',
-      icon: 'fa fa-plus',
-      provides: 'shortcut'
+      provides: 'console',
+      route: 'dashboard/rentalProducts',
+      label: 'Rental Product Availability'
     }
   ],
   permissions: [
