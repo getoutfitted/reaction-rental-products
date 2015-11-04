@@ -41,6 +41,9 @@ Meteor.methods({
       let variants = product.variants;
       _.each(variants, function (variant) {
         if (variant.type !== 'inventory') {
+          if (!variant.price || variant.price === 0) {
+            variant.price = 0.01;
+          }
           _.defaults(variant, {pricePerDay: variant.price, unavailableDates: []});
           if (variant.pricePerDay === 0) {
             variant.pricePerDay = variant.price;
