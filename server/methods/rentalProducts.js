@@ -41,6 +41,7 @@ Meteor.methods({
       let variants = product.variants;
       _.each(variants, function (variant) {
         if (variant.type !== 'inventory') {
+          // XXX: This is sketchy and needs to change to a schema validation, but the validation is complicated
           if (!variant.price || variant.price === 0) {
             variant.price = 0.01;
           }
@@ -123,9 +124,11 @@ Meteor.methods({
       endTime: Date
     });
     check(quantity, Number);
+    let Products = ReactionCore.Collections.Products;
 
     let requestedVariants = [];
     let requestedDates = [];
+    // Add store buffer into dates to reserve
     let iter = moment(reservationRequest.startTime).twix(reservationRequest.endTime, {
       allDay: true
     }).iterate('days');

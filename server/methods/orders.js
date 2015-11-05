@@ -4,10 +4,12 @@ Meteor.methods({
    */
   'rentalProducts/inventoryAdjust': function (orderId) {
     check(orderId, String);
-
+    let Products = ReactionCore.Collections.Products;
+    let Orders = ReactionCore.Collections.Orders;
     const order = Orders.findOne(orderId);
     if (!order) { return false; } // If we can't find an order, exit.
 
+    // TODO: Add store buffer days into dates to reserve;
     const datesToReserve = [];
     iter = moment(order.startTime).twix(order.endTime, { allDay: true }).iterate('days'); // Momentjs iterator
     while (iter.hasNext()) { datesToReserve.push(iter.next().toDate()); }  // Create array of requested dates
@@ -34,7 +36,7 @@ Meteor.methods({
           let reservedDates = Products.findOne({
             '_id': orderProduct.productId,
             'variants._id': variantId
-          }, {'variants.$.unavailableDates': 'variants.$.unavailableDates'});
+          }, {fields: {'variants.$.unavailableDates': 1}}).variants[0].unavailableDates;
 
           // We take the time to insert unavailable dates in ascending date order
           // find the position that we should insert the reserved dates
