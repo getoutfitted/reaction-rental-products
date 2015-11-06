@@ -1,3 +1,7 @@
+Template.dashboardRentalProductAvailability.helpers({
+  currentMonth: moment(Session.get('dashboardViewStart')).format('MMMM')
+});
+
 Template.dashboardVariantAvailability.helpers({
   viewStart: Session.get('dashboardViewStart'),
   viewEnd: Session.get('dashboardViewEnd'),
