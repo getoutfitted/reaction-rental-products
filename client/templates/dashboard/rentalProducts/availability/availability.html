@@ -3,31 +3,50 @@
   <div class='container'>
     <h1>{{title}}</h1>
   </div>
+  <span class="pull-left viewPrevCalendar"><i class="fa fa-3x fa-chevron-left"></i> Prev Month</span>
+  <span>{{currentMonth}}</span>
+  <span class="pull-right viewNextCalendar"><i class="fa fa-3x fa-chevron-right"></i> Next Month</span>
   <div class='container'>
-    <table class="table table-hover">
-      <thead>
-        <th>Title</th>
-        <th>ID</th>
-        <th>parentId</th>
-        <th>QTY</th>
-        <th>unavailableDates</th>
-      </thead>
-      <tbody>
-        {{#each variants}}
-          {{> dashboardVariantAvailability}}
-        {{/each}}
-      </tbody>
-    </table>
+    {{#each variants}}
+      {{> dashboardVariantAvailability}}
+    {{/each}}
   </div>
 </template>
 
 <template name="dashboardVariantAvailability">
   {{! context is variant }}
-  <tr>
-    <th scope="row">{{title}}</th>
-    <td>{{_id}}</td>
-    <td>{{parentId}}</td>
-    <td>{{inventoryQuantity}}</td>
-    <td>{{unavailableDates}}</td>
-  </tr>
+  <div class="row">
+    <div class="col-md-4">
+      {{title}}
+    </div>
+    <div class="col-md-4">
+      {{_id}}
+    </div>
+    <div class="col-md-4">
+      {{parentId}}
+    </div>
+  </div>
+  <table class="table table-hover">
+    <thead>
+      {{#each days}}
+        {{> dashboardCalendarDay}}
+      {{/each}}
+    </thead>
+    <tbody>
+      {{#each variant in inventoryVariants}}
+        <tr>
+          {{#each day in days}}
+            <td>
+              <i class="{{isDayBooked day variant.unavailableDates}} fa fa-square"></i>
+            </td>
+          {{/each}}
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</template>
+
+<template name="dashboardCalendarDay">
+  <th>{{formattedDay start}}</th>
+  {{inventoryVariants}}
 </template>
