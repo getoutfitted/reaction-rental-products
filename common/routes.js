@@ -31,6 +31,7 @@ Router.route('datepicker', {
 });
 
 Router.route('dashboard/rentalShopSettings', {
+  name: 'dashboard.rentalShopSettings',
   controller: ShopAdminController,
   path: '/dashboard/rentalShopSettings',
   template: 'rentalShopSettings',
