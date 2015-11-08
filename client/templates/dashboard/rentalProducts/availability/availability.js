@@ -1,10 +1,16 @@
 Template.dashboardRentalProductAvailability.helpers({
-  currentMonth: moment(Session.get('dashboardViewStart')).format('MMMM')
+  skus: function () {
+    let skus = _.filter(this.variants, function (variant) {
+      return variant.sku;
+    });
+    return skus;
+  }
 });
 
 Template.dashboardVariantAvailability.helpers({
   viewStart: Session.get('dashboardViewStart'),
   viewEnd: Session.get('dashboardViewEnd'),
+  currentMonth: moment(Session.get('dashboardViewStart')).format('MMMM'),
   days: function () {
     Session.setDefault('dashboardViewStart', moment().startOf('month').toDate());
     Session.setDefault('dashboardViewEnd', moment().endOf('month').toDate());
@@ -13,6 +19,14 @@ Template.dashboardVariantAvailability.helpers({
     return moment(viewStart).twix(moment(viewEnd)).split(1, 'day');
   },
   inventoryVariants: function () {
+    let variants = Template.parentData().variants;
+    let _id = this._id;
+    let inventoryVariants = _.filter(variants, function (variant) {
+      return variant.parentId === _id;
+    });
+    if (inventoryVariants.length > 0) {
+      return inventoryVariants;
+    }
     return [this];
   },
   isDayBooked: function (day, unavailableDates) {

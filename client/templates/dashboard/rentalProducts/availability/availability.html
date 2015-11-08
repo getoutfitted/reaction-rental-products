@@ -7,7 +7,7 @@
   <span>{{currentMonth}}</span>
   <span class="pull-right viewNextCalendar"><i class="fa fa-3x fa-chevron-right"></i> Next Month</span>
   <div class='container'>
-    {{#each variants}}
+    {{#each skus}}
       {{> dashboardVariantAvailability}}
     {{/each}}
   </div>
@@ -16,18 +16,13 @@
 <template name="dashboardVariantAvailability">
   {{! context is variant }}
   <div class="row">
-    <div class="col-md-4">
-      {{title}}
-    </div>
-    <div class="col-md-4">
-      {{_id}}
-    </div>
-    <div class="col-md-4">
-      {{parentId}}
+    <div class="col-md-12">
+      <h2>{{sku}} - {{title}}</h2>
     </div>
   </div>
   <table class="table table-hover">
     <thead>
+      <th>Barcode</th>
       {{#each days}}
         {{> dashboardCalendarDay}}
       {{/each}}
@@ -35,6 +30,7 @@
     <tbody>
       {{#each variant in inventoryVariants}}
         <tr>
+          <th>{{variant.barcode}}</th>
           {{#each day in days}}
             <td>
               <i class="{{isDayBooked day variant.unavailableDates}} fa fa-square"></i>
