@@ -1,21 +1,22 @@
 ReactionCore.registerPackage({
+  label: 'Rental Products',
   name: 'rental-products',
   autoEnable: true,
   registry: [
     {
       provides: 'dashboard',
       label: 'Rental Products',
-      route: 'dashboard/rentalProducts',
+      route: 'dashboard.rentalProducts',
       description: 'Enables Rental / For Hire Products',
       icon: 'fa fa-calendar',
       cycle: '3',
-      container: 'reaction-rental-products'
+      container: 'rental-products'
     }, {
       provides: 'settings',
-      route: 'dashboard/rentalProducts',
       label: 'Rental Product Settings',
-      container: 'reaction-rental-products',
-      template: 'rentalShopSettings'
+      route: 'dashboard.rentalShopSettings',
+      template: 'rentalShopSettings',
+      container: 'rental-products'
     }, {
       route: 'createRentalType',
       label: 'Create Rental Product',

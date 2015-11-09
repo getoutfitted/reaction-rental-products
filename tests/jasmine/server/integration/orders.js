@@ -41,5 +41,9 @@ describe('getoutfitted:reaction-rental-products orders methods', function () {
 
       done();
     });
+
+    it('should insert dates into correct position', function (done) {
+      done();
+    });
   });
 });

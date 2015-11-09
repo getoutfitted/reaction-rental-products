@@ -7,12 +7,12 @@ Template.rentalShopSettings.helpers({
 AutoForm.hooks({
   rentalShopEditForm: {
     onSuccess: function () {
-      return Alerts.add('Shop general settings saved.', 'success', {
+      return Alerts.add('Shop rental settings saved.', 'success', {
         autoHide: true
       });
     },
     onError: function (operation, error) {
-      return Alerts.add('Shop general settings update failed. ' + error, 'danger');
+      return Alerts.add('Shop rental settings update failed. ' + error, 'danger');
     }
   }
 });
