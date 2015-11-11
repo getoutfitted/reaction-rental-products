@@ -19,6 +19,7 @@ Package.onUse(function (api) {
   api.use('aldeed:template-extension@3.4.3');
   api.use('aldeed:autoform@5.7.1');
   api.use('rajit:bootstrap3-datepicker@1.4.1', ['client']);
+  api.use('reactioncommerce:reaction-factories');
 
   api.imply('momentjs:moment'); // Make moment available to all packages
   api.imply('momentjs:twix'); // Make moment twix available to all packages
@@ -74,6 +75,9 @@ Package.onUse(function (api) {
     'client/datepicker.js',
     'client/templates.js'
   ], ['client']);
+
+// Generating data
+api.addFiles('server/factories.js', 'server');
 });
 
 Package.onTest(function (api) {
