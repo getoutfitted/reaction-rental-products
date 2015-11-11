@@ -92,8 +92,21 @@ ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
       type: String,
       optional: true
     },
+    location: {
+      label: 'Warehouse Storage Location',
+      type: String,
+      optional: true
+    },
     currentLocation: {
       type: ReactionCore.Schemas.Location,
+      optional: true
+    },
+    color: {
+      type: String,
+      optional: true
+    },
+    size: {
+      type: String,
       optional: true
     },
     events: {
@@ -138,6 +151,10 @@ ReactionCore.Schemas.RentalProduct = new SimpleSchema([
     cleaningBuffer: {
       type: Number,
       defaultValue: 0,
+      optional: true
+    },
+    shopifyId: {
+      type: String,
       optional: true
     }
   }

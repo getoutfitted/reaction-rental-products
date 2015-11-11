@@ -78,6 +78,7 @@ function randomVariant(options = {}) {
 
 Factory.define('rentalProduct', ReactionCore.Collections.Products, Factory.extend('product', {
   type: 'rental',
+  shopId: ReactionCore.getShopId(),
   cleaningBuffer: 1,
   variants: function () {
     return [
