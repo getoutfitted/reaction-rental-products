@@ -1,7 +1,7 @@
 Package.describe({
   summary: 'Reaction Rental Products - Enable rental and for-hire products',
   name: 'getoutfitted:reaction-rental-products',
-  version: '0.0.2',
+  version: '0.1.0',
   git: 'https://github.com/getoutfitted/reaction-rental-products.git'
 });
 
