@@ -153,6 +153,10 @@ ReactionCore.Schemas.RentalProduct = new SimpleSchema([
       index: 1,
       optional: true
     },
+    colors: {
+      type: [String],
+      optional: true
+    },
     cleaningBuffer: {
       type: Number,
       defaultValue: 0,
