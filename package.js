@@ -1,7 +1,7 @@
 Package.describe({
   summary: 'Reaction Rental Products - Enable rental and for-hire products',
   name: 'getoutfitted:reaction-rental-products',
-  version: '0.1.0',
+  version: '0.1.1',
   git: 'https://github.com/getoutfitted/reaction-rental-products.git'
 });
 
@@ -36,6 +36,7 @@ Package.onUse(function (api) {
   ], ['server']);
 
   api.addFiles([
+    'common/common.js',
     'common/schemas/rentalProducts.js', // Schema for rental products
     'common/schemas/rentalShops.js',
     'common/schemas/orders.js',
