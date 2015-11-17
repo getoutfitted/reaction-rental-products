@@ -76,6 +76,12 @@ ReactionCore.Schemas.ProductEvent = new SimpleSchema({
 
 ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
   ReactionCore.Schemas.ProductVariant, {
+    _id: {
+      type: String,
+      autoValue: RentalProducts.schemaIdAutoValue,
+      index: 1,
+      label: "Variant ID"
+    },
     active: {
       type: Boolean,
       optional: true,
@@ -106,6 +112,18 @@ ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
       optional: true
     },
     size: {
+      type: String,
+      optional: true
+    },
+    alternateSize: {
+      type: String,
+      optional: true,
+    },
+    manufacturerSku: {
+      type: String,
+      optional: true
+    },
+    shopifyTitle: {
       type: String,
       optional: true
     },
@@ -148,6 +166,14 @@ ReactionCore.Schemas.RentalProduct = new SimpleSchema([
       type: String,
       defaultValue: 'rental'
     },
+    shopifyTitle: {
+      type: String,
+      optional: true
+    },
+    gender: {
+      type: String,
+      optional: true
+    },
     productType: {
       type: String,
       index: 1,
@@ -165,7 +191,22 @@ ReactionCore.Schemas.RentalProduct = new SimpleSchema([
     shopifyId: {
       type: String,
       optional: true
-    }
+    },
+    handle: {
+      type: String,
+      optional: true,
+      index: 1,
+      autoValue: function () {
+        let slug = getSlug(this.siblingField("title").value || this.siblingField("_id").value || "");
+        if (this.isInsert && !this.value) {
+          return slug;
+        } else if (this.isUpsert && !this.value) {
+          return {
+            $setOnInsert: slug
+          };
+        }
+      }
+    },
   }
 ]);
 
