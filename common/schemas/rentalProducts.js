@@ -52,28 +52,6 @@ ReactionCore.Schemas.Location = new SimpleSchema({
   }
 });
 
-ReactionCore.Schemas.ProductEvent = new SimpleSchema({
-  _id: {
-    type: String,
-    defaultValue: Random.id()
-  },
-  createdAt: {
-    type: Date,
-    defaultValue: new Date()
-  },
-  title: {
-    type: String
-  },
-  location: {
-    type: ReactionCore.Schemas.Location,
-    optional: true
-  },
-  description: {
-    type: String,
-    optional: true
-  }
-});
-
 ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
   ReactionCore.Schemas.ProductVariant, {
     _id: {
@@ -81,18 +59,6 @@ ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
       autoValue: RentalProducts.schemaIdAutoValue,
       index: 1,
       label: "Variant ID"
-    },
-    active: {
-      type: Boolean,
-      optional: true,
-      defaultValue: true,
-      index: 1
-    },
-    unavailableDates: {
-      type: [Date],
-      defaultValue: [],
-      optional: true,
-      index: 1
     },
     status: {
       type: String,
@@ -126,18 +92,6 @@ ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
     shopifyTitle: {
       type: String,
       optional: true
-    },
-    events: {
-      type: [ReactionCore.Schemas.ProductEvent],
-      optional: true,
-      defaultValue: [
-        {
-          _id: Random.id(),
-          createdAt: new Date(),
-          title: 'Inbounded',
-          description: 'Added to Inventory'
-        }
-      ]
     },
     pricePerDay: {
       label: 'Daily Rate',
