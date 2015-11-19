@@ -30,7 +30,7 @@ ReactionCore.Schemas.InventoryVariants = new SimpleSchema({
     type: String,
     label: 'Shop ID'
   },
-  variantId: {
+  parentId: {
     type: String,
     optional: true
   },
