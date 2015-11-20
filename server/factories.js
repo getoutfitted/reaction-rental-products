@@ -13,13 +13,40 @@ let takenDates = [
 let rentalLength = _.random(1, 12);
 let timeTilRental = _.random(1, 60);
 
+
+function inventoryVariant(parentId, number = 0, options = {}) {
+  check(parentId, String);
+  defaults = {
+    id: Random.id(),
+    productId: undefined,
+    parentId: parentId,
+    barcode: 'SKU123-' + number,
+    sku: 'SKU123',
+    unavailableDates: [],
+    events: [
+      {
+        _id: Random.id(),
+        createdAt: new Date,
+        location: {
+          coords: {
+            x: 38.846127,
+            y: -104.800644
+          }
+        },
+        description: faker.hacker.phrase(),
+        title: faker.commerce.productName()
+      }
+    ]
+  };
+  return _.defaults(options, defaults);
+}
+
 function randomVariant(options = {}) {
   defaults = {
     _id: Random.id(),
     parentId: '',
     type: 'variant',
     active: true,
-    unavailableDates: [],
     status: 'En Route',
     currentLocation: {
       coords: {
@@ -42,20 +69,6 @@ function randomVariant(options = {}) {
     title: faker.hacker.noun(),
     sku: faker.random.number(6),
     taxable: true,
-    events: [
-      {
-        _id: Random.id(),
-        createdAt: new Date,
-        location: {
-          coords: {
-            x: 38.846127,
-            y: -104.800644
-          }
-        },
-        description: faker.hacker.phrase(),
-        title: faker.commerce.productName()
-      }
-    ],
     metafields: [
       {
         key: faker.hacker.noun(),
