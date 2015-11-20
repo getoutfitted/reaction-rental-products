@@ -97,7 +97,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
   });
 
   // TODO: depricate this in favor of rentalProducts/cloneVariant method
-  describe('cloneRentalVariant', function () {
+  xdescribe('cloneRentalVariant', function () {
     beforeEach(function () {
       Products.remove({});
     });
