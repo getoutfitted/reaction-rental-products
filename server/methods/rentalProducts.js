@@ -76,12 +76,12 @@ Meteor.methods({
   },
 
   /*
-   * Push an event to a specific variant
+   * Push an event to a specific inventoryVariant
    * params:
-   *   variantId - the id of the variant to which we are adding a product event
+   *   inventoryVariantId - the id of the variant to which we are adding a product event
    *   eventDoc - An object containing the information for the event
    */
-  'rentalProducts/createProductEvent': function (inventoryVariantId, eventDoc) {
+  'rentalProducts/createInventoryEvent': function (inventoryVariantId, eventDoc) {
     check(inventoryVariantId, String);
 
     check(eventDoc, {
@@ -134,46 +134,46 @@ Meteor.methods({
   #
    * returns array of available (inventory) variant ids
    */
-  'rentalProducts/checkInventoryAvailability': function (productId, variantId, reservationRequest, quantity = 1) {
-    check(productId, String);
+  'rentalProducts/checkInventoryAvailability': function (variantId, reservationRequest, quantity = 1) {
     check(variantId, String);
     check(reservationRequest, {
       startTime: Date,
       endTime: Date
     });
     check(quantity, Number);
-    let Products = ReactionCore.Collections.Products;
+    let InventoryVariants = ReactionCore.Collections.InventoryVariants;
 
     let requestedVariants = [];
     let requestedDates = [];
-    // Add store buffer into dates to reserve
+
+    // TODO: Add shipping, return, and cleaning buffers into dates to reserve
+    // @PaulGreever
     let iter = moment(reservationRequest.startTime).twix(reservationRequest.endTime, {
       allDay: true
     }).iterate('days');
 
     while (iter.hasNext()) { requestedDates.push(iter.next().toDate()); }
 
-    let product = Products.findOne(productId);
-    let variant = _.findWhere(product.variants, { _id: variantId });
-    let inventoryVariants = _.where(product.variants, { parentId: variantId });
+    let inventoryVariants = InventoryVariants.find({parentId: variantId}).fetch();
 
     if (inventoryVariants.length > 0) {
       // if this variant has multiple inventory
-      for (let item of inventoryVariants) {
+      for (let uid of inventoryVariants) {
         // Check to see if any of the dates requested are unavailable
         // if so, this item is unavailable for requested time period
-        if  (checkAvailability(item.unavailableDates, requestedDates)) {
-          requestedVariants.push(item._id);
+        if (checkAvailability(uid.unavailableDates, requestedDates)) {
+          requestedVariants.push(uid._id);
           if (requestedVariants.length >= quantity) {
             break;
           }
         }
       }
+    // TODO: Update single inventory existing on variant for future
     } else if (checkAvailability(variant.unavailableDates, requestedDates)) {
       // else if there is only one of this variant
       requestedVariants.push(variant._id);
     }
-    // return requested variants array - array of variantId
+    // return requested variants array  (an array consisting of available variantIds)
     return requestedVariants;
   }
 });
