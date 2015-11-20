@@ -1,3 +1,44 @@
+ReactionCore.Schemas.Location = new SimpleSchema({
+  address1: {
+    label: 'Address 1',
+    type: String,
+    optional: true
+  },
+  address2: {
+    label: 'Address 2',
+    type: String,
+    optional: true
+  },
+  city: {
+    type: String,
+    label: 'City',
+    optional: true
+  },
+  region: {
+    label: 'State/Province/Region',
+    type: String,
+    optional: true
+  },
+  postal: {
+    label: 'ZIP/Postal Code',
+    type: String,
+    optional: true
+  },
+  country: {
+    type: String,
+    label: 'Country',
+    optional: true
+  },
+  coords: {
+    type: ReactionCore.Schemas.Coordinates,
+    optional: true
+  },
+  metafields: {
+    type: [ReactionCore.Schemas.Metafield],
+    optional: true
+  }
+});
+
 ReactionCore.Schemas.ProductEvent = new SimpleSchema({
   _id: {
     type: String,
@@ -28,7 +69,8 @@ ReactionCore.Schemas.InventoryVariants = new SimpleSchema({
   },
   shopId: {
     type: String,
-    label: 'Shop ID'
+    label: 'Shop ID',
+    optional: true
   },
   parentId: {
     type: String,

@@ -11,54 +11,13 @@ ReactionCore.Schemas.Coordinates = new SimpleSchema({
   }
 });
 
-ReactionCore.Schemas.Location = new SimpleSchema({
-  address1: {
-    label: 'Address 1',
-    type: String,
-    optional: true
-  },
-  address2: {
-    label: 'Address 2',
-    type: String,
-    optional: true
-  },
-  city: {
-    type: String,
-    label: 'City',
-    optional: true
-  },
-  region: {
-    label: 'State/Province/Region',
-    type: String,
-    optional: true
-  },
-  postal: {
-    label: 'ZIP/Postal Code',
-    type: String,
-    optional: true
-  },
-  country: {
-    type: String,
-    label: 'Country',
-    optional: true
-  },
-  coords: {
-    type: ReactionCore.Schemas.Coordinates,
-    optional: true
-  },
-  metafields: {
-    type: [ReactionCore.Schemas.Metafield],
-    optional: true
-  }
-});
-
 ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
   ReactionCore.Schemas.ProductVariant, {
     _id: {
       type: String,
       autoValue: RentalProducts.schemaIdAutoValue,
       index: 1,
-      label: "Variant ID"
+      label: 'Variant ID'
     },
     status: {
       type: String,
