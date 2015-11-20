@@ -37,6 +37,7 @@ Package.onUse(function (api) {
 
   api.addFiles([
     'common/common.js',
+    'common/schemas/inventoryVariants.js',
     'common/schemas/rentalProducts.js', // Schema for rental products
     'common/schemas/rentalShops.js',
     'common/schemas/orders.js',

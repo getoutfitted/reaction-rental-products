@@ -5,6 +5,7 @@ Meteor.methods({
   'rentalProducts/inventoryAdjust': function (orderId) {
     check(orderId, String);
     let Products = ReactionCore.Collections.Products;
+    let InventoryVariants = ReactionCore.Collections.InventoryVariants;
     let Orders = ReactionCore.Collections.Orders;
     const order = Orders.findOne(orderId);
     if (!order) { return false; } // If we can't find an order, exit.
@@ -22,30 +23,28 @@ Meteor.methods({
          * stop when we get to end day + trailing buffer
          */
         let variantIds = Meteor.call('rentalProducts/checkInventoryAvailability',
-                                      product._id,
                                       orderProduct.variants._id,
                                       {endTime: order.endTime, startTime: order.startTime},
                                       orderProduct.quantity);
         if (variantIds.length !== orderProduct.quantity) {
-          throw new Meteor.Error(403, 'Available inventory and quantity requested do not match');
+          throw new Meteor.Error(403, 'Requested ' + orderProduct.quantity + ' but only ' + variantIds.length + ' were available.');
         }
 
         // Not using $in because we need to determine the correct position
         // to insert the new dates separately for each inventoryVariant
         for (let variantId of variantIds) {
-          let reservedDates = Products.findOne({
-            '_id': orderProduct.productId,
-            'variants._id': variantId
-          }, {fields: {'variants.$.unavailableDates': 1}}).variants[0].unavailableDates;
+          let reservedDates = InventoryVariants.findOne({
+            _id: variantId
+          }, {fields: {unavailableDates: 1}}).unavailableDates;
 
           // We take the time to insert unavailable dates in ascending date order
           // find the position that we should insert the reserved dates
           positionToInsert = _.sortedIndex(reservedDates, datesToReserve[0]);
 
           // insert datesToReserve into the correct variants at the correct position
-          Products.update({'_id': orderProduct.productId, 'variants._id': variantId }, {
+          InventoryVariants.update({_id: variantId}, {
             $push: {
-              'variants.$.unavailableDates': {
+              unavailableDates: {
                 $each: datesToReserve,
                 $position: positionToInsert
               }

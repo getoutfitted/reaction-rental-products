@@ -1,6 +1,8 @@
 let sharedId = Random.id();
 
-let takenDates = [
+faker.getoutfitted = {};
+
+faker.getoutfitted.takenDates = [
   moment().startOf('day').add(10, 'days').toDate(),
   moment().startOf('day').add(11, 'days').toDate(),
   moment().startOf('day').add(12, 'days').toDate(),
@@ -19,7 +21,6 @@ function randomVariant(options = {}) {
     parentId: '',
     type: 'variant',
     active: true,
-    unavailableDates: [],
     status: 'En Route',
     currentLocation: {
       coords: {
@@ -42,20 +43,6 @@ function randomVariant(options = {}) {
     title: faker.hacker.noun(),
     sku: faker.random.number(6),
     taxable: true,
-    events: [
-      {
-        _id: Random.id(),
-        createdAt: new Date,
-        location: {
-          coords: {
-            x: 38.846127,
-            y: -104.800644
-          }
-        },
-        description: faker.hacker.phrase(),
-        title: faker.commerce.productName()
-      }
-    ],
     metafields: [
       {
         key: faker.hacker.noun(),
@@ -87,26 +74,29 @@ Factory.define('rentalProduct', ReactionCore.Collections.Products, Factory.exten
   }
 }));
 
-Factory.define('rentalProductWithInventory', ReactionCore.Collections.Products, Factory.extend('rentalProduct', {
-  variants: function () {
-    return [
-      randomVariant({_id: sharedId}),
-      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
-      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
-      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
-      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
-      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
-      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
-      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
-      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
-      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
-      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
-      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
-      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates}),
-      randomVariant()
-    ];
-  }
-}));
+Factory.define('inventoryVariant', ReactionCore.Collections.InventoryVariants, {
+  id: Random.id(),
+  productId: undefined,
+  parentId: Random.id(),
+  shopId: Random.id(),
+  barcode: 'SKU123-1',
+  sku: 'SKU123',
+  unavailableDates: [],
+  events: [
+    {
+      _id: Random.id(),
+      createdAt: new Date,
+      location: {
+        coords: {
+          x: 38.846127,
+          y: -104.800644
+        }
+      },
+      description: faker.hacker.phrase(),
+      title: faker.commerce.productName()
+    }
+  ]
+});
 
 Factory.define('theProductFormerlyKnownAsRental', ReactionCore.Collections.Products, Factory.extend('product', {
   type: 'simple',
@@ -114,7 +104,7 @@ Factory.define('theProductFormerlyKnownAsRental', ReactionCore.Collections.Produ
   variants: function () {
     return [
       randomVariant({_id: sharedId}),
-      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: takenDates})
+      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: faker.getoutfitted.takenDates})
     ];
   }
 }));

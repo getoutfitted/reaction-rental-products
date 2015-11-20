@@ -11,88 +11,13 @@ ReactionCore.Schemas.Coordinates = new SimpleSchema({
   }
 });
 
-ReactionCore.Schemas.Location = new SimpleSchema({
-  address1: {
-    label: 'Address 1',
-    type: String,
-    optional: true
-  },
-  address2: {
-    label: 'Address 2',
-    type: String,
-    optional: true
-  },
-  city: {
-    type: String,
-    label: 'City',
-    optional: true
-  },
-  region: {
-    label: 'State/Province/Region',
-    type: String,
-    optional: true
-  },
-  postal: {
-    label: 'ZIP/Postal Code',
-    type: String,
-    optional: true
-  },
-  country: {
-    type: String,
-    label: 'Country',
-    optional: true
-  },
-  coords: {
-    type: ReactionCore.Schemas.Coordinates,
-    optional: true
-  },
-  metafields: {
-    type: [ReactionCore.Schemas.Metafield],
-    optional: true
-  }
-});
-
-ReactionCore.Schemas.ProductEvent = new SimpleSchema({
-  _id: {
-    type: String,
-    defaultValue: Random.id()
-  },
-  createdAt: {
-    type: Date,
-    defaultValue: new Date()
-  },
-  title: {
-    type: String
-  },
-  location: {
-    type: ReactionCore.Schemas.Location,
-    optional: true
-  },
-  description: {
-    type: String,
-    optional: true
-  }
-});
-
 ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
   ReactionCore.Schemas.ProductVariant, {
     _id: {
       type: String,
       autoValue: RentalProducts.schemaIdAutoValue,
       index: 1,
-      label: "Variant ID"
-    },
-    active: {
-      type: Boolean,
-      optional: true,
-      defaultValue: true,
-      index: 1
-    },
-    unavailableDates: {
-      type: [Date],
-      defaultValue: [],
-      optional: true,
-      index: 1
+      label: 'Variant ID'
     },
     status: {
       type: String,
@@ -126,18 +51,6 @@ ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
     shopifyTitle: {
       type: String,
       optional: true
-    },
-    events: {
-      type: [ReactionCore.Schemas.ProductEvent],
-      optional: true,
-      defaultValue: [
-        {
-          _id: Random.id(),
-          createdAt: new Date(),
-          title: 'Inbounded',
-          description: 'Added to Inventory'
-        }
-      ]
     },
     pricePerDay: {
       label: 'Daily Rate',

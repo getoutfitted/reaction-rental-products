@@ -81,7 +81,18 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
     });
 
     it('should update item prices in cart if cart rental length changes', function (done) {
-      const product = Factory.create('rentalProductWithInventory');
+      const product = Factory.create('rentalProduct');
+      const variant = product.variants[0];
+      const quantity = variant.inventoryQuantity;
+      _(quantity).times(function (n) {
+        Factory.create('inventoryVariant', {
+          parentId: variant._id,
+          productId: product._id,
+          barcode: 'BARCODE' + n,
+          sku: 'BARCODE',
+          unavailableDates: faker.getoutfitted.takenDates
+        });
+      });
       const emptyCart = Factory.create('rentalCart', {items: []});
       const daysTilRental = _.random(7, 30);
       const rentalLength = _.random(1, 14);
@@ -102,7 +113,18 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
     });
 
     it('should only update rental item prices if cart rental length changes', function (done) {
-      const rentalProduct = Factory.create('rentalProductWithInventory');
+      const rentalProduct = Factory.create('rentalProduct');
+      const variant = rentalProduct.variants[0];
+      const quantity = variant.inventoryQuantity;
+      _(quantity).times(function (n) {
+        Factory.create('inventoryVariant', {
+          parentId: variant._id,
+          productId: rentalProduct._id,
+          barcode: 'BARCODE' + n,
+          sku: 'BARCODE',
+          unavailableDates: faker.getoutfitted.takenDates
+        });
+      });
       const product = Factory.create('product');
       const emptyCart = Factory.create('rentalCart', {items: []});
       const daysTilRental = _.random(7, 30);
@@ -169,7 +191,18 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
     });
 
     it('should calculate rental price if product is "rental" type', function (done) {
-      const product = Factory.create('rentalProductWithInventory');
+      const product = Factory.create('rentalProduct');
+      const variant = product.variants[0];
+      const quantity = variant.inventoryQuantity;
+      _(quantity).times(function (n) {
+        Factory.create('inventoryVariant', {
+          parentId: variant._id,
+          productId: product._id,
+          barcode: 'BARCODE' + n,
+          sku: 'BARCODE',
+          unavailableDates: faker.getoutfitted.takenDates
+        });
+      });
       const emptyCart = Factory.create('rentalCart', {items: []});
       Meteor.call('cart/addToCart', emptyCart._id, product._id, product.variants[0], '1');
       const cart = Cart.findOne(emptyCart._id);
