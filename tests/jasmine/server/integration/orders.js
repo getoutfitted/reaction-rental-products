@@ -8,9 +8,19 @@ describe('getoutfitted:reaction-rental-products orders methods', function () {
     it('should reserve dates requested', function (done) {
       const product = Factory.create('rentalProduct');
       const variant = product.variants[0];
+      const quantity = variant.inventoryQuantity;
+      _(quantity).times(function (n) {
+        Factory.create('inventoryVariant', {
+          parentId: variant._id,
+          productId: product._id,
+          barcode: 'BARCODE' + n,
+          sku: 'BARCODE'
+        });
+      });
+
       const daysTilRental = _.random(7, 30);
       const rentalLength = _.random(1, 14);
-      const quantity = 1;
+      const quantityRequested = 1;
       const order = Factory.create('rentalOrder', {
         startTime: moment().startOf('day').add(daysTilRental, 'days').toDate(),
         endTime: moment().startOf('day').add(daysTilRental + rentalLength, 'days').toDate(),
@@ -19,26 +29,21 @@ describe('getoutfitted:reaction-rental-products orders methods', function () {
             _id: faker.random.uuid(),
             productId: product._id,
             variants: variant,
-            quantity: quantity,
+            quantity: quantityRequested,
             type: 'rental'
           }
         ]
       });
-      const preInventoryAvailable = Meteor.call('rentalProducts/checkInventoryAvailability', product._id, variant._id, {
+      // TODO: Figure out why this is returning more than the requested number of inventoryVariants
+      const preInventoryAvailable = Meteor.call('rentalProducts/checkInventoryAvailability', variant._id, {
         startTime: moment().startOf('day').add(daysTilRental, 'days').toDate(),
         endTime: moment().startOf('day').add(daysTilRental + rentalLength, 'days').toDate()
-      }, quantity);
+      }, quantityRequested);
 
       Meteor.call('rentalProducts/inventoryAdjust', order._id);
-      const updatedProduct = Products.findOne(product._id);
-      const updatedVariant = updatedProduct.variants[0];
-      expect(updatedVariant.unavailableDates.length).toEqual(rentalLength + 1);
-      postInventoryAvailable = Meteor.call('rentalProducts/checkInventoryAvailability', updatedProduct._id, updatedVariant._id, {
-        startTime: moment().startOf('day').add(daysTilRental, 'days').toDate(),
-        endTime: moment().startOf('day').add(daysTilRental + rentalLength, 'days').toDate()
-      }, quantity);
-      expect(postInventoryAvailable.length + quantity).toEqual(preInventoryAvailable.length);
-
+      const updatedInventoryVariant = InventoryVariants.findOne(preInventoryAvailable[0]);
+      // Rental Length + 1 because we add rentalLength days to the first day.
+      expect(updatedInventoryVariant.unavailableDates.length).toEqual(rentalLength + 1);
       done();
     });
 
