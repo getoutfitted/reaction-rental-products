@@ -2,6 +2,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
   describe('rentalProducts/setProductType', function () {
     beforeEach(function () {
       Products.remove({});
+      InventoryVariants.remove({});
     });
 
     it('should throw 403 error by non admin', function (done) {
@@ -29,14 +30,17 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       done();
     });
 
-    it('should initialize unavailable dates for variants', function (done) {
+    it('should initialize inventoryVariants', function (done) {
       spyOn(Roles, 'userIsInRole').and.returnValue(true);
       const product = Factory.create('product');
-
+      const productQty = product.variants[0].inventoryQuantity;
       expect(_.size(product.variants)).toEqual(1);
+
       Meteor.call('rentalProducts/setProductType', product._id, 'rental');
-      const updatedProduct = Products.findOne(product._id);
-      expect(updatedProduct.variants[0].unavailableDates).toEqual([]);
+      const inventoryVariants = InventoryVariants.find({parentId: product.variants[0]._id});
+      const inventoryVariant = inventoryVariants.fetch()[0];
+      expect(inventoryVariants.count()).toEqual(productQty);
+      expect(inventoryVariant.unavailableDates).toEqual([]);
       done();
     });
 
