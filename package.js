@@ -15,11 +15,14 @@ Package.onUse(function (api) {
   api.use('momentjs:twix@0.7.0');
   api.use('matb33:collection-hooks');
   api.use('meteor-platform@1.2.1');
-  api.use('reactioncommerce:core@0.9.4');
-  api.use('aldeed:template-extension@3.4.3');
+  api.use('reactioncommerce:core@0.9.5');
+  api.use('reactioncommerce:reaction-inventory');
+  api.use('aldeed:collection2@2.5.0');
+  api.use('aldeed:simple-schema@1.3.3');
+  api.use('aldeed:template-extension@4.0.0');
   api.use('aldeed:autoform@5.7.1');
   api.use('rajit:bootstrap3-datepicker@1.4.1', ['client']);
-  api.use('reactioncommerce:reaction-factories');
+  // api.use('reactioncommerce:reaction-factories');
 
   api.imply('momentjs:moment'); // Make moment available to all packages
   api.imply('momentjs:twix'); // Make moment twix available to all packages
@@ -78,8 +81,8 @@ Package.onUse(function (api) {
     'client/templates.js'
   ], ['client']);
 
-// Generating data
-api.addFiles('server/factories.js', 'server');
+  // Generating data
+  // api.addFiles('server/factories.js', 'server');
 });
 
 Package.onTest(function (api) {

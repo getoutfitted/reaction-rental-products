@@ -42,7 +42,7 @@ ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
     },
     alternateSize: {
       type: String,
-      optional: true,
+      optional: true
     },
     manufacturerSku: {
       type: String,
@@ -110,7 +110,7 @@ ReactionCore.Schemas.RentalProduct = new SimpleSchema([
       optional: true,
       index: 1,
       autoValue: function () {
-        let slug = getSlug(this.siblingField("title").value || this.siblingField("_id").value || "");
+        let slug = getSlug(this.siblingField('title').value || this.siblingField('_id').value || '');
         if (this.isInsert && !this.value) {
           return slug;
         } else if (this.isUpsert && !this.value) {
@@ -119,9 +119,10 @@ ReactionCore.Schemas.RentalProduct = new SimpleSchema([
           };
         }
       }
-    },
+    }
   }
 ]);
 
 // Update ProductVariant because it's checked against in core in certain methods.
 ReactionCore.Schemas.ProductVariant = ReactionCore.Schemas.RentalProductVariant;
+ReactionCore.Schemas.Product = ReactionCore.Schemas.RentalProduct;
