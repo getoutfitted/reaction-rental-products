@@ -1,6 +1,8 @@
 let sharedId = Random.id();
 
-let takenDates = [
+faker.getoutfitted = {};
+
+faker.getoutfitted.takenDates = [
   moment().startOf('day').add(10, 'days').toDate(),
   moment().startOf('day').add(11, 'days').toDate(),
   moment().startOf('day').add(12, 'days').toDate(),
@@ -10,13 +12,15 @@ let takenDates = [
   moment().startOf('day').add(16, 'days').toDate()
 ];
 
-function randomVariant(type, variantSharedId, variantTakenDates) {
-  return {
-    _id: type === 'parent' ? variantSharedId : Random.id(),
-    parentId: type === 'parent' ? '' : variantSharedId,
-    type: type === 'inventory' ? 'inventory' : 'rentalVariant',
+let rentalLength = _.random(1, 12);
+let timeTilRental = _.random(1, 60);
+
+function randomVariant(options = {}) {
+  defaults = {
+    _id: Random.id(),
+    parentId: '',
+    type: 'variant',
     active: true,
-    unavailableDates: type === 'inventory' ? variantTakenDates : [],
     status: 'En Route',
     currentLocation: {
       coords: {
@@ -39,20 +43,6 @@ function randomVariant(type, variantSharedId, variantTakenDates) {
     title: faker.hacker.noun(),
     sku: faker.random.number(6),
     taxable: true,
-    events: [
-      {
-        _id: Random.id(),
-        createdAt: new Date,
-        location: {
-          coords: {
-            x: 38.846127,
-            y: -104.800644
-          }
-        },
-        description: faker.hacker.phrase(),
-        title: faker.commerce.productName()
-      }
-    ],
     metafields: [
       {
         key: faker.hacker.noun(),
@@ -69,45 +59,67 @@ function randomVariant(type, variantSharedId, variantTakenDates) {
       }
     ]
   };
+
+  return _.defaults(options, defaults);
 }
 
 Factory.define('rentalProduct', ReactionCore.Collections.Products, Factory.extend('product', {
-  productType: 'rental',
-  preparationBuffer: 3,
+  type: 'rental',
+  shopId: ReactionCore.getShopId(),
+  cleaningBuffer: 1,
   variants: function () {
     return [
-      randomVariant('random', '')
+      randomVariant()
     ];
   }
 }));
 
-Factory.define('rentalProductWithInventory', ReactionCore.Collections.Products, Factory.extend('rentalProduct', {
+Factory.define('inventoryVariant', ReactionCore.Collections.InventoryVariants, {
+  id: Random.id(),
+  productId: undefined,
+  parentId: Random.id(),
+  shopId: Random.id(),
+  barcode: 'SKU123-1',
+  sku: 'SKU123',
+  unavailableDates: [],
+  events: [
+    {
+      _id: Random.id(),
+      createdAt: new Date,
+      location: {
+        coords: {
+          x: 38.846127,
+          y: -104.800644
+        }
+      },
+      description: faker.hacker.phrase(),
+      title: faker.commerce.productName()
+    }
+  ]
+});
+
+Factory.define('theProductFormerlyKnownAsRental', ReactionCore.Collections.Products, Factory.extend('product', {
+  type: 'simple',
+  cleaningBuffer: 1,
   variants: function () {
     return [
-      randomVariant('parent', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('inventory', sharedId, takenDates),
-      randomVariant('random', '')
+      randomVariant({_id: sharedId}),
+      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: faker.getoutfitted.takenDates})
     ];
   }
 }));
 
-Factory.define('rentalCart', ReactionCore.Collections.Cart, Factory.extend('order', {
-  startTime: new Date,
-  endTime: new Date
+Factory.define('rentalCart', ReactionCore.Collections.Cart, Factory.extend('cart', {
+  startTime: moment(new Date()).add(timeTilRental, 'days').toDate(),
+  endTime: moment(new Date()).add(timeTilRental + rentalLength, 'days').toDate(),
+  rentalDays: rentalLength
+}));
+
+Factory.define('emptyCart', ReactionCore.Collections.Cart, Factory.extend('cart', {
+  items: undefined
 }));
 
 Factory.define('rentalOrder', ReactionCore.Collections.Orders, Factory.extend('order', {
-  startTime: new Date,
-  endTime: new Date
+  startTime: moment(new Date()).add(timeTilRental, 'days').toDate(),
+  endTime: moment(new Date()).add(timeTilRental + rentalLength, 'days').toDate()
 }));
