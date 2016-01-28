@@ -26,7 +26,7 @@ Package.onUse(function (api) {
 
   api.imply('momentjs:moment'); // Make moment available to all packages
   api.imply('momentjs:twix'); // Make moment twix available to all packages
-
+  api.addFiles('lib/rentalProducts.js');
   api.addFiles([
     'server/register.js'
   ], ['server']); // register as a reaction package
