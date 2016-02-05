@@ -15,7 +15,7 @@ Package.onUse(function (api) {
   api.use('momentjs:twix@0.7.0');
   api.use('matb33:collection-hooks');
   api.use('meteor-platform@1.2.1');
-  api.use('reactioncommerce:core@0.9.5');
+  api.use('reactioncommerce:core@0.11.0');
   api.use('reactioncommerce:reaction-inventory');
   api.use('aldeed:collection2@2.5.0');
   api.use('aldeed:simple-schema@1.3.3');
