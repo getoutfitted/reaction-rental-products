@@ -95,10 +95,10 @@ Package.onTest(function (api) {
   api.use('velocity:html-reporter@0.9.1');
   api.use('velocity:console-reporter@0.1.4');
 
-  api.use('reactioncommerce:core');
+  api.use('reactioncommerce:core@0.11.0');
   api.use('reactioncommerce:reaction-factories');
-  api.use('reactioncommerce:bootstrap-theme');
-  api.use('getoutfitted:reaction-rental-products'); // Add our own package as a dep for testing!
+  // api.use('reactioncommerce:bootstrap-theme');
+  api.use('getoutfitted:reaction-rental-products@0.2.0'); // Add our own package as a dep for testing!
 
   api.addFiles('server/factories.js', 'server');
   api.addFiles('tests/jasmine/server/integration/rentalProducts.js', 'server');
