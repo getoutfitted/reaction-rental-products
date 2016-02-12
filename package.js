@@ -1,7 +1,7 @@
 Package.describe({
   summary: 'Reaction Rental Products - Enable rental and for-hire products',
   name: 'getoutfitted:reaction-rental-products',
-  version: '0.2.0',
+  version: '0.3.0',
   git: 'https://github.com/getoutfitted/reaction-rental-products.git'
 });
 
@@ -93,7 +93,7 @@ Package.onTest(function (api) {
 
   api.use('reactioncommerce:core@0.11.0');
   api.use('reactioncommerce:reaction-factories');
-  api.use('getoutfitted:reaction-rental-products@0.2.0'); // Add our own package as a dep for testing!
+  api.use('getoutfitted:reaction-rental-products'); // Add our own package as a dep for testing!
 
   api.addFiles('server/factories.js', 'server');
   api.addFiles('tests/jasmine/server/integration/rentalProducts.js', 'server');
