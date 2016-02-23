@@ -1,3 +1,7 @@
+Template.rentalShopSettings.onCreated(function () {
+  this.subscribe('Shops');
+});
+
 Template.rentalShopSettings.helpers({
   shop: function () {
     return ReactionCore.Collections.Shops.findOne();

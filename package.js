@@ -11,17 +11,23 @@ Package.onUse(function (api) {
   api.use('underscore');
   api.use('ecmascript');
   api.use('random');
+  api.use('reactive-var');
+  api.use('reactive-dict');
   api.use('momentjs:moment@2.10.6');
   api.use('momentjs:twix@0.7.0');
   api.use('matb33:collection-hooks');
   api.use('meteor-platform@1.2.1');
-  api.use('reactioncommerce:core@0.11.0');
-  api.use('reactioncommerce:reaction-inventory');
+  api.use('kadira:flow-router');
+  api.use('kadira:blaze-layout');
   api.use('aldeed:collection2@2.5.0');
   api.use('aldeed:simple-schema@1.3.3');
   api.use('aldeed:template-extension@4.0.0');
   api.use('aldeed:autoform@5.7.1');
   api.use('rajit:bootstrap3-datepicker@1.4.1', ['client']);
+  api.use('reactioncommerce:core@0.12.0');
+  api.use('reactioncommerce:reaction-inventory');
+  api.use('reactioncommerce:reaction-router');
+  api.use('reactioncommerce:reaction-collections');
 
   api.imply('momentjs:moment'); // Make moment available to all packages
   api.imply('momentjs:twix'); // Make moment twix available to all packages
@@ -45,12 +51,13 @@ Package.onUse(function (api) {
     'common/schemas/orders.js',
     'common/schemas/cart.js',
     'common/collections.js',
-    'common/hooks.js',
-    'common/routes.js'
+    // 'common/routes.js',
+    'common/hooks.js'
   ], ['client', 'server']);
 
   // Helpers
   api.addFiles([
+    'client/routes.js',
     'client/helpers/products.js'
   ], ['client']);
 

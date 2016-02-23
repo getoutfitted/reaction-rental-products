@@ -9,3 +9,5 @@ ReactionCore.Collections.Orders.attachSchema([ReactionCore.Schemas.RentalCart, R
 ReactionCore.Collections.Shops.attachSchema(ReactionCore.Schemas.RentalShop);
 
 ReactionCore.Collections.InventoryVariants.attachSchema(ReactionCore.Schemas.InventoryVariants);
+
+ReactionCore.Schemas.Shop = ReactionCore.Schemas.RentalShop;

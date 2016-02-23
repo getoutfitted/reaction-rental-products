@@ -1,34 +1,35 @@
 ReactionCore.registerPackage({
   label: 'Rental Products',
   name: 'rental-products',
+  icon: 'fa fa-calendar',
   autoEnable: true,
-  registry: [
-    {
-      provides: 'dashboard',
-      label: 'Rental Products',
-      route: 'dashboard.rentalProducts',
-      description: 'Enables Rental / For Hire Products',
-      icon: 'fa fa-calendar',
-      cycle: '3',
-      container: 'rental-products'
-    }, {
-      provides: 'settings',
-      label: 'Rental Product Settings',
-      route: 'dashboard.rentalShopSettings',
+  settings: {},
+  registry: [{
+    route: '/dashboard/rentalProducts',
+    name: 'rentalProducts',
+    provides: 'dashboard',
+    label: 'Rental Products',
+    description: 'Enables rental products for your shop',
+    icon: 'fa fa-calendar',
+    container: 'core',
+    template: 'rentalShopSettings',
+    workflow: 'coreWorkflow',
+    priority: 2
+  }],
+  layout: [{
+    layout: 'coreAdminLayout',
+    workflow: 'coreWorkflow',
+    theme: 'default',
+    enabled: true,
+    structure: {
       template: 'rentalShopSettings',
-      container: 'rental-products'
-    }, {
-      route: 'createRentalType',
-      label: 'Create Rental Product',
-      icon: 'fa fa-plus',
-      provides: 'shortcut'
+      layoutHeader: 'layoutHeader',
+      layoutFooter: '',
+      notFound: 'notFound',
+      dashboardHeader: 'dashboardHeader',
+      dashboardControls: 'accountsDashboardControls', // TODO: Update this for Rental Products
+      dashboardHeaderControls: '',
+      adminControlsFooter: 'adminControlsFooter'
     }
-  ],
-  permissions: [
-    {
-      label: 'Rentals',
-      permission: 'ReactionCore.Collections.RentalTypes',
-      group: 'Shop Settings'
-    }
-  ]
+  }]
 });
