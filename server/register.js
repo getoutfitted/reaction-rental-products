@@ -3,22 +3,32 @@ ReactionCore.registerPackage({
   name: 'rental-products',
   icon: 'fa fa-calendar',
   autoEnable: true,
-  settings: {},
   registry: [{
+    // Provides Dashboard Card
+    // Route from card renders template specified in the dashboard when clicking
+    // the card or the arrow on the card
     route: '/dashboard/rentalProducts',
-    name: 'rentalProducts',
     provides: 'dashboard',
+    name: 'rentalProducts',
     label: 'Rental Products',
     description: 'Enables rental products for your shop',
     icon: 'fa fa-calendar',
-    container: 'core',
+    container: 'getoutfitted',
     template: 'rentalShopSettings',
-    workflow: 'coreWorkflow',
-    priority: 2
+    workflow: 'coreRentalWorkflow',
+    priority: 1
+  }, {
+    // Provides Dashboard Settings Pane
+    // Provides link to dashboard settings pane from 'gear' icon on dashboard card
+    provides: 'settings',
+    label: 'Rental Products Settings',
+    route: '/dashboard/rentalProducts/settings',
+    name: 'rentalProducts.settings',
+    template: 'rentalShopSettings'
   }],
   layout: [{
-    layout: 'coreAdminLayout',
-    workflow: 'coreWorkflow',
+    workflow: 'coreRentalWorkflow',
+    layout: 'coreLayout',
     theme: 'default',
     enabled: true,
     structure: {
@@ -27,7 +37,7 @@ ReactionCore.registerPackage({
       layoutFooter: '',
       notFound: 'notFound',
       dashboardHeader: 'dashboardHeader',
-      dashboardControls: 'accountsDashboardControls', // TODO: Update this for Rental Products
+      dashboardControls: 'accountsDashboardControls',
       dashboardHeaderControls: '',
       adminControlsFooter: 'adminControlsFooter'
     }
