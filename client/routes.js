@@ -1,66 +1,66 @@
-let shopHandle;
-Tracker.autorun(function () {
-  if (ReactionCore.ready()) {
-    shopHandle = ReactionCore.getShopName().toLowerCase();
-  }
-});
+// let shopHandle;
+// Tracker.autorun(function () {
+//   if (ReactionCore.ready()) {
+//     shopHandle = ReactionCore.getShopName().toLowerCase();
+//   }
+// });
 
-let rentalProductRoutes = ReactionRouter.group({
-  prefix: `/${shopHandle}/dashboard/rentalProducts`,
-  name: 'rentalProducts'
-});
+// let rentalProductRoutes = ReactionRouter.group({
+//   prefix: `/dashboard/rentalProducts`,
+//   name: 'rentalProducts'
+// });
 
-rentalProductRoutes.route('/test', {
-  name: 'rentalProducts.dashboard',
-  action: function () {
-    BlazeLayout.render('coreAdminLayout', {
-      layoutHeader: 'layoutHeader',
-      dashboardHeader: 'dashboardHeader',
-      template: 'dashboardRentalProducts',
-      layoutFooter: 'layoutFooter',
-      dashboardControls: 'dashboardControls'
-    });
-  }
-});
-
-rentalProductRoutes.route('/availability/:_id', {
-  name: 'rentalProducts.availabilityById',
-  action: function () {
-    BlazeLayout.render('coreAdminLayout', {
-      layoutHeader: 'layoutHeader',
-      dashboardHeader: 'dashboardHeader',
-      template: 'dashboardRentalProductAvailability', //'rentalProducts.availabilityById'
-      layoutFooter: 'layoutFooter',
-      dashboardControls: 'dashboardControls'
-    });
-  }
-});
-
-rentalProductRoutes.route('/datepicker', {
-  name: 'datepicker',
-  action: function () {
-    BlazeLayout.render('coreAdminLayout', {
-      layoutHeader: 'layoutHeader',
-      dashboardHeader: 'dashboardHeader',
-      template: 'rentalProductsDatepicker',
-      layoutFooter: 'layoutFooter',
-      dashboardControls: 'dashboardControls'
-    });
-  }
-});
-
-rentalProductRoutes.route('/settings', {
-  name: 'rentalProducts.settings',
-  action: function () {
-    BlazeLayout.render('coreAdminLayout', {
-      layoutHeader: 'layoutHeader',
-      dashboardHeader: 'dashboardHeader',
-      template: 'rentalShopSettings',
-      layoutFooter: 'layoutFooter',
-      dashboardControls: 'dashboardControls'
-    });
-  }
-});
+// rentalProductRoutes.route('/test', {
+//   name: 'rentalProducts.dashboard',
+//   action: function () {
+//     BlazeLayout.render('coreAdminLayout', {
+//       layoutHeader: 'layoutHeader',
+//       dashboardHeader: 'dashboardHeader',
+//       template: 'dashboardRentalProducts',
+//       layoutFooter: 'layoutFooter',
+//       dashboardControls: 'dashboardControls'
+//     });
+//   }
+// });
+//
+// rentalProductRoutes.route('/availability/:_id', {
+//   name: 'rentalProducts.availabilityById',
+//   action: function () {
+//     BlazeLayout.render('coreAdminLayout', {
+//       layoutHeader: 'layoutHeader',
+//       dashboardHeader: 'dashboardHeader',
+//       template: 'dashboardRentalProductAvailability', //'rentalProducts.availabilityById'
+//       layoutFooter: 'layoutFooter',
+//       dashboardControls: 'dashboardControls'
+//     });
+//   }
+// });
+//
+// rentalProductRoutes.route('/datepicker', {
+//   name: 'datepicker',
+//   action: function () {
+//     BlazeLayout.render('coreAdminLayout', {
+//       layoutHeader: 'layoutHeader',
+//       dashboardHeader: 'dashboardHeader',
+//       template: 'rentalProductsDatepicker',
+//       layoutFooter: 'layoutFooter',
+//       dashboardControls: 'dashboardControls'
+//     });
+//   }
+// });
+//
+// rentalProductRoutes.route('/settings', {
+//   name: 'rentalProducts.settings',
+//   action: function () {
+//     BlazeLayout.render('coreAdminLayout', {
+//       layoutHeader: 'layoutHeader',
+//       dashboardHeader: 'dashboardHeader',
+//       template: 'rentalShopSettings',
+//       layoutFooter: 'layoutFooter',
+//       dashboardControls: 'dashboardControls'
+//     });
+//   }
+// });
 
 // rentalProductRoutes.route('/', {
 //   name: 'rentalProducts.dashboard',
