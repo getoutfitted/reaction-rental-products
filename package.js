@@ -28,6 +28,7 @@ Package.onUse(function (api) {
   api.use('reactioncommerce:reaction-inventory');
   api.use('reactioncommerce:reaction-router');
   api.use('reactioncommerce:reaction-collections');
+  api.use('reactioncommerce:reaction-ui');
 
   api.imply('momentjs:moment'); // Make moment available to all packages
   api.imply('momentjs:twix'); // Make moment twix available to all packages
@@ -63,6 +64,9 @@ Package.onUse(function (api) {
 
   // templates
   api.addFiles([
+    // layout
+    'client/templates/layout/coreRentalLayout.html',
+    'client/templates/layout/coreRentalLayout.js',
     // admin
     'client/templates/dashboard/settings/rentalShopSettings.html',
     'client/templates/dashboard/settings/rentalShopSettings.js',

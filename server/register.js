@@ -17,6 +17,7 @@ ReactionCore.registerPackage({
     container: 'getoutfitted',
     template: 'dashboardRentalProducts',
     workflow: 'coreRentalWorkflow',
+    layout: 'coreRentalLayout',
     priority: 1
   }, {
     // Provides Dashboard Settings Pane
@@ -39,9 +40,10 @@ ReactionCore.registerPackage({
     template: 'rentalProductsDatepicker',
     workflow: 'coreWorkflow'
   }],
+
   layout: [{
     workflow: 'coreRentalWorkflow',
-    layout: 'coreLayout',
+    layout: 'coreRentalLayout',
     theme: 'default',
     enabled: true,
     structure: {
