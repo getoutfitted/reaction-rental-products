@@ -4,7 +4,7 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
       Products = ReactionCore.Collections.Products;
       Cart = ReactionCore.Collections.Cart;
       Cart.remove({});
-      Products.remove({});
+      ReactionCore.Collections.Products.remove({});
     });
 
     it('should set cart rental start and end times', function (done) {
@@ -177,7 +177,7 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
   describe('before:cart/addToCart', function () {
     beforeEach(function () {
       Cart.remove({});
-      Products.remove({});
+      ReactionCore.Collections.Products.remove({});
     });
 
     it('should have standard product price if product is "simple" type', function (done) {

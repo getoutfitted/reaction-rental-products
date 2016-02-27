@@ -25,6 +25,7 @@ Package.onUse(function (api) {
   api.use('aldeed:autoform@5.7.1');
   api.use('rajit:bootstrap3-datepicker@1.4.1', ['client']);
   api.use('reactioncommerce:core@0.12.0');
+  api.use('reactioncommerce:reaction-product-variant'); // Migrate to full replacement of basic product
   api.use('reactioncommerce:reaction-inventory');
   api.use('reactioncommerce:reaction-router');
   api.use('reactioncommerce:reaction-collections');

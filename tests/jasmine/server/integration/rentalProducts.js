@@ -2,7 +2,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
   describe('rentalProducts/setProductType', function () {
     beforeEach(function () {
       Products = ReactionCore.Collections.Products;
-      Products.remove({});
+      ReactionCore.Collections.Products.remove({});
       InventoryVariants.remove({});
     });
 
@@ -15,7 +15,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
         Meteor.call('rentalProducts/setProductType', product._id, 'rental');
       }).toThrow(new Meteor.Error(403, 'Access Denied'));
 
-      expect(Products.update).not.toHaveBeenCalled();
+      expect(ReactionCore.Collections.Products.update).not.toHaveBeenCalled();
       done();
     });
 
@@ -26,7 +26,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       expect(_.size(product.variants)).toEqual(1);
       Meteor.call('rentalProducts/setProductType', product._id, 'rental');
 
-      const updatedProduct = Products.findOne(product._id);
+      const updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
       expect(updatedProduct.type).toEqual('rental');
       done();
     });
@@ -52,7 +52,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       expect(_.size(product.variants)).toEqual(1);
       Meteor.call('rentalProducts/setProductType', product._id, 'rental');
 
-      const updatedProduct = Products.findOne(product._id);
+      const updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
       expect(updatedProduct.variants[0].pricePerDay).toEqual(product.variants[0].price);
       done();
     });
@@ -64,7 +64,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       expect(product.variants.length).toEqual(2);
 
       Meteor.call('rentalProducts/setProductType', product._id, 'rental');
-      const updatedProduct = Products.findOne(product._id);
+      const updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
       expect(updatedProduct.type).toEqual('rental');
       expect(updatedProduct.variants[1].rentalPrice).toBeUndefined();
       done();
@@ -77,7 +77,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       expect(product.variants.length).toEqual(2);
 
       Meteor.call('rentalProducts/setProductType', product._id, 'rental');
-      const updatedProduct = Products.findOne(product._id);
+      const updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
       expect(updatedProduct.type).toEqual('rental');
       expect(updatedProduct.variants[0].rentalPrice).toEqual(product.variants[0].rentalPrice);
       done();
@@ -90,7 +90,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       expect(product.variants.length).toEqual(2);
 
       Meteor.call('rentalProducts/setProductType', product._id, 'rental');
-      const updatedProduct = Products.findOne(product._id);
+      const updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
       expect(updatedProduct.type).toEqual('rental');
       expect(updatedProduct.variants[0].unavailableDates).toEqual(product.variants[0].unavailableDates);
       done();
@@ -100,7 +100,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
   // TODO: depricate this in favor of rentalProducts/cloneVariant method
   xdescribe('cloneRentalVariant', function () {
     beforeEach(function () {
-      Products.remove({});
+      ReactionCore.Collections.Products.remove({});
     });
 
     it('should throw 403 error by non admin', function (done) {
@@ -112,7 +112,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
         Meteor.call('products/cloneVariant', product._id, product.variants[0]._id);
       }).toThrow(new Meteor.Error(403, 'Access Denied'));
 
-      expect(Products.insert).not.toHaveBeenCalled();
+      expect(ReactionCore.Collections.Products.insert).not.toHaveBeenCalled();
       done();
     });
 
@@ -123,7 +123,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       expect(_.size(product.variants)).toEqual(1);
       Meteor.call('products/cloneVariant', product._id, product.variants[0]._id);
 
-      const updatedProduct = Products.findOne(product._id);
+      const updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
       expect(_.size(updatedProduct.variants)).toEqual(2);
       expect(updatedProduct.variants[0].unavailableDates).toEqual([]);
       expect(updatedProduct.variants[1].unavailableDates).toEqual([]);
@@ -137,7 +137,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       expect(_.size(product.variants)).toEqual(1);
       Meteor.call('products/cloneVariant', product._id, product.variants[0]._id);
 
-      const updatedProduct = Products.findOne(product._id);
+      const updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
       expect(_.size(updatedProduct.variants)).toEqual(2);
       done();
     });
@@ -145,7 +145,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
 
   describe('createVariant', function () {
     beforeEach(function () {
-      Products.remove({});
+      ReactionCore.Collections.Products.remove({});
     });
 
     it('should throw 403 error by non admin', function (done) {
@@ -156,7 +156,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       expect(function () {
         Meteor.call('products/createVariant', product._id);
       }).toThrow(new Meteor.Error(403, 'Access Denied'));
-      expect(Products.update).not.toHaveBeenCalled();
+      expect(ReactionCore.Collections.Products.update).not.toHaveBeenCalled();
 
       done();
     });
@@ -168,7 +168,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
       Meteor.call('products/deleteVariant', product.variants[0]._id);
       Meteor.call('products/createVariant', product._id);
 
-      const updatedProduct = Products.findOne(product._id);
+      const updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
       expect(_.size(updatedProduct.variants)).toEqual(1);
 
       const variant = updatedProduct.variants[0];
@@ -181,7 +181,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
 
   describe('updateVariant', function () {
     beforeEach(function () {
-      Products.remove({});
+      ReactionCore.Collections.Products.remove({});
     });
 
     it('should throw 403 error by non admin', function (done) {
@@ -193,20 +193,20 @@ describe('getoutfitted:reaction-rental-products methods', function () {
         Meteor.call('products/updateVariant', product.variants[0]);
       }).toThrow(new Meteor.Error(403, 'Access Denied'));
 
-      expect(Products.update).not.toHaveBeenCalled();
+      expect(ReactionCore.Collections.Products.update).not.toHaveBeenCalled();
       done();
     });
   });
 
   describe('createProduct', function () {
     beforeEach(function () {
-      Products.remove({});
+      ReactionCore.Collections.Products.remove({});
     });
     // TODO: Need afterhook to create inventoryVariants
     xit('should have rental attributes', function (done) {
       spyOn(Roles, 'userIsInRole').and.returnValue(true);
       const prodId = Meteor.call('products/createProduct');
-      const product = Products.findOne(prodId);
+      const product = ReactionCore.Collections.Products.findOne(prodId);
       const variant = product.variants[0];
       expect(product.type).toEqual('rental');
       expect(variant.events[0].title).toEqual('Inbounded');
@@ -219,7 +219,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
     let productEvents = {};
 
     beforeEach(function () {
-      Products.remove({});
+      ReactionCore.Collections.Products.remove({});
       InventoryVariants.remove({});
 
       // TODO: MOVE events to faker
@@ -282,7 +282,7 @@ describe('getoutfitted:reaction-rental-products methods', function () {
 
   describe('rentalProducts/checkVariantAvailability', function () {
     beforeEach(function () {
-      Products.remove({});
+      ReactionCore.Collections.Products.remove({});
       InventoryVariants.remove({});
     });
 

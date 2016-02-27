@@ -8,10 +8,10 @@
  * @return {String} formatted pricePerDay/price or pricePerDay/price range
  */
 this.getVariantPriceOrPricePerDayRange = function (currentVariantId, currentProductId) {
-  let productId = currentProductId || selectedProductId();
-  let variantId = currentVariantId || selectedVariant()._id;
+  let productId = currentProductId || ReactionProduct.selectedProductId(); // XXX: Refactor to Reaction.Product
+  let variantId = currentVariantId || ReactionProduct.selectedVariant()._id;
 
-  let product = Products.findOne(productId);
+  let product = ReactionCore.Collections.Products.findOne(productId);
   if (!(variantId && productId && product)) {
     return undefined;
   }
@@ -71,8 +71,8 @@ this.getVariantPriceOrPricePerDayRange = function (currentVariantId, currentProd
  * @return {String} formatted price or price range
  */
 this.getProductPriceOrPricePerDayRange = function (currentProductId) {
-  let productId = currentProductId || selectedProductId();
-  let product = Products.findOne(productId);
+  let productId = currentProductId || ReactionProduct.selectedProductId();
+  let product = ReactionCore.Collections.Products.findOne(productId);
 
   if (!product) {
     return undefined;

@@ -2,7 +2,7 @@ describe('getoutfitted:reaction-rental-products orders methods', function () {
   describe('rentalProducts/inventoryAdjust', function () {
     beforeEach(function () {
       Products = ReactionCore.Collections.Products;
-      Products.remove({});
+      ReactionCore.Collections.Products.remove({});
       Orders.remove({});
     });
 

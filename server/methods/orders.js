@@ -16,7 +16,7 @@ Meteor.methods({
     while (iter.hasNext()) { datesToReserve.push(iter.next().toDate()); }  // Create array of requested dates
 
     for (let orderProduct of order.items) {
-      let product = Products.findOne(orderProduct.productId);
+      let product = ReactionCore.Collections.Products.findOne(orderProduct.productId);
       if (product.type === 'rental') {
         /* push start date minus pre-buffer days
          * loop through adding one day to array
@@ -52,7 +52,7 @@ Meteor.methods({
           });
         }
       } else {
-        Products.update({
+        ReactionCore.Collections.Products.update({
           '_id': product.productId,
           'variants._id': product.variants._id
         }, { $inc: {'variants.$.inventoryQuantity': -orderProduct.quantity}});

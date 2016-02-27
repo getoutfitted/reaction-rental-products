@@ -41,7 +41,7 @@ ReactionCore.registerPackage({
   }],
   layout: [{
     workflow: 'coreRentalWorkflow',
-    layout: 'coreLayout',
+    layout: 'coreAdminLayout',
     theme: 'default',
     enabled: true,
     structure: {

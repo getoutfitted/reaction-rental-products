@@ -1,6 +1,6 @@
 Template.productDetail.helpers({
   isProductType: function (productType) {
-    let product = selectedProduct();
+    let product = ReactionProduct.selectedProduct();
     if (product) {
       if (product.type === productType) {
         return 'true';
@@ -9,11 +9,14 @@ Template.productDetail.helpers({
     return null;
   },
   actualRentalOrPurchasablePrice: function () {
+    const current = ReactionProduct.selectedVariant();
+    const product = ReactionProduct.selectedProduct();
     let childVariants;
     let purchasableOrRentable;
-    let current = selectedVariant();
-    let product = selectedProduct();
-    let priceType = product.type === 'rental' ? 'pricePerDay' : 'price';
+    let priceType = 'price';
+    if (product && product.type === 'rental') {
+      priceType = 'pricePerDay';
+    }
     if (product && current) {
       childVariants = (function () {
         let _results = [];
@@ -35,7 +38,7 @@ Template.productDetail.helpers({
 
 Template.productDetail.events({
   'change #productTypeSelect': function (event) {
-    let product = selectedProduct();
+    let product = ReactionProduct.selectedProduct();
     let productType = event.currentTarget.value;
     Meteor.call('rentalProducts/setProductType', product._id, productType);
   }
