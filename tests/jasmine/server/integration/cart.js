@@ -3,7 +3,7 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
     beforeEach(function () {
       Products = ReactionCore.Collections.Products;
       Cart = ReactionCore.Collections.Cart;
-      Cart.remove({});
+      ReactionCore.Collections.Cart.remove({});
       ReactionCore.Collections.Products.remove({});
     });
 
@@ -15,7 +15,7 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
       const endTime = moment().add(daysTilRental + rentalLength, 'days').toDate();
       spyOn(Meteor, 'userId').and.returnValue(cart.userId);
       Meteor.call('rentalProducts/setRentalPeriod', cart._id, startTime, endTime);
-      const updatedCart = Cart.findOne(cart._id);
+      const updatedCart = ReactionCore.Collections.Cart.findOne(cart._id);
       expect(+updatedCart.startTime).toEqual(+startTime);
       expect(+updatedCart.endTime).toEqual(+endTime);
       done();
@@ -32,7 +32,7 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
       spyOn(Meteor, 'userId').and.returnValue(cart.userId);
       Meteor.call('rentalProducts/setRentalPeriod', cart._id, startTime, endTime);
 
-      const updatedCart = Cart.findOne(cart._id);
+      const updatedCart = ReactionCore.Collections.Cart.findOne(cart._id);
       expect(updatedCart.rentalDays).toEqual(lengthInDays);
       done();
     });
@@ -48,7 +48,7 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
       spyOn(Meteor, 'userId').and.returnValue(cart.userId);
       Meteor.call('rentalProducts/setRentalPeriod', cart._id, startTime, endTime);
 
-      const updatedCart = Cart.findOne(cart._id);
+      const updatedCart = ReactionCore.Collections.Cart.findOne(cart._id);
       expect(updatedCart.rentalDays).toEqual(lengthInDays);
       done();
     });
@@ -64,7 +64,7 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
       spyOn(Meteor, 'userId').and.returnValue(cart.userId);
       Meteor.call('rentalProducts/setRentalPeriod', cart._id, startTime, endTime);
 
-      const updatedCart = Cart.findOne(cart._id);
+      const updatedCart = ReactionCore.Collections.Cart.findOne(cart._id);
       expect(updatedCart.rentalHours).toEqual(lengthInHours);
       done();
     });
@@ -77,7 +77,7 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
       spyOn(Meteor, 'userId').and.returnValue(cart.userId);
       Meteor.call('rentalProducts/setRentalPeriod', cart._id, startTime, endTime);
 
-      const updatedCart = Cart.findOne(cart._id);
+      const updatedCart = ReactionCore.Collections.Cart.findOne(cart._id);
       expect(updatedCart.rentalDays).toEqual(1);
       done();
     });
@@ -103,12 +103,12 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
       const lengthInDays = moment(startTime).twix(endTime).count('days');
 
       Meteor.call('cart/addToCart', emptyCart._id, product._id, product.variants[0], '1');
-      const cart = Cart.findOne(emptyCart._id);
+      const cart = ReactionCore.Collections.Cart.findOne(emptyCart._id);
       expect(cart.cartSubTotal()).toEqual(Number(product.variants[0].pricePerDay * cart.rentalDays).toFixed(2));
 
       spyOn(Meteor, 'userId').and.returnValue(cart.userId);
       Meteor.call('rentalProducts/setRentalPeriod', emptyCart._id, startTime, endTime);
-      const updatedCart = Cart.findOne(emptyCart._id);
+      const updatedCart = ReactionCore.Collections.Cart.findOne(emptyCart._id);
       expect(updatedCart.rentalDays).toEqual(lengthInDays);
       expect(updatedCart.cartSubTotal()).toEqual(Number(product.variants[0].pricePerDay * updatedCart.rentalDays).toFixed(2));
       done();
@@ -138,13 +138,13 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
       // add simple and rental products to cart
       Meteor.call('cart/addToCart', emptyCart._id, rentalProduct._id, rentalProduct.variants[0], '1');
       Meteor.call('cart/addToCart', emptyCart._id, product._id, product.variants[0], '1');
-      const cart = Cart.findOne(emptyCart._id);
+      const cart = ReactionCore.Collections.Cart.findOne(emptyCart._id);
       expect(cart.cartSubTotal()).toEqual(
         Number(rentalProduct.variants[0].pricePerDay * cart.rentalDays + product.variants[0].price).toFixed(2));
 
       spyOn(Meteor, 'userId').and.returnValue(cart.userId);
       Meteor.call('rentalProducts/setRentalPeriod', emptyCart._id, startTime, endTime);
-      const updatedCart = Cart.findOne(emptyCart._id);
+      const updatedCart = ReactionCore.Collections.Cart.findOne(emptyCart._id);
       expect(updatedCart.rentalDays).toEqual(lengthInDays);
       expect(updatedCart.cartSubTotal()).toEqual(
         Number(rentalProduct.variants[0].pricePerDay * updatedCart.rentalDays + product.variants[0].price).toFixed(2));
@@ -162,12 +162,12 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
 
       // Add simple product to cart
       Meteor.call('cart/addToCart', emptyCart._id, product._id, product.variants[0], '1');
-      const cart = Cart.findOne(emptyCart._id);
+      const cart = ReactionCore.Collections.Cart.findOne(emptyCart._id);
       expect(cart.cartSubTotal()).toEqual(product.variants[0].price.toFixed(2));
 
       spyOn(Meteor, 'userId').and.returnValue(cart.userId);
       Meteor.call('rentalProducts/setRentalPeriod', emptyCart._id, startTime, endTime);
-      const updatedCart = Cart.findOne(emptyCart._id);
+      const updatedCart = ReactionCore.Collections.Cart.findOne(emptyCart._id);
       expect(updatedCart.rentalDays).toEqual(lengthInDays);
       expect(updatedCart.cartSubTotal()).toEqual(product.variants[0].price.toFixed(2));
       done();
@@ -176,7 +176,7 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
 
   describe('before:cart/addToCart', function () {
     beforeEach(function () {
-      Cart.remove({});
+      ReactionCore.Collections.Cart.remove({});
       ReactionCore.Collections.Products.remove({});
     });
 
@@ -184,7 +184,7 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
       const product = Factory.create('product');
       const emptyCart = Factory.create('cart', {items: []});
       Meteor.call('cart/addToCart', emptyCart._id, product._id, product.variants[0], '1');
-      const cart = Cart.findOne(emptyCart._id);
+      const cart = ReactionCore.Collections.Cart.findOne(emptyCart._id);
       expect(cart.items[0].variants.price).toEqual(product.variants[0].price);
       expect(cart.items[0].quantity).toEqual(1);
       expect(cart.items.length).toEqual(1);
@@ -207,7 +207,7 @@ describe('getoutfitted:reaction-rental-products cart methods', function () {
       });
       const emptyCart = Factory.create('rentalCart', {items: []});
       Meteor.call('cart/addToCart', emptyCart._id, product._id, product.variants[0], '1');
-      const cart = Cart.findOne(emptyCart._id);
+      const cart = ReactionCore.Collections.Cart.findOne(emptyCart._id);
       expect(cart.items[0].variants.price).toEqual(product.variants[0].pricePerDay * cart.rentalDays);
       expect(cart.items[0].quantity).toEqual(1);
       expect(cart.items.length).toEqual(1);

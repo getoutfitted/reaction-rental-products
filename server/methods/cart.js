@@ -31,7 +31,7 @@ Meteor.methods({
       cart.items = [];
     }
 
-    Cart.update({
+    ReactionCore.Collections.Cart.update({
       _id: cartId
     }, {
       $set: {
@@ -60,7 +60,7 @@ Meteor.methods({
     const fieldToSet = 'rental' + units[0].toUpperCase() + units.substr(1); // Make sure that units is correct
     opts[fieldToSet] = rentalLength;
 
-    Cart.update({
+    ReactionCore.Collections.Cart.update({
       _id: cartId
     }, {
       $set: updateObj
