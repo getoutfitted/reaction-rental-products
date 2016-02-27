@@ -1,6 +1,6 @@
 Template.childVariantForm.helpers({
   isProductType: function (productType) {
-    let product = selectedProduct();
+    let product = ReactionProduct.selectedProduct();
     if (product) {
       if (product.type === productType) {
         return true;

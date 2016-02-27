@@ -2,7 +2,7 @@
 // because we are replacing the template and leveraging all original helpers.
 Template.variantForm.helpers({
   isProductType: function (productType) {
-    let product = selectedProduct();
+    let product = ReactionProduct.selectedProduct();
     if (product) {
       if (product.type === productType) {
         return true;
