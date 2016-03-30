@@ -82,7 +82,12 @@ Meteor.methods({
       });
       return ReactionCore.Collections.Products.update({_id: productId}, {$set: {type: "rental"}});
     }
-
+    let variants = ReactionCore.Collections.Products.find({
+      ancestors: { $in: [productId] }
+    }).fetch();
+    _.each(variants, function (variant) {
+      ReactionCore.Collections.Products.update({_id: variant._id}, {$set: {type: "variant"}});
+    });
     return ReactionCore.Collections.Products.update({_id: productId}, {$set: {type: "simple"}});
   },
 

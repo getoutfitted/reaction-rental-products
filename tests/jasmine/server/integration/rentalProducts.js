@@ -51,25 +51,50 @@ fdescribe("getoutfitted:reaction-rental-products methods", function () {
     it("should initialize pricePerDay for variants", function (done) {
       spyOn(Roles, "userIsInRole").and.returnValue(true);
       const product = Factory.create("product");
+      const variant = Factory.create("variant", {
+        ancestors: [product._id],
+        inventoryQuantity: _.random(1, 10),
+        sku: "BASIC-PROD",
+        price: Math.round(Math.random() * (10000 - 1) + 1) / 100
+      });
 
-      expect(_.size(product.variants)).toEqual(1);
       Meteor.call("rentalProducts/setProductType", product._id, "rental");
 
       const updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
-      expect(updatedProduct.variants[0].pricePerDay).toEqual(product.variants[0].price);
+      const variants = ReactionCore.Collections.Products.find({
+        ancestors: { $in: [product._id] }
+      }).fetch();
+      expect(updatedProduct.type).toEqual("rental");
+      expect(variants[0].pricePerDay).toEqual(variant.price);
       done();
     });
 
-    it("should not initialize inventory variants", function (done) {
+    it("should not initialize inventory variants if they already exist", function (done) {
       spyOn(Roles, "userIsInRole").and.returnValue(true);
-      const product = Factory.create("theProductFormerlyKnownAsRental");
-      expect(product.type).toEqual("simple");
-      expect(product.variants.length).toEqual(2);
+      const product = Factory.create("product");
+      const variant = Factory.create("variant", {
+        ancestors: [product._id],
+        inventoryQuantity: _.random(1, 10),
+        sku: "BASIC-PROD",
+        price: Math.round(Math.random() * (10000 - 1) + 1) / 100
+      });
 
       Meteor.call("rentalProducts/setProductType", product._id, "rental");
-      const updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
+      let updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
+      let updatedVariant = ReactionCore.Collections.Products.findOne(variant._id);
+      expect(InventoryVariants.find({productId: variant._id}).count()).toEqual(variant.inventoryQuantity);
       expect(updatedProduct.type).toEqual("rental");
-      expect(updatedProduct.variants[1].rentalPrice).toBeUndefined();
+      expect(updatedVariant.type).toEqual("rentalVariant");
+
+      Meteor.call("rentalProducts/setProductType", product._id, "simple");
+      updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
+      updatedVariant = ReactionCore.Collections.Products.findOne(variant._id);
+      expect(updatedProduct.type).toEqual("simple");
+      expect(updatedVariant.type).toEqual("variant");
+
+      Meteor.call("rentalProducts/setProductType", product._id, "rental");
+      updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
+      expect(updatedProduct.type).toEqual("rental");
       done();
     });
 
