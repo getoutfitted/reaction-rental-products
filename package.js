@@ -32,12 +32,13 @@ Package.onUse(function (api) {
   // community packages
   api.use("reactioncommerce:reaction-router@1.1.0");
   api.use("reactioncommerce:core@0.12.0");
+  api.use("reactioncommerce:reaction-product-variant@1.0.0");
   api.use("matb33:collection-hooks");
 
   // Collection packages
   api.use("aldeed:collection2@2.5.0");
   api.use("aldeed:simple-schema@1.3.3");
-  
+
   // Rental Specific Packages
   api.use("momentjs:moment@2.10.6");
   api.use("momentjs:twix@0.7.0");

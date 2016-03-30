@@ -35,12 +35,13 @@ fdescribe("getoutfitted:reaction-rental-products methods", function () {
       spyOn(Roles, "userIsInRole").and.returnValue(true);
       const product = Factory.create("product");
       const variant = Factory.create("variant", {
-        ancestors: [product._id]
+        ancestors: [product._id],
+        inventoryQuantity: _.random(1, 10),
+        sku: "BASIC-PROD"
       });
       const productQty = variant.inventoryQuantity;
-
       Meteor.call("rentalProducts/setProductType", product._id, "rental");
-      const inventoryVariants = InventoryVariants.find({productId: product.variants[0]._id});
+      const inventoryVariants = InventoryVariants.find({productId: variant._id});
       const inventoryVariant = inventoryVariants.fetch()[0];
       expect(inventoryVariants.count()).toEqual(productQty);
       expect(inventoryVariant.unavailableDates).toEqual([]);

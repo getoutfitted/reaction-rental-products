@@ -38,38 +38,49 @@ Meteor.methods({
     const product = ReactionCore.Collections.Products.findOne(productId);
     // if product type is rental, setup variants.
     if (productType === "rental") {
-      let variants = product.variants;
+      let variants = ReactionCore.Collections.Products.find({
+        ancestors: { $in: [productId] },
+        type: "variant"
+      }).fetch();
+
       _.each(variants, function (variant) {
-        if (variant.type !== "inventory") {
-          // XXX: This is sketchy and needs to change to a schema validation, but the validation is complicated
-          if (!variant.price || variant.price === 0) {
-            variant.price = 0.01;
-          }
-          _.defaults(variant, {pricePerDay: variant.price});
-          if (variant.pricePerDay === 0) {
-            variant.pricePerDay = variant.price;
-          }
+        let childVariants = ReactionCore.Collections.Products.find({
+          ancestors: { $in: [variant._id] },
+          type: "variant"
+        }).fetch();
+        // Set type to rental variant;
+        variant.type = "rentalVariant";
 
-          // If this variant is a parent, no inventory children. Only inventory children childmost variants
-          if (!_.findWhere(variants, {parentId: variant._id})) {
-            let inventoryVariantQty = ReactionCore.Collections.InventoryVariants.find({parentId: variant._id}).count();
-            let count = variant.inventoryQuantity - inventoryVariantQty;
-            if (count > 0) {
-              _(variant.inventoryQuantity - inventoryVariantQty).times(function (n) {
-                let inventoryVariant = {};
-                inventoryVariant.parentId = variant._id;
-                inventoryVariant.barcode = variant.sku + "-" + (n + count); // GetOutfitted.helpers.paddedNumber(n + count);
-                inventoryVariant.sku = variant.sku;
-                inventoryVariant.color = variant.color;
-                inventoryVariant.size = variant.size;
+        // XXX: This is sketchy and needs to change to a schema validation, but the validation is complicated
+        if (!variant.price || variant.price === 0) {
+          variant.price = 0.01;
+        }
+        _.defaults(variant, {pricePerDay: variant.price});
+        if (variant.pricePerDay === 0) {
+          variant.pricePerDay = variant.price;
+        }
 
-                ReactionCore.Collections.InventoryVariants.insert(inventoryVariant);
-              });
-            }
+        // If this variant is a parent, no inventory children. Only inventory children childmost variants
+        if (childVariants.length === 0) {
+          let existingInventoryVariantQty = ReactionCore.Collections.InventoryVariants.find({productId: variant._id}).count();
+          let count = variant.inventoryQuantity - existingInventoryVariantQty;
+          if (count > 0) {
+            _(variant.inventoryQuantity - existingInventoryVariantQty).times(function (n) {
+              let inventoryVariant = {};
+              inventoryVariant.productId = variant._id;
+              inventoryVariant.barcode = variant.sku + "-" + (n + existingInventoryVariantQty); // GetOutfitted.helpers.paddedNumber(n + count);
+              inventoryVariant.sku = variant.sku;
+              inventoryVariant.color = variant.color;
+              inventoryVariant.size = variant.size;
+
+              ReactionCore.Collections.InventoryVariants.insert(inventoryVariant);
+            });
           }
         }
+        ReactionCore.Collections.Products.update({_id: variant._id}, {$set: variant});
+        ReactionCore.Collections.Products.findOne({_id: variant._id});
       });
-      return ReactionCore.Collections.Products.update({_id: productId}, {$set: {type: "rental", variants: variants}});
+      return ReactionCore.Collections.Products.update({_id: productId}, {$set: {type: "rental"}});
     }
 
     return ReactionCore.Collections.Products.update({_id: productId}, {$set: {type: "simple"}});
