@@ -1,3 +1,303 @@
+/**
+ * Reaction Product Methods
+ */
+/* eslint new-cap: 0 */
+/* eslint no-loop-func: 0 */
+/* eslint quotes: 0 */
+
+/**
+ * @array toDenormalize
+ * @summary contains a list of fields, which should be denormalized
+ * @type {string[]}
+ */
+const toDenormalize = [
+  "price",
+  "inventoryQuantity",
+  "lowInventoryWarningThreshold",
+  "inventoryPolicy",
+  "inventoryManagement"
+];
+
+/**
+ * @function createTitle
+ * @description Recursive method which trying to find a new `title`, given the
+ * existing copies
+ * @param {String} newTitle - product `title`
+ * @param {String} productId - current product `_id`
+ * @return {String} title - modified `title`
+ */
+function createTitle(newTitle, productId) {
+  // exception product._id needed for cases then double triggering happens
+  let title = newTitle || "";
+  let titleCount = ReactionCore.Collections.Products.find({
+    title: title,
+    _id: {
+      $nin: [productId]
+    }
+  }).count();
+  // current product "copy" number
+  let titleNumberSuffix = 0;
+  // product handle prefix
+  let titleString = title;
+  // copySuffix "-copy-number" suffix of product
+  let copySuffix = titleString.match(/-copy-\d+$/) || titleString.match(/-copy$/);
+  // if product is a duplicate, we should take the copy number, and cut
+  // the handle
+  if (copySuffix) {
+    // we can have two cases here: copy-number and just -copy. If there is
+    // no numbers in copySuffix then we should put 1 in handleNumberSuffix
+    titleNumberSuffix = +String(copySuffix).match(/\d+$/) || 1;
+    // removing last numbers and last "-" if it presents
+    titleString = title.replace(/\d+$/, '').replace(/-$/, '');
+  }
+
+  // if we have more than one product with the same handle, we should mark
+  // it as "copy" or increment our product handle if it contain numbers.
+  if (titleCount > 0) {
+    // if we have product with name like "product4", we should take care
+    // about its uniqueness
+    if (titleNumberSuffix > 0) {
+      title = `${titleString}-${titleNumberSuffix + titleCount}`;
+    } else {
+      // first copy will be "...-copy", second: "...-copy-2"
+      title = `${titleString}-copy${ titleCount > 1 ? "-" + titleCount : ""}`;
+    }
+  }
+
+  // we should check again if there are any new matches with DB
+  if (ReactionCore.Collections.Products.find({
+    title: title
+  }).count() !== 0) {
+    title = createTitle(title, productId);
+  }
+  return title;
+}
+
+/**
+ * @function createHandle
+ * @description Recursive method which trying to find a new `handle`, given the
+ * existing copies
+ * @param {String} productHandle - product `handle`
+ * @param {String} productId - current product `_id`
+ * @return {String} handle - modified `handle`
+ */
+function createHandle(productHandle, productId) {
+  let handle = productHandle || "";
+  // exception product._id needed for cases then double triggering happens
+  let handleCount = ReactionCore.Collections.Products.find({
+    handle: handle,
+    _id: {
+      $nin: [productId]
+    }
+  }).count();
+  // current product "copy" number
+  let handleNumberSuffix = 0;
+  // product handle prefix
+  let handleString = handle;
+  // copySuffix "-copy-number" suffix of product
+  let copySuffix = handleString.match(/-copy-\d+$/) || handleString.match(/-copy$/);
+
+  // if product is a duplicate, we should take the copy number, and cut
+  // the handle
+  if (copySuffix) {
+    // we can have two cases here: copy-number and just -copy. If there is
+    // no numbers in copySuffix then we should put 1 in handleNumberSuffix
+    handleNumberSuffix = +String(copySuffix).match(/\d+$/) || 1;
+    // removing last numbers and last "-" if it presents
+    handleString = handle.replace(/\d+$/, '').replace(/-$/, '');
+  }
+
+  // if we have more than one product with the same handle, we should mark
+  // it as "copy" or increment our product handle if it contain numbers.
+  if (handleCount > 0) {
+    // if we have product with name like "product4", we should take care
+    // about its uniqueness
+    if (handleNumberSuffix > 0) {
+      handle = `${handleString}-${handleNumberSuffix + handleCount}`;
+    } else {
+      // first copy will be "...-copy", second: "...-copy-2"
+      handle = `${handleString}-copy${ handleCount > 1
+        ? '-' + handleCount : ''}`;
+    }
+  }
+
+  // we should check again if there are any new matches with DB
+  if (ReactionCore.Collections.Products.find({
+    handle: handle
+  }).count() !== 0) {
+    handle = createHandle(handle, productId);
+  }
+
+  return handle;
+}
+
+/**
+ * @function copyMedia
+ * @description copy images links to cloned variant from original
+ * @param {String} newId - [cloned|original] product _id
+ * @param {String} variantOldId - old variant _id
+ * @param {String} variantNewId - - cloned variant _id
+ * @return {Number} ReactionCore.Collections.Media#update result
+ */
+function copyMedia(newId, variantOldId, variantNewId) {
+  ReactionCore.Collections.Media.find({
+    "metadata.variantId": variantOldId
+  }).forEach(function (fileObj) {
+    let newFile = fileObj.copy();
+    return newFile.update({
+      $set: {
+        "metadata.productId": newId,
+        "metadata.variantId": variantNewId
+      }
+    });
+  });
+}
+
+/**
+ * @function denormalize
+ * @description With flattened model we do not want to get variant docs in
+ * `products` publication, but we need some data from variants to display price,
+ * quantity, etc. That's why we are denormalizing these properties into product
+ * doc. Also, this way should have a speed benefit comparing the way where we
+ * could dynamically build denormalization inside `products` publication.
+ * @summary update product denormalized properties if variant was updated or
+ * removed
+ * @param {String} id - product _id
+ * @param {String} field - type of field. Could be:
+ * "price",
+ * "inventoryQuantity",
+ * "inventoryManagement",
+ * "inventoryPolicy",
+ * "lowInventoryWarningThreshold"
+ * @since 0.11.0
+ * @return {Number} - number of successful update operations. Should be "1".
+ */
+function denormalize(id, field) {
+  const doc = ReactionCore.Collections.Products.findOne(id);
+  let variants;
+  if (doc.type === "simple") {
+    variants = ReactionCore.getTopVariants(id);
+  } else if (doc.type === "variant" && doc.ancestors.length === 1) {
+    variants = ReactionCore.getVariants(id);
+  }
+  let update = {};
+
+  switch (field) {
+  case "inventoryPolicy":
+  case "inventoryQuantity":
+  case "inventoryManagement":
+    Object.assign(update, {
+      isSoldOut: isSoldOut(variants),
+      isLowQuantity: isLowQuantity(variants),
+      isBackorder: isBackorder(variants)
+    });
+    break;
+  case "lowInventoryWarningThreshold":
+    Object.assign(update, {
+      isLowQuantity: isLowQuantity(variants)
+    });
+    break;
+  default: // "price" is object with range, min, max
+    const priceObject = ReactionCore.getProductPriceRange(id);
+    Object.assign(update, {
+      price: priceObject
+    });
+  }
+  ReactionCore.Collections.Products.update(id, {
+    $set: update
+  }, {
+    selector: {
+      type: "simple"
+    }
+  });
+}
+
+/**
+ * isSoldOut
+ * @description We are stop accepting new orders if product marked as
+ * `isSoldOut`.
+ * @param {Array} variants - Array with top-level variants
+ * @return {Boolean} true if summary product quantity is zero.
+ */
+function isSoldOut(variants) {
+  return variants.every(variant => {
+    if (variant.inventoryManagement && variant.inventoryPolicy) {
+      return ReactionCore.getVariantQuantity(variant) === 0;
+    }
+    return false;
+  });
+}
+
+/**
+ * isLowQuantity
+ * @description If at least one of the variants is less than the threshold,
+ * then function returns `true`
+ * @param {Array} variants - array of child variants
+ * @return {boolean} low quantity or not
+ */
+function isLowQuantity(variants) {
+  return variants.some(variant => {
+    const quantity = ReactionCore.getVariantQuantity(variant);
+    // we need to keep an eye on `inventoryPolicy` too and qty > 0
+    if (variant.inventoryManagement && variant.inventoryPolicy && quantity) {
+      return quantity <= variant.lowInventoryWarningThreshold;
+    }
+    // TODO: need to test this function with real data
+    return false;
+  });
+}
+
+/**
+ * isBackorder
+ * @description Is products variants is still available to be ordered after
+ * summary variants quantity is zero
+ * @param {Array} variants - array with variant objects
+ * @return {boolean} is backorder allowed or now for a product
+ */
+function isBackorder(variants) {
+  return variants.every(variant => {
+    return !variant.inventoryPolicy && variant.inventoryManagement &&
+      variant.inventoryQuantity === 0;
+  });
+}
+
+/**
+ * flushQuantity
+ * @description if variant `inventoryQuantity` not zero, function update it to
+ * zero. This needed in case then option with it's own `inventoryQuantity`
+ * creates to top-level variant. In that case top-level variant should display
+ * sum of his options `inventoryQuantity` fields.
+ * @param {String} id - variant _id
+ * @return {Number} - collection update results
+ */
+function flushQuantity(id) {
+  const variant = ReactionCore.Collections.Products.findOne(id);
+  // if variant already have descendants, quantity should be 0, and we don't
+  // need to do all next actions
+  if (variant.inventoryQuantity === 0) {
+    return 1; // let them think that we have one successful operation here
+  }
+
+  return ReactionCore.Collections.Products.update({
+    _id: id
+  }, {
+    $set: {
+      inventoryQuantity: 0
+    }
+  }, {
+    selector: {
+      type: "variant"
+    }
+  });
+}
+
+/**
+ * checkAvailability
+ * @description Basic binary search to see if requested dates are available for a given inventory item
+ * @param {[Date]} reservedDates - Array of dates that have been reserved for a particular item
+ * @param {[Date]} requestedDates - Array of dates that have been requested for reservation
+ * @return {Boolean} - availability of item
+ */
 function checkAvailability(reservedDates, requestedDates) {
   for (let date of requestedDates) {
     let min = 0;
@@ -191,5 +491,101 @@ Meteor.methods({
     }
     // return requested variants array  (an array consisting of available variantIds)
     return requestedVariants;
+  },
+
+  /**
+   * rentalProducts/cloneVariant
+   * @summary clones a product variant into a new variant
+   * @description the method copies variants, but will also create and clone
+   * child variants (options)
+   * @param {String} productId - the productId we're whose variant we're
+   * cloning
+   * @param {String} variantId - the variantId that we're cloning
+   * @todo rewrite @description
+   * @return {String} - cloned variant _id
+   */
+  "rentalProducts/cloneRentalVariant": function (productId, variantId) {
+    check(productId, String);
+    check(variantId, String);
+    // user needs createProduct permission to clone
+    if (!ReactionCore.hasPermission("createProduct")) {
+      throw new Meteor.Error(403, "Access Denied");
+    }
+
+    const variants = ReactionCore.Collections.Products.find({
+      $or: [{
+        _id: variantId
+      }, {
+        ancestors: {
+          $in: [variantId]
+        }
+      }],
+      type: "rentalVariant"
+    }).fetch();
+
+    // exit if we're trying to clone a ghost (variant that doesn't exist)
+    if (variants.length === 0) {
+      return;
+    }
+
+    const variantNewId = Random.id(); // for the parent variant
+    // we need to make sure that top level variant will be cloned first, his
+    // descendants later.
+    // we could use this way in future: http://stackoverflow.com/questions/
+    // 9040161/mongo-order-by-length-of-array, by now following are allowed
+    // @link http://underscorejs.org/#sortBy
+    const sortedVariants = _.sortBy(variants, doc => doc.ancestors.length);
+
+    sortedVariants.map(variant => {
+      const oldId = variant._id;
+      let type = "child";
+      let clone = {};
+      if (variantId === variant._id) {
+        type = "parent";
+        Object.assign(clone, variant, {
+          _id: variantNewId,
+          title: ""
+        });
+      } else {
+        const parentIndex = variant.ancestors.indexOf(variantId);
+        const ancestorsClone = variant.ancestors.slice(0);
+        // if variantId exists in ancestors, we override it by new _id
+        !!~parentIndex && ancestorsClone.splice(parentIndex, 1, variantNewId);
+        Object.assign(clone, variant, {
+          _id: Random.id(),
+          ancestors: ancestorsClone,
+          optionTitle: "",
+          title: ""
+        });
+      }
+      delete clone.updatedAt;
+      delete clone.createdAt;
+      delete clone.inventoryQuantity;
+      copyMedia(productId, oldId, clone._id);
+
+      return ReactionCore.Collections.Products.insert(clone, {
+        validate: false
+      }, (error, result) => {
+        if (result) {
+          if (type === "child") {
+            ReactionCore.Log.info(
+              `products/cloneVariant: created sub child clone: ${
+                clone._id} from ${variantId}`
+            );
+          } else {
+            ReactionCore.Log.info(
+              `products/cloneVariant: created clone: ${
+                clone._id} from ${variantId}`
+            );
+          }
+        }
+        if (error) {
+          ReactionCore.Log.error(
+            `products/cloneVariant: cloning of ${variantId} was failed: ${
+              error}`
+          );
+        }
+      });
+    });
   }
 });

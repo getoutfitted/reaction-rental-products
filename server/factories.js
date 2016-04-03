@@ -65,14 +65,20 @@ let timeTilRental = _.random(1, 60);
 // }
 
 Factory.define("rentalProduct", ReactionCore.Collections.Products, Factory.extend("product", {
-  type: "rental",
+  type: "simple",
   shopId: ReactionCore.getShopId(),
-  cleaningBuffer: 1
+  cleaningBuffer: 1,
+  gender: _.sample(["Mens", "Womens", "Unisex", "Boys", "Girls"])
 }));
 
 Factory.define("rentalVariant", ReactionCore.Collections.Products, Factory.extend("variant", {
-  type: "rentalVariant",
-  inventoryQuantity: _.random(1, 10)
+  type: "variant",
+  inventoryQuantity: _.random(1, 10),
+  pricePerDay: _.random(1, 10000) / 100,
+  color: _.sample(["Blue", "Red", "Black", "White"]),
+  size: _.sample(["Extra Small", "Small", "Medium", "Large", "Extra Large", "XXL"]),
+  gender: _.sample(["Mens", "Womens", "Unisex", "Boys", "Girls"]),
+  location: _.sample(["A", "B", "C"]) + _.random(1, 12)
 }));
 
 Factory.define("inventoryVariant", ReactionCore.Collections.InventoryVariants, {
@@ -98,17 +104,6 @@ Factory.define("inventoryVariant", ReactionCore.Collections.InventoryVariants, {
     }
   ]
 });
-
-Factory.define('theProductFormerlyKnownAsRental', ReactionCore.Collections.Products, Factory.extend('product', {
-  type: 'simple',
-  cleaningBuffer: 1,
-  variants: function () {
-    return [
-      randomVariant({_id: sharedId}),
-      randomVariant({type: 'inventory', parentId: sharedId, unavailableDates: faker.getoutfitted.takenDates})
-    ];
-  }
-}));
 
 Factory.define('rentalCart', ReactionCore.Collections.Cart, Factory.extend('cart', {
   startTime: moment(new Date()).add(timeTilRental, 'days').toDate(),

@@ -50,6 +50,7 @@ Package.onUse(function (api) {
   // Methods
   api.addFiles([
     "server/methods/rentalProducts.js",
+    "server/methods/inventoryVariants.js",
     "server/methods/orders.js",
     "server/methods/cart.js",
     "server/hooks.js"

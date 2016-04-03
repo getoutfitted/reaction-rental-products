@@ -72,14 +72,10 @@ ReactionCore.Schemas.InventoryVariants = new SimpleSchema({
     label: 'Shop ID',
     optional: true
   },
-// XXX: Shouldn't need this anymore with flat products
-  // parentId: {
-  //   type: String,
-  //   optional: true
-  // },
-  productId: {
+  productId: { // 'Product / Variant that owns this inventory'
     type: String,
-    optional: true
+    optional: true,
+    index: 1
   },
   sku: {
     type: String,
@@ -89,14 +85,18 @@ ReactionCore.Schemas.InventoryVariants = new SimpleSchema({
     type: String,
     optional: true
   },
-  color: {
+  nickname: {
     type: String,
     optional: true
   },
-  size: {
-    type: String,
-    optional: true
-  },
+  // color: {
+  //   type: String,
+  //   optional: true
+  // },
+  // size: {
+  //   type: String,
+  //   optional: true
+  // },
   active: {
     type: Boolean,
     optional: true,
@@ -117,6 +117,11 @@ ReactionCore.Schemas.InventoryVariants = new SimpleSchema({
   },
   unavailableDates: {
     type: [Date],
+    optional: true,
+    defaultValue: []
+  },
+  unavailableDetails: {
+    type: [Object],
     optional: true,
     defaultValue: []
   },
