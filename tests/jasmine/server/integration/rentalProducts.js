@@ -398,4 +398,63 @@ fdescribe("getoutfitted:reaction-rental-products methods", function () {
       done();
     });
   });
+
+  describe("rentalProducts/createInventoryVariant", function () {
+    it("should 403 error by non permissioned user", function (done) {
+      spyOn(Roles, "userIsInRole").and.returnValue(false);
+      spyOn(InventoryVariants, "insert");
+      expect(function () {
+        Meteor.call("rentalProducts/createInventoryVariant", "fakeId");
+      }).toThrow(new Meteor.Error(403, "Access Denied"));
+      expect(InventoryVariants.insert).not.toHaveBeenCalled();
+      done();
+    });
+
+    it("should create an inventory variant by admin", function (done) {
+      spyOn(Roles, "userIsInRole").and.returnValue(true);
+      const product = Factory.create("rentalProduct");
+      const variant = Factory.create("rentalVariant", {
+        ancestors: [product._id]
+      });
+      Meteor.call("rentalProducts/createInventoryVariant", variant._id);
+      const inventoryVariants = InventoryVariants.find({productId: variant._id});
+      expect(inventoryVariants.count()).toEqual(1);
+      expect(inventoryVariants.fetch()[0].unavailableDates).toEqual([]);
+      expect(inventoryVariants.fetch()[0].active).toEqual(true);
+      done();
+    });
+
+    it("should create an inventory variant with options by admin", function (done) {
+      spyOn(Roles, "userIsInRole").and.returnValue(true);
+      const product = Factory.create("rentalProduct");
+      const variant = Factory.create("rentalVariant", {
+        ancestors: [product._id]
+      });
+      const options = { active: false, barcode: "BARCODE-234" };
+      Meteor.call("rentalProducts/createInventoryVariant", variant._id, options);
+      const inventoryVariants = InventoryVariants.find({productId: variant._id});
+      expect(inventoryVariants.count()).toEqual(1);
+      expect(inventoryVariants.fetch()[0].unavailableDates).toEqual([]);
+      expect(inventoryVariants.fetch()[0].active).toEqual(false);
+      expect(inventoryVariants.fetch()[0].barcode).toEqual("BARCODE-234");
+      done();
+    });
+    
+    it("should create multiple inventory variants by passing qty by admin", function (done) {
+      spyOn(Roles, "userIsInRole").and.returnValue(true);
+      const product = Factory.create("rentalProduct");
+      const variant = Factory.create("rentalVariant", {
+        ancestors: [product._id]
+      });
+      const options = { active: true, barcode: "BCODE" };
+      Meteor.call("rentalProducts/createInventoryVariant", variant._id, options, 5);
+      const inventoryVariants = InventoryVariants.find({productId: variant._id});
+      expect(inventoryVariants.count()).toEqual(5);
+      expect(inventoryVariants.fetch()[0].unavailableDates).toEqual([]);
+      expect(inventoryVariants.fetch()[0].active).toEqual(true);
+      expect(inventoryVariants.fetch()[0].barcode).toEqual("BCODE-1");
+      expect(inventoryVariants.fetch()[1].barcode).toEqual("BCODE-2");
+      done();
+    });
+  });
 });

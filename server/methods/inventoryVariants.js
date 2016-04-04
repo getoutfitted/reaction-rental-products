@@ -6,33 +6,46 @@ Meteor.methods({
    * @param {Object} [inventoryVariant] - inventoryVariant object
    * @return {String} new inventoryVariant _id
    */
-  "rentalProducts/createInventoryVariant": function (productId, inventoryVariant) {
-    check(parentId, String);
+  "rentalProducts/createInventoryVariant": function (productId, inventoryVariant = {}, qty = 1) {
+    check(productId, String);
     check(inventoryVariant, Match.Optional(Object));
+    check(qty, Match.Optional(Number));
     // must have createProduct permissions
     if (!ReactionCore.hasPermission("createProduct")) {
       throw new Meteor.Error(403, "Access Denied");
     }
+    let inventoryVariantIds = [];
 
-    const inventoryVariantId = Random.id();
+    _(qty).times(function (i) {
+      const inventoryVariantId = Random.id();
+      let barcode = inventoryVariant.barcode;
 
-    const assembledInventoryVariant = Object.assign(inventoryVariant || {}, {
-      _id: inventoryVariantId,
-      productId: productId
-    });
-
-    ReactionCore.Collections.InventoryVariants.insert(assembledInventoryVariant,
-      (error, result) => {
-        if (result) {
-          ReactionCore.Log.info(
-            `rentalProducts/createInventoryVariant: created inventoryVariant: ${
-              inventoryVariantId} for ${productId}`
-          );
-        }
+      if (barcode && qty > 1) {
+        barcode = barcode + "-" + i;
       }
-    );
 
-    return inventoryVariantId;
+      const assembledInventoryVariant = Object.assign(inventoryVariant || {}, {
+        _id: inventoryVariantId,
+        productId: productId
+      });
+
+      ReactionCore.Collections.InventoryVariants.insert(assembledInventoryVariant,
+        (error, result) => {
+          if (result) {
+            ReactionCore.Log.info(
+              `rentalProducts/createInventoryVariant: created inventoryVariant: ${
+                inventoryVariantId} for ${productId}`
+            );
+          }
+          if (error) {
+            ReactionCore.Log.error(`rentalProducts/createInventoryVariant error
+              while creating inventory variant: ${inventoryVariantId} for ${productId}`, error);
+          }
+        }
+      );
+      inventoryVariantIds.push(inventoryVariantId); // Questionable to keep this out of the callback, but otherwise
+    });                                 // return would also need to be in callback.
+    return inventoryVariantIds;
   },
 
   /**
