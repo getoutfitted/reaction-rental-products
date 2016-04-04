@@ -439,7 +439,7 @@ fdescribe("getoutfitted:reaction-rental-products methods", function () {
       expect(inventoryVariants.fetch()[0].barcode).toEqual("BARCODE-234");
       done();
     });
-    
+
     it("should create multiple inventory variants by passing qty by admin", function (done) {
       spyOn(Roles, "userIsInRole").and.returnValue(true);
       const product = Factory.create("rentalProduct");
@@ -452,8 +452,86 @@ fdescribe("getoutfitted:reaction-rental-products methods", function () {
       expect(inventoryVariants.count()).toEqual(5);
       expect(inventoryVariants.fetch()[0].unavailableDates).toEqual([]);
       expect(inventoryVariants.fetch()[0].active).toEqual(true);
-      expect(inventoryVariants.fetch()[0].barcode).toEqual("BCODE-1");
-      expect(inventoryVariants.fetch()[1].barcode).toEqual("BCODE-2");
+      expect(inventoryVariants.fetch()[0].barcode).toEqual("BCODE-0");
+      expect(inventoryVariants.fetch()[1].barcode).toEqual("BCODE-1");
+      done();
+    });
+  });
+
+  describe("rentalProducts/updateInventoryVariantField", function () {
+    it("should 403 error by non permissioned user", function (done) {
+      spyOn(Roles, "userIsInRole").and.returnValue(false);
+      spyOn(InventoryVariants, "update");
+      expect(function () {
+        Meteor.call("rentalProducts/updateInventoryVariantField", "fakeId", "field", "value");
+      }).toThrow(new Meteor.Error(403, "Access Denied"));
+      expect(InventoryVariants.update).not.toHaveBeenCalled();
+      done();
+    });
+
+    it("should update a field of an inventory variant by admin", function (done) {
+      spyOn(Roles, "userIsInRole").and.returnValue(true);
+      const product = Factory.create("rentalProduct");
+      const variant = Factory.create("rentalVariant", {
+        ancestors: [product._id]
+      });
+      Meteor.call("rentalProducts/createInventoryVariant", variant._id);
+      const inventoryVariants = InventoryVariants.find({productId: variant._id});
+      const inventoryVariant = inventoryVariants.fetch()[0];
+      expect(inventoryVariant.active).toEqual(true);
+
+      Meteor.call("rentalProducts/updateInventoryVariantField", inventoryVariant._id, "active", false);
+      const updatedInventoryVariants = InventoryVariants.find({productId: variant._id});
+      const updatedInventoryVariant = updatedInventoryVariants.fetch()[0];
+      expect(updatedInventoryVariant.active).toEqual(false);
+      done();
+    });
+  });
+
+  describe("rentalProducts/deleteInventoryVariant", function () {
+    it("should 403 error by non permissioned user", function (done) {
+      spyOn(Roles, "userIsInRole").and.returnValue(false);
+      spyOn(InventoryVariants, "update");
+      expect(function () {
+        Meteor.call("rentalProducts/deleteInventoryVariant", "fakeId");
+      }).toThrow(new Meteor.Error(403, "Access Denied"));
+      expect(InventoryVariants.update).not.toHaveBeenCalled();
+      done();
+    });
+
+    it("should delete an inventory variant by admin", function (done) {
+      spyOn(Roles, "userIsInRole").and.returnValue(true);
+      const product = Factory.create("rentalProduct");
+      const variant = Factory.create("rentalVariant", {
+        ancestors: [product._id]
+      });
+
+      Meteor.call("rentalProducts/createInventoryVariant", variant._id);
+      const inventoryVariants = InventoryVariants.find({productId: variant._id}).fetch();
+      const inventoryVariant = inventoryVariants[0];
+      expect(_.size(inventoryVariants)).toEqual(1);
+
+      Meteor.call("rentalProducts/deleteInventoryVariant", inventoryVariant._id);
+      const updatedInventoryVariants = InventoryVariants.find({productId: variant._id});
+      expect(updatedInventoryVariants.count()).toEqual(0);
+      done();
+    });
+
+    it("should delete multiple inventory variants by admin", function (done) {
+      spyOn(Roles, "userIsInRole").and.returnValue(true);
+      const product = Factory.create("rentalProduct");
+      const variant = Factory.create("rentalVariant", {
+        ancestors: [product._id]
+      });
+      Meteor.call("rentalProducts/createInventoryVariant", variant._id, {}, 5);
+      const inventoryVariants = InventoryVariants.find({productId: variant._id}).fetch();
+      const iv1 = inventoryVariants[0];
+      const iv2 = inventoryVariants[1];
+      expect(_.size(inventoryVariants)).toEqual(5);
+
+      Meteor.call("rentalProducts/deleteInventoryVariant", [iv1._id, iv2._id]);
+      const updatedInventoryVariants = InventoryVariants.find({productId: variant._id});
+      expect(updatedInventoryVariants.count()).toEqual(3);
       done();
     });
   });

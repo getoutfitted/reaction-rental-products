@@ -15,18 +15,20 @@ Meteor.methods({
       throw new Meteor.Error(403, "Access Denied");
     }
     let inventoryVariantIds = [];
+    let barcode = inventoryVariant.barcode;
+    const baseBarcode = inventoryVariant.barcode;
 
     _(qty).times(function (i) {
       const inventoryVariantId = Random.id();
-      let barcode = inventoryVariant.barcode;
-
+      
       if (barcode && qty > 1) {
-        barcode = barcode + "-" + i;
+        barcode = baseBarcode + "-" + i;
       }
 
       const assembledInventoryVariant = Object.assign(inventoryVariant || {}, {
         _id: inventoryVariantId,
-        productId: productId
+        productId: productId,
+        barcode: barcode
       });
 
       ReactionCore.Collections.InventoryVariants.insert(assembledInventoryVariant,
@@ -67,9 +69,9 @@ Meteor.methods({
 
     let stringValue = EJSON.stringify(value);
     let update = EJSON.parse("{\"" + field + "\":" + stringValue + "}");
-
+    
     // we need to use sync mode here, to return correct error and result to UI
-    const result = ReactionCore.Collections.Products.update(inventoryVariantId, {
+    const result = ReactionCore.Collections.InventoryVariants.update(inventoryVariantId, {
       $set: update
     });
     return result;
@@ -90,7 +92,7 @@ Meteor.methods({
 
     let inventoryVariantIds;
 
-    if (!Array.isArray(inventoryVariant)) {
+    if (!Array.isArray(inventoryVariantId)) {
       inventoryVariantIds = [inventoryVariantId];
     } else {
       inventoryVariantIds = inventoryVariantId;
