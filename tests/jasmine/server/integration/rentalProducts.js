@@ -1,127 +1,4 @@
 describe("getoutfitted:reaction-rental-products methods", function () {
-  xdescribe("rentalProducts/setProductType", function () {
-    // it("should throw 403 error by non admin", function (done) {
-    //   const product = Factory.create("product");
-    //   spyOn(ReactionCore.Collections.Products, "update");
-    //
-    //   expect(function () {
-    //     Meteor.call("rentalProducts/setProductType", product._id, "rental");
-    //   }).toThrow(new Meteor.Error(403, "Access Denied"));
-    //
-    //   expect(ReactionCore.Collections.Products.update).not.toHaveBeenCalled();
-    //   done();
-    // });
-    //
-    // it("should set product type to rental by admin", function (done) {
-    //   spyOn(Roles, "userIsInRole").and.returnValue(true);
-    //   const product = Factory.create("product");
-    //   expect(product.type).toEqual("simple");
-    //   Meteor.call("rentalProducts/setProductType", product._id, "rental");
-    //
-    //   const updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
-    //   expect(updatedProduct.type).toEqual("rental");
-    //   done();
-    // });
-    //
-    // it("should initialize inventoryVariants", function (done) {
-    //   spyOn(Roles, "userIsInRole").and.returnValue(true);
-    //   const product = Factory.create("product");
-    //   const variant = Factory.create("variant", {
-    //     ancestors: [product._id],
-    //     inventoryQuantity: _.random(1, 10),
-    //     sku: "BASIC-PROD"
-    //   });
-    //   const productQty = variant.inventoryQuantity;
-    //   Meteor.call("rentalProducts/setProductType", product._id, "rental");
-    //   const inventoryVariants = InventoryVariants.find({productId: variant._id});
-    //   const inventoryVariant = inventoryVariants.fetch()[0];
-    //   expect(inventoryVariants.count()).toEqual(productQty);
-    //   expect(inventoryVariant.unavailableDates).toEqual([]);
-    //   done();
-    // });
-    //
-    // it("should initialize pricePerDay for variants", function (done) {
-    //   spyOn(Roles, "userIsInRole").and.returnValue(true);
-    //   const product = Factory.create("product");
-    //   const variant = Factory.create("variant", {
-    //     ancestors: [product._id],
-    //     inventoryQuantity: _.random(1, 10),
-    //     sku: "BASIC-PROD",
-    //     price: Math.round(Math.random() * (10000 - 1) + 1) / 100
-    //   });
-    //
-    //   Meteor.call("rentalProducts/setProductType", product._id, "rental");
-    //
-    //   const updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
-    //   const variants = ReactionCore.Collections.Products.find({
-    //     ancestors: { $in: [product._id] }
-    //   }).fetch();
-    //   expect(updatedProduct.type).toEqual("rental");
-    //   expect(variants[0].pricePerDay).toEqual(variant.price);
-    //   done();
-    // });
-
-    // Currently changing product type is unidirectional - we cannot change from rental to simple
-    // because it causes validation errors.
-    //
-    // xit("should not initialize inventory variants if they already exist", function (done) {
-    //   spyOn(Roles, "userIsInRole").and.returnValue(true);
-    //   const product = Factory.create("product");
-    //   const variant = Factory.create("variant", {
-    //     ancestors: [product._id],
-    //     inventoryQuantity: _.random(1, 10),
-    //     sku: "BASIC-PROD",
-    //     price: Math.round(Math.random() * (10000 - 1) + 1) / 100
-    //   });
-    //
-    //   Meteor.call("rentalProducts/setProductType", product._id, "rental");
-    //   let updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
-    //   let updatedVariant = ReactionCore.Collections.Products.findOne(variant._id);
-    //   expect(InventoryVariants.find({productId: variant._id}).count()).toEqual(variant.inventoryQuantity);
-    //   expect(updatedProduct.type).toEqual("rental");
-    //   expect(updatedVariant.type).toEqual("rentalVariant");
-    //
-    //   Meteor.call("rentalProducts/setProductType", product._id, "simple");
-    //   updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
-    //   updatedVariant = ReactionCore.Collections.Products.findOne(variant._id);
-    //
-    //   expect(updatedProduct.type).toEqual("simple");
-    //   expect(updatedVariant.type).toEqual("variant");
-    //
-    //   Meteor.call("rentalProducts/setProductType", product._id, "rental");
-    //   updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
-    //   expect(updatedProduct.type).toEqual("rental");
-    //   done();
-    // });
-
-    // Not testing this until a better way to do bidirectional testing is found
-    // xit("should not update previously set variant price per day", function (done) {
-    //   spyOn(Roles, "userIsInRole").and.returnValue(true);
-    //   const product = Factory.create("theProductFormerlyKnownAsRental");
-    //   expect(product.type).toEqual("simple");
-    //   expect(product.variants.length).toEqual(2);
-    //
-    //   Meteor.call("rentalProducts/setProductType", product._id, "rental");
-    //   const updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
-    //   expect(updatedProduct.type).toEqual("rental");
-    //   expect(updatedProduct.variants[0].rentalPrice).toEqual(product.variants[0].rentalPrice);
-    //   done();
-    // });
-
-    // xit("should not update previously set variant unavailable dates", function (done) {
-    //   spyOn(Roles, "userIsInRole").and.returnValue(true);
-    //   const product = Factory.create("theProductFormerlyKnownAsRental");
-    //   expect(product.type).toEqual("simple");
-    //   expect(product.variants.length).toEqual(2);
-    //
-    //   Meteor.call("rentalProducts/setProductType", product._id, "rental");
-    //   const updatedProduct = ReactionCore.Collections.Products.findOne(product._id);
-    //   expect(updatedProduct.type).toEqual("rental");
-    //   expect(updatedProduct.variants[0].unavailableDates).toEqual(product.variants[0].unavailableDates);
-    //   done();
-    // });
-  });
-
   // TODO: depricate this in favor of rentalProducts/cloneVariant method
   describe("cloneRentalVariant", function () {
     it("should throw 403 error by non admin", function (done) {
@@ -138,6 +15,7 @@ describe("getoutfitted:reaction-rental-products methods", function () {
 
     it("should clone rental variant by admin", function (done) {
       spyOn(Roles, "userIsInRole").and.returnValue(true);
+      spyOn(ReactionCore, "hasPermission").and.returnValue(true);
       const product = Factory.create("rentalProduct");
       const variant = Factory.create("rentalVariant", {
         ancestors: [product._id]
@@ -158,6 +36,7 @@ describe("getoutfitted:reaction-rental-products methods", function () {
 
     it("should have rental variant properties", function (done) {
       spyOn(Roles, "userIsInRole").and.returnValue(true);
+      spyOn(ReactionCore, "hasPermission").and.returnValue(true);
       const product = Factory.create("rentalProduct");
       const variant = Factory.create("rentalVariant", {
         ancestors: [product._id]
@@ -196,6 +75,7 @@ describe("getoutfitted:reaction-rental-products methods", function () {
 
     it("should create rentalVariant by admin", function (done) {
       spyOn(Roles, "userIsInRole").and.returnValue(true);
+      spyOn(ReactionCore, "hasPermission").and.returnValue(true);
       const product = Factory.create("rentalProduct");
       Meteor.call("products/createVariant", product._id);
 
