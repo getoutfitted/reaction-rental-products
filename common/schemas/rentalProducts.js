@@ -1,8 +1,9 @@
 ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
   ReactionCore.Schemas.ProductVariant, {
-    type: {
-      type: String,
-      defaultValue: "rentalVariant"
+    functionalType: { // functionalType allows us to add-on to the schema for the `simple` and `variant` types
+      type: String,   // and still maintain opportunity to have unique product types.
+      optional: true,
+      defaultValue: "variant"
     },
     location: {
       label: "Warehouse Storage Location",
@@ -33,7 +34,7 @@ ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
     //   type: [ReactionCore.Schemas.rentalPriceBucket],
     //   optional: true,
     // },
-    workflow: {
+    workflow: { // XXX: Not 100% certain we need this here, definitely need it on inventory and product
       type: ReactionCore.Schemas.Workflow,
       optional: true
     }
@@ -42,9 +43,10 @@ ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
 
 ReactionCore.Schemas.RentalProduct = new SimpleSchema([
   ReactionCore.Schemas.Product, {
-    type: {
-      type: String,
-      defaultValue: "rental"
+    functionalType: { // functionalType allows us to add-on to the schema for the `simple` and `variant` types
+      type: String,   // and still maintain opportunity to have unique product types.
+      optional: true,
+      defaultValue: "simple"
     },
     gender: {
       type: String,
@@ -70,7 +72,3 @@ ReactionCore.Schemas.RentalProduct = new SimpleSchema([
     }
   }
 ]);
-
-// Update ProductVariant because it's checked against in core in certain methods.
-// ReactionCore.Schemas.ProductVariant = ReactionCore.Schemas.RentalProductVariant;
-// ReactionCore.Schemas.Product = ReactionCore.Schemas.RentalProduct;
