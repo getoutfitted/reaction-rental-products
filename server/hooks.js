@@ -33,3 +33,39 @@ ReactionCore.MethodHooks.beforeMethods({
     return false;
   }
 });
+
+ReactionCore.MethodHooks.afterMethods({
+  "cart/addToCart": function (options) {
+    check(options.arguments[0], String);
+    check(options.arguments[1], String);
+    // console.log(options);
+    const variantId = options.arguments[1];
+    const cart = ReactionCore.Collections.Cart.findOne({ userId: Meteor.userId });
+    if (!cart) {
+      return true;
+    }
+    if (cart.items && cart.items.length > 0) {
+      _.map(cart.items, function (item) {
+        if (item.variants._id === variantId
+          && item.variants.functionalType === "rentalVariant" // TODO: future if item.type === rental
+          && cart.rentalDays) {
+            // TODO: update qty to verified rental qty available
+          // Set price to calculated rental price;
+          item.variants.price = item.variants.pricePerDay * cart.rentalDays;
+        }
+        return item;
+      });
+    } else {
+      cart.items = [];
+    }
+
+    ReactionCore.Collections.Cart.update({
+      _id: cart._id
+    }, {
+      $set: {
+        items: cart.items
+      }
+    });
+    return true; // Continue with other hooks;
+  }
+});
