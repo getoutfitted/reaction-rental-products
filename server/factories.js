@@ -68,7 +68,8 @@ Factory.define("rentalProduct", ReactionCore.Collections.Products, Factory.exten
   type: "simple",
   shopId: ReactionCore.getShopId(),
   cleaningBuffer: 1,
-  gender: _.sample(["Mens", "Womens", "Unisex", "Boys", "Girls"])
+  gender: _.sample(["Mens", "Womens", "Unisex", "Boys", "Girls"]),
+  functionalType: "rental"
 }));
 
 Factory.define("rentalVariant", ReactionCore.Collections.Products, Factory.extend("variant", {
@@ -78,13 +79,13 @@ Factory.define("rentalVariant", ReactionCore.Collections.Products, Factory.exten
   color: _.sample(["Blue", "Red", "Black", "White"]),
   size: _.sample(["Extra Small", "Small", "Medium", "Large", "Extra Large", "XXL"]),
   gender: _.sample(["Mens", "Womens", "Unisex", "Boys", "Girls"]),
-  location: _.sample(["A", "B", "C"]) + _.random(1, 12)
+  location: _.sample(["A", "B", "C"]) + _.random(1, 12),
+  functionalType: "rentalVariant"
 }));
 
 Factory.define("inventoryVariant", ReactionCore.Collections.InventoryVariants, {
   id: Random.id(),
-  productId: undefined,
-  parentId: Random.id(),
+  productId: Random.id(),
   shopId: Random.id(),
   barcode: "SKU123-1",
   sku: "SKU123",

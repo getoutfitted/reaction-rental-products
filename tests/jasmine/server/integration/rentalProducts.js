@@ -1,4 +1,4 @@
-fdescribe("getoutfitted:reaction-rental-products methods", function () {
+describe("getoutfitted:reaction-rental-products methods", function () {
   xdescribe("rentalProducts/setProductType", function () {
     // it("should throw 403 error by non admin", function (done) {
     //   const product = Factory.create("product");

@@ -12,6 +12,10 @@ ReactionCore.Schemas.RentalCartItem = new SimpleSchema([
       type: String,
       optional: true
     },
+    functionalType: {
+      type: String,
+      optional: true
+    },
     variants: {
       type: ReactionCore.Schemas.RentalProductVariant
     }

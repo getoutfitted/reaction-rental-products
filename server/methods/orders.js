@@ -15,19 +15,18 @@ Meteor.methods({
     iter = moment(order.startTime).twix(order.endTime, { allDay: true }).iterate('days'); // Momentjs iterator
     while (iter.hasNext()) { datesToReserve.push(iter.next().toDate()); }  // Create array of requested dates
 
-    for (let orderProduct of order.items) {
-      let product = ReactionCore.Collections.Products.findOne(orderProduct.productId);
-      if (product.type === 'rental') {
+    for (let item of order.items) {
+      if (item.variants.functionalType === 'rentalVariant') {
         /* push start date minus pre-buffer days
          * loop through adding one day to array
          * stop when we get to end day + trailing buffer
          */
         let variantIds = Meteor.call('rentalProducts/checkInventoryAvailability',
-                                      orderProduct.variants._id,
+                                      item.variants._id,
                                       {endTime: order.endTime, startTime: order.startTime},
-                                      orderProduct.quantity);
-        if (variantIds.length !== orderProduct.quantity) {
-          throw new Meteor.Error(403, 'Requested ' + orderProduct.quantity + ' but only ' + variantIds.length + ' were available.');
+                                      item.quantity);
+        if (variantIds.length !== item.quantity) {
+          throw new Meteor.Error(403, 'Requested ' + item.quantity + ' but only ' + variantIds.length + ' were available.');
         }
 
         // Not using $in because we need to determine the correct position
@@ -53,9 +52,12 @@ Meteor.methods({
         }
       } else {
         ReactionCore.Collections.Products.update({
-          '_id': product.productId,
-          'variants._id': product.variants._id
-        }, { $inc: {'variants.$.inventoryQuantity': -orderProduct.quantity}});
+          _id: item.variants._id
+        }, {
+          $inc: {
+            inventoryQuantity: -item.quantity
+          }
+        }, { selector: { type: "variant" } });
       }
     }
   }

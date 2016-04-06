@@ -69,7 +69,7 @@ Meteor.methods({
 
     let stringValue = EJSON.stringify(value);
     let update = EJSON.parse("{\"" + field + "\":" + stringValue + "}");
-    
+
     // we need to use sync mode here, to return correct error and result to UI
     const result = ReactionCore.Collections.InventoryVariants.update(inventoryVariantId, {
       $set: update
