@@ -322,6 +322,9 @@ describe("getoutfitted:reaction-rental-products methods", function () {
 
     it("should create multiple inventory variants by passing qty by admin", function (done) {
       spyOn(Roles, "userIsInRole").and.returnValue(true);
+      function hasBarcode(inventoryList, barcode) {
+        return inventoryList.some(inventoryItem => barcode === inventoryItem.barcode);
+      }
       const product = Factory.create("rentalProduct");
       const variant = Factory.create("rentalVariant", {
         ancestors: [product._id]
@@ -332,8 +335,9 @@ describe("getoutfitted:reaction-rental-products methods", function () {
       expect(inventoryVariants.count()).toEqual(5);
       expect(inventoryVariants.fetch()[0].unavailableDates).toEqual([]);
       expect(inventoryVariants.fetch()[0].active).toEqual(true);
-      expect(inventoryVariants.fetch()[0].barcode).toEqual("BCODE-0");
-      expect(inventoryVariants.fetch()[1].barcode).toEqual("BCODE-1");
+      expect(hasBarcode(inventoryVariants.fetch(), "BCODE-0")).toBeTruthy();
+      expect(hasBarcode(inventoryVariants.fetch(), "BCODE-1")).toBeTruthy();
+      expect(hasBarcode(inventoryVariants.fetch(), "BCODE-4")).toBeTruthy();
       done();
     });
   });

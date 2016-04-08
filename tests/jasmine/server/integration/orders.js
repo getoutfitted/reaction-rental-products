@@ -68,7 +68,6 @@ describe("getoutfitted:reaction-rental-products orders methods", function () {
       previouslyBookedDates = InventoryVariants.findOne({}, {sort: {numberOfDatesBooked: -1}}).unavailableDates.length;
       Meteor.call("rentalProducts/inventoryAdjust", order._id);
       const updatedInventoryVariant = InventoryVariants.findOne({}, {sort: {numberOfDatesBooked: -1}});
-      // console.log(InventoryVariants.find({}, {sort: {numberOfDatesBooked: -1}, fields: {numberOfDatesBooked: 1}}).fetch());
       // Rental Length + 1 because we add rentalLength days to the first day.
       expect(updatedInventoryVariant.unavailableDates.length).toEqual(previouslyBookedDates + rentalLength + 1);
       done();
