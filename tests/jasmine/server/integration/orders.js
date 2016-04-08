@@ -215,4 +215,83 @@ describe("getoutfitted:reaction-rental-products orders methods", function () {
       done();
     });
   });
+
+  describe("rentalProducts/reserveInventoryVariantForDates", () => {
+    let iter;
+    let firstDays;
+    let firstStart;
+    let firstEnd;
+    let secondStart;
+    let secondEnd;
+
+    beforeAll(() => {
+      // this is needed for `inventory/register`
+      spyOn(ReactionCore, "hasPermission").and.returnValue(true);
+      rentalProduct = Factory.create("rentalProduct");
+      rentalVariant = Factory.create("rentalVariant", {
+        ancestors: [rentalProduct._id],
+        inventoryQuantity: 1
+      });
+
+      reservedDays = [];
+      reservedStart = moment().startOf("day").add(4, "days").toDate();
+      reservedEnd = moment().startOf("day").add(16, "days").toDate();
+      iter = moment(reservedStart).twix(reservedEnd, {allDay: true}).iterate("days");
+      while (iter.hasNext()) { reservedDays.push(iter.next().toDate()); }
+    });
+
+    beforeEach(()=> {
+      ReactionCore.Collections.Orders.remove({});
+      InventoryVariants.remove({});
+      inventoryVariant = Factory.create("inventoryVariant", {
+        productId: rentalVariant._id,
+        barcode: "BARCODE",
+        sku: "SKU123",
+        unavailableDates: reservedDays,
+        numberOfDatesBooked: reservedDays.length
+      });
+    });
+
+    it("should reserve available inventory for dates requested", done => {
+      let inv = ReactionCore.Collections.InventoryVariants.findOne();
+      expect(inv.unavailableDates.length).toEqual(13);
+      Meteor.call("rentalProducts/reserveInventoryVariantForDates", inventoryVariant._id, {
+        startTime: moment().startOf("day").add(1, "days").toDate(),
+        endTime: moment().startOf("day").add(3, "days").toDate()
+      });
+      inv = ReactionCore.Collections.InventoryVariants.findOne();
+      expect(inv.unavailableDates.length).toEqual(16);
+      return done();
+    });
+
+    it("should throw 409 error if requested inventory is already booked", done => {
+      let inv = ReactionCore.Collections.InventoryVariants.findOne();
+      let resReq = {
+        startTime: moment().startOf("day").add(2, "days").toDate(),
+        endTime: moment().startOf("day").add(4, "days").toDate()
+      };
+      expect(inv.unavailableDates.length).toEqual(13);
+      expect(() => {
+        Meteor.call("rentalProducts/reserveInventoryVariantForDates", inventoryVariant._id, resReq);
+      }).toThrow(new Meteor.Error(409, `Could not insert reservation ${resReq} `
+        + `for Inventory Variant: ${inventoryVariant._id} - There is a conflict with an existing reservation.`));
+
+      inv = ReactionCore.Collections.InventoryVariants.findOne();
+      expect(inv.unavailableDates.length).toEqual(13);
+      return done();
+    });
+
+    it("should throw 404 error if requested inventory is not found", done => {
+      let id = "FakeId";
+      let resReq = {
+        startTime: moment().startOf("day").add(2, "days").toDate(),
+        endTime: moment().startOf("day").add(4, "days").toDate()
+      };
+      expect(() => {
+        Meteor.call("rentalProducts/reserveInventoryVariantForDates", id, resReq);
+      }).toThrow(new Meteor.Error(404, `Could not insert reservation ${resReq} `
+        + `for Inventory Variant: ${id} - Inventory Variant not found!`));
+      return done();
+    });
+  });
 });

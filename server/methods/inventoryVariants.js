@@ -125,7 +125,7 @@ Meteor.methods({
     while (iter.hasNext()) { requestedDates.push(iter.next().toDate()); }
 
     if (inventoryVariant
-      && RentalProducts.checkAvailability(inventoryVariant._id, requestedDates)) {
+      && RentalProducts.checkAvailability(inventoryVariant.unavailableDates, requestedDates)) {
       let reservedDates = InventoryVariants.findOne({
         _id: inventoryVariant._id
       }, {fields: {unavailableDates: 1}}).unavailableDates;
@@ -147,10 +147,10 @@ Meteor.methods({
         }
       });
     } else if (inventoryVariant) {
-      throw new Meteor.Error(409, `Could not insert reservation ${reservationRequest}
-        for Inventory Variant: ${inventoryVariantId} - There is a conflict with an existing reservation.`);
+      throw new Meteor.Error(409, `Could not insert reservation ${reservationRequest} `
+        + `for Inventory Variant: ${inventoryVariantId} - There is a conflict with an existing reservation.`);
     }
-    throw new Meteor.Error(404, `Could not insert reservation ${reservationRequest}
-      for Inventory Variant: ${inventoryVariantId} - Inventory Variant not found!`);
+    throw new Meteor.Error(404, `Could not insert reservation ${reservationRequest} `
+      + `for Inventory Variant: ${inventoryVariantId} - Inventory Variant not found!`);
   }
 });
