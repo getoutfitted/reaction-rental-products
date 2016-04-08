@@ -1,28 +1,4 @@
 ReactionCore.MethodHooks.beforeMethods({
-  // "cart/addToCart": function (options) {
-  //   check(options.arguments, [Match.Any]);
-  //   const product = ReactionCore.Collections.Products.findOne(options.arguments[0]);
-  //   const variant = ReactionCore.Collections.Products.findOne(options.arguments[1]);
-  //   const cart = ReactionCore.Collections.Cart.findOne({ userId: Meteor.userId });
-  //
-  //   // If we can"t find the product or the cart, continue with `cart/addToCart`
-  //   if (!product || !cart) {
-  //     return true;
-  //   }
-  //
-  //   // mutate price of object if rental
-  //   // TODO: find new way to do this
-  //   if (product.functionalType === "rental") {
-  //     if (!cart.rentalDays) {
-  //       ReactionCore.Log.warn("Cart did not have rental days");
-  //       return true;
-  //       // cart.rentalDays = 1;
-  //     }
-  //     console.log(variant.pricePerDay);
-  //     console.log(cart.rentalDays);
-  //   }
-  //   return true;
-  // },
   "orders/inventoryAdjust": function (options) {
     check(options.arguments, [Match.Any]);
     const orderId = options.arguments[0];
@@ -30,7 +6,7 @@ ReactionCore.MethodHooks.beforeMethods({
 
     Meteor.call("rentalProducts/inventoryAdjust", orderId);
 
-    return false;
+    return false; // Don't move on with the original call.
   }
 });
 
@@ -38,7 +14,7 @@ ReactionCore.MethodHooks.afterMethods({
   "cart/addToCart": function (options) {
     check(options.arguments[0], String);
     check(options.arguments[1], String);
-    // console.log(options);
+
     const variantId = options.arguments[1];
     const cart = ReactionCore.Collections.Cart.findOne({ userId: Meteor.userId });
     if (!cart) {
@@ -67,5 +43,6 @@ ReactionCore.MethodHooks.afterMethods({
       }
     });
     return true; // Continue with other hooks;
+    // TODO: Figure out what I should be returning
   }
 });

@@ -20,7 +20,7 @@ Meteor.methods({
 
     _(qty).times(function (i) {
       const inventoryVariantId = Random.id();
-      
+
       if (barcode && qty > 1) {
         barcode = baseBarcode + "-" + i;
       }
@@ -108,5 +108,49 @@ Meteor.methods({
       return numRemoved;
     }
     throw new Meteor.Error(304, "Something went wrong, no inventoryVariants were deleted!");
+  },
+
+  "rentalProducts/reserveInventoryVariantForDates": function (inventoryVariantId, reservationRequest) {
+    check(inventoryVariantId, String);
+    check(reservationRequest, {
+      startTime: Date,
+      endTime: Date
+    });
+
+    let inventoryVariant = ReactionCore.Collections.InventoryVariants.findOne(inventoryVariantId);
+    let requestedDates = [];
+    let iter = moment(reservationRequest.startTime).twix(reservationRequest.endTime, {
+      allDay: true
+    }).iterate("days");
+    while (iter.hasNext()) { requestedDates.push(iter.next().toDate()); }
+
+    if (inventoryVariant
+      && RentalProducts.checkAvailability(inventoryVariant._id, requestedDates)) {
+      let reservedDates = InventoryVariants.findOne({
+        _id: inventoryVariant._id
+      }, {fields: {unavailableDates: 1}}).unavailableDates;
+
+      // We take the time to insert unavailable dates in ascending date order
+      // find the position that we should insert the reserved dates
+      positionToInsert = _.sortedIndex(reservedDates, requestedDates[0]);
+
+      // insert datesToReserve into the correct variants at the correct position
+      return InventoryVariants.update({_id: inventoryVariant._id}, {
+        $inc: {
+          numberOfDatesBooked: requestedDates.length
+        },
+        $push: {
+          unavailableDates: {
+            $each: requestedDates,
+            $position: positionToInsert
+          }
+        }
+      });
+    } else if (inventoryVariant) {
+      throw new Meteor.Error(409, `Could not insert reservation ${reservationRequest}
+        for Inventory Variant: ${inventoryVariantId} - There is a conflict with an existing reservation.`);
+    }
+    throw new Meteor.Error(404, `Could not insert reservation ${reservationRequest}
+      for Inventory Variant: ${inventoryVariantId} - Inventory Variant not found!`);
   }
 });

@@ -120,6 +120,11 @@ ReactionCore.Schemas.InventoryVariants = new SimpleSchema({
     optional: true,
     defaultValue: []
   },
+  numberOfDatesBooked: {
+    type: Number,
+    optional: true,
+    defaultValue: 0
+  },
   unavailableDetails: {
     type: [Object],
     optional: true,

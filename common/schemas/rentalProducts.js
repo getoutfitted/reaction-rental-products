@@ -3,7 +3,7 @@ ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
     functionalType: { // functionalType allows us to add-on to the schema for the `simple` and `variant` types
       type: String,   // and still maintain opportunity to have unique product types.
       optional: true,
-      defaultValue: "variant"
+      defaultValue: "variant" // "rentalVariant"
     },
     location: {
       label: "Warehouse Storage Location",
@@ -46,7 +46,7 @@ ReactionCore.Schemas.RentalProduct = new SimpleSchema([
     functionalType: { // functionalType allows us to add-on to the schema for the `simple` and `variant` types
       type: String,   // and still maintain opportunity to have unique product types.
       optional: true,
-      defaultValue: "simple"
+      defaultValue: "simple" // "rental"
     },
     gender: {
       type: String,

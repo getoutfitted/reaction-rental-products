@@ -24,7 +24,7 @@ Meteor.methods({
         let variantIds = Meteor.call('rentalProducts/checkInventoryAvailability',
                                       item.variants._id,
                                       {endTime: order.endTime, startTime: order.startTime},
-                                      item.quantity);
+                                      item.quantity, false);
         if (variantIds.length !== item.quantity) {
           throw new Meteor.Error(403, 'Requested ' + item.quantity + ' but only ' + variantIds.length + ' were available.');
         }
@@ -42,6 +42,9 @@ Meteor.methods({
 
           // insert datesToReserve into the correct variants at the correct position
           InventoryVariants.update({_id: variantId}, {
+            $inc: {
+              numberOfDatesBooked: datesToReserve.length
+            },
             $push: {
               unavailableDates: {
                 $each: datesToReserve,

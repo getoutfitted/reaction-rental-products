@@ -6,7 +6,6 @@ Meteor.methods({
    * @param   {Date}   startTime - Datetime of start of rental
    * @param   {Date}   endTime   - Datetime of end of rental
    */
-
   "rentalProducts/setRentalPeriod": function (cartId, startTime, endTime) {
     check(cartId, String);
     check(startTime, Date);
@@ -21,6 +20,7 @@ Meteor.methods({
     // If cart has items in it - update the price for those items
     if (cart.items && cart.items.length > 0) {
       // Update price of each item in cart based on rental lengthInDays
+      // TODO: Make sure that all products are still available
       _.map(cart.items, function (item) {
         if (item.variants.functionalType === "rentalVariant") { // TODO: future if item.type === rental
           item.variants.price = item.variants.pricePerDay * rental.count("days");
@@ -47,6 +47,7 @@ Meteor.methods({
     });
   },
 
+  // Deprecate this function? Or figure out what it's for.
   "rentalProducts/setRentalLength": function (cartId, rentalLength, units) {
     check(cartId, String);
     check(rentalLength, Number);
