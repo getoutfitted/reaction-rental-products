@@ -152,5 +152,89 @@ Meteor.methods({
     }
     throw new Meteor.Error(404, `Could not insert reservation ${reservationRequest} `
       + `for Inventory Variant: ${inventoryVariantId} - Inventory Variant not found!`);
+  },
+  /**
+   * rentalProducts/registerInventory
+   * @summary check a product and update Inventory collection with inventory documents.
+   * @param {Object} product - valid ReactionCore.Schemas.Product object
+   * @return {Number} - returns the total amount of new inventory created
+   */
+  "rentalProducts/registerInventory": function (product) {
+    let type;
+    switch (product.type) {
+    case "variant":
+      check(product, ReactionCore.Schemas.ProductVariant);
+      type = "variant";
+      break;
+    default:
+      check(product, ReactionCore.Schemas.Product);
+      type = "simple";
+    }
+    // user needs createProduct permission to register new inventory
+    if (!ReactionCore.hasPermission("createProduct")) {
+      throw new Meteor.Error(403, "Access Denied");
+    }
+    // this.unblock();
+
+    let totalNewInventory = 0;
+    const productId = type === "variant" ? product.ancestors[0] : product._id;
+    const variants = ReactionCore.getVariants(productId);
+
+    // we'll check each variant to see if it has been fully registered
+    for (let variant of variants) {
+      let inventoryVariants = ReactionCore.Collections.InventoryVariants.find({
+        productId: variant._id
+      });
+      // we'll return this as well
+      let inventoryVariantCount = inventoryVariants.count();
+      // if the variant exists already we remove it from the inventoryVariants
+      // so that we don't process it as an insert
+      if (inventoryVariantCount < variant.inventoryQuantity) {
+        let newQty = variant.inventoryQuantity || 0;
+        let i = inventoryVariantCount + 1;
+
+        ReactionCore.Log.info(
+          `inserting ${newQty - inventoryVariantCount
+          } new inventory variants ${variant._id}`
+        );
+
+        const bulk = ReactionCore.Collections.InventoryVariants._collection.rawCollection().initializeUnorderedBulkOp();
+        while (i <= newQty) {
+          let id = ReactionCore.Collections.InventoryVariants._makeNewID();
+          let sku = variant.sku || "";
+          bulk.insert({
+            _id: id,
+            productId: variant._id,
+            shopId: product.shopId,
+            createdAt: new Date,
+            updatedAt: new Date,
+            unavailableDates: [],
+            unavailableDetails: [],
+            events: [],
+            active: true,
+            sku: sku,
+            barcode: sku + "_" + i,
+            workflow: { // we add this line because `batchInsert` doesn't know
+              status: "active" // about SimpleSchema, so `defaultValue` will not
+            }
+          });
+          i++;
+        }
+
+        // took from: http://guide.meteor.com/collections.html#bulk-data-changes
+        let execute = Meteor.wrapAsync(bulk.execute, bulk);
+        let inventoryItem = execute();
+        let inserted = inventoryItem.nInserted;
+
+        if (!inserted) { // or maybe `inventory.length === 0`?
+          // throw new Meteor.Error("Inventory Anomaly Detected. Abort! Abort!");
+          return totalNewInventory;
+        }
+        ReactionCore.Log.debug(`registered ${inserted}`);
+        totalNewInventory += inserted;
+      }
+    }
+    // returns the total amount of new inventory created
+    return totalNewInventory;
   }
 });

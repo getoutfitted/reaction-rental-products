@@ -148,5 +148,9 @@ ReactionCore.Schemas.InventoryVariants = new SimpleSchema({
       return new Date;
     },
     optional: true
+  },
+  workflow: {
+    type: ReactionCore.Schemas.Workflow,
+    optional: true
   }
 });

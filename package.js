@@ -47,18 +47,22 @@ Package.onUse(function (api) {
   // register package
   api.addFiles("server/register.js", "server");
 
+  // RentalProducts object
+  api.addFiles("common/common.js", ["client", "server"]);
+
   // Methods
   api.addFiles([
     "server/methods/rentalProducts.js",
     "server/methods/inventoryVariants.js",
     "server/methods/orders.js",
     "server/methods/cart.js",
-    "server/hooks.js"
+    "server/hooks.js",
+    "server/rentalProducts.js",
+    "server/publications.js"
   ], ["server"]);
 
   // Schemas, Collections, and Hooks
   api.addFiles([
-    "common/common.js",
     "common/schemas/inventoryVariants.js",
     "common/schemas/rentalProducts.js", // Schema for rental products
     "common/schemas/rentalShops.js",
@@ -81,6 +85,7 @@ Package.onUse(function (api) {
     "client/templates/dashboard/rentalProducts/availability/availability.html",
     "client/templates/dashboard/rentalProducts/availability/availability.js"
   ], ["client"]);
+
 });
 
 Package.onTest(function (api) {

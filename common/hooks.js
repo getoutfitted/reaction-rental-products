@@ -1,3 +1,13 @@
+
+/**
+ * after insert
+ * @summary should fires on create new variants, on clones products/variants
+ */
+ReactionCore.Collections.Products.after.insert(function (userId, doc) {
+  if (doc.type !== "variant" || doc.functionalType !== "rentalVariant") return false;
+  Meteor.call("rentalProducts/registerInventory", doc);
+});
+
 // function applyRentalVariantDefaults(variant) {
 //   return _.defaults(variant, {
 //     type: 'rentalVariant'

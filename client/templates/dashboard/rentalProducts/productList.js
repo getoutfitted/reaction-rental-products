@@ -1,3 +1,7 @@
+Template.dashboardRentalProducts.onCreated(function () {
+  Meteor.subscribe("rentalProducts");
+});
+
 Template.dashboardRentalProduct.helpers({
 });
 
