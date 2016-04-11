@@ -116,6 +116,9 @@ Meteor.methods({
       startTime: Date,
       endTime: Date
     });
+    if (!ReactionCore.hasPermission("createProduct")) {
+      throw new Meteor.Error(403, "Access Denied");
+    }
 
     let inventoryVariant = ReactionCore.Collections.InventoryVariants.findOne(inventoryVariantId);
     let requestedDates = [];

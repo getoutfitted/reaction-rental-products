@@ -183,13 +183,6 @@ describe("getoutfitted:reaction-rental-products methods", function () {
       const variant = Factory.create("rentalVariant", {
         ancestors: [product._id]
       });
-      _(variant.inventoryQuantity).times(function (n) {
-        Factory.create("inventoryVariant", {
-          productId: variant._id,
-          barcode: "BARCODE" + n,
-          sku: "BARCODE"
-        });
-      });
       const quantity = _.random(1, variant.inventoryQuantity);
       const inventoryVariants = InventoryVariants.find({productId: variant._id});
       expect(inventoryVariants.count()).toEqual(variant.inventoryQuantity);
@@ -210,14 +203,6 @@ describe("getoutfitted:reaction-rental-products methods", function () {
       });
       const quantity = variant.inventoryQuantity;
       const quantityRequested = 200;
-      _(quantity).times(function (n) {
-        Factory.create("inventoryVariant", {
-          productId: variant._id,
-          barcode: "BARCODE" + n,
-          sku: "BARCODE",
-          unavailableDates: faker.getoutfitted.takenDates
-        });
-      });
 
       const inventoryAvailable = Meteor.call("rentalProducts/checkInventoryAvailability", variant._id, {
         startTime: moment().startOf("day").add(3, "days").toDate(),
@@ -228,19 +213,17 @@ describe("getoutfitted:reaction-rental-products methods", function () {
       done();
     });
 
-    it("should be return empty array if requested dates are booked for all inventory variants", function (done) {
+    it("should return empty array if requested dates are booked for all inventory variants", function (done) {
       spyOn(Roles, "userIsInRole").and.returnValue(true);
       const product = Factory.create("rentalProduct");
       const variant = Factory.create("rentalVariant", {
         ancestors: [product._id]
       });
-      const quantity = variant.inventoryQuantity;
-      _(quantity).times(function (n) {
-        Factory.create("inventoryVariant", {
-          productId: variant._id,
-          barcode: "BARCODE" + n,
-          sku: "BARCODE",
-          unavailableDates: faker.getoutfitted.takenDates
+      const inventoryVariants = ReactionCore.Collections.InventoryVariants.find({productId: variant._id}).fetch();
+      inventoryVariants.forEach(function (iv) {
+        Meteor.call("rentalProducts/reserveInventoryVariantForDates", iv._id, {
+          startTime: moment().startOf("day").add(10, "days").toDate(),
+          endTime: moment().startOf("day").add(16, "days").toDate()
         });
       });
 
@@ -253,19 +236,17 @@ describe("getoutfitted:reaction-rental-products methods", function () {
       done();
     });
 
-    it("should be return empty array if requested dates are partially booked for all inventory variants", function (done) {
+    it("should return empty array if requested dates are partially booked for all inventory variants", function (done) {
       spyOn(Roles, "userIsInRole").and.returnValue(true);
       const product = Factory.create("rentalProduct");
       const variant = Factory.create("rentalVariant", {
         ancestors: [product._id]
       });
-      const quantity = variant.inventoryQuantity;
-      _(quantity).times(function (n) {
-        Factory.create("inventoryVariant", {
-          productId: variant._id,
-          barcode: "BARCODE" + n,
-          sku: "BARCODE",
-          unavailableDates: faker.getoutfitted.takenDates
+      const inventoryVariants = ReactionCore.Collections.InventoryVariants.find({productId: variant._id}).fetch();
+      inventoryVariants.forEach(function (iv) {
+        Meteor.call("rentalProducts/reserveInventoryVariantForDates", iv._id, {
+          startTime: moment().startOf("day").add(10, "days").toDate(),
+          endTime: moment().startOf("day").add(16, "days").toDate()
         });
       });
 
@@ -294,10 +275,11 @@ describe("getoutfitted:reaction-rental-products methods", function () {
       spyOn(Roles, "userIsInRole").and.returnValue(true);
       const product = Factory.create("rentalProduct");
       const variant = Factory.create("rentalVariant", {
-        ancestors: [product._id]
+        ancestors: [product._id],
+        inventoryQuantity: 0
       });
       Meteor.call("rentalProducts/createInventoryVariant", variant._id);
-      const inventoryVariants = InventoryVariants.find({productId: variant._id});
+      let inventoryVariants = InventoryVariants.find({productId: variant._id});
       expect(inventoryVariants.count()).toEqual(1);
       expect(inventoryVariants.fetch()[0].unavailableDates).toEqual([]);
       expect(inventoryVariants.fetch()[0].active).toEqual(true);
@@ -308,11 +290,13 @@ describe("getoutfitted:reaction-rental-products methods", function () {
       spyOn(Roles, "userIsInRole").and.returnValue(true);
       const product = Factory.create("rentalProduct");
       const variant = Factory.create("rentalVariant", {
-        ancestors: [product._id]
+        ancestors: [product._id],
+        inventoryQuantity: 0
       });
       const options = { active: false, barcode: "BARCODE-234" };
       Meteor.call("rentalProducts/createInventoryVariant", variant._id, options);
       const inventoryVariants = InventoryVariants.find({productId: variant._id});
+      console.log(inventoryVariants.fetch());
       expect(inventoryVariants.count()).toEqual(1);
       expect(inventoryVariants.fetch()[0].unavailableDates).toEqual([]);
       expect(inventoryVariants.fetch()[0].active).toEqual(false);
@@ -327,7 +311,8 @@ describe("getoutfitted:reaction-rental-products methods", function () {
       }
       const product = Factory.create("rentalProduct");
       const variant = Factory.create("rentalVariant", {
-        ancestors: [product._id]
+        ancestors: [product._id],
+        inventoryQuantity: 0
       });
       const options = { active: true, barcode: "BCODE" };
       Meteor.call("rentalProducts/createInventoryVariant", variant._id, options, 5);
@@ -387,10 +372,10 @@ describe("getoutfitted:reaction-rental-products methods", function () {
       spyOn(Roles, "userIsInRole").and.returnValue(true);
       const product = Factory.create("rentalProduct");
       const variant = Factory.create("rentalVariant", {
-        ancestors: [product._id]
+        ancestors: [product._id],
+        inventoryQuantity: 1
       });
 
-      Meteor.call("rentalProducts/createInventoryVariant", variant._id);
       const inventoryVariants = InventoryVariants.find({productId: variant._id}).fetch();
       const inventoryVariant = inventoryVariants[0];
       expect(_.size(inventoryVariants)).toEqual(1);
@@ -405,9 +390,9 @@ describe("getoutfitted:reaction-rental-products methods", function () {
       spyOn(Roles, "userIsInRole").and.returnValue(true);
       const product = Factory.create("rentalProduct");
       const variant = Factory.create("rentalVariant", {
-        ancestors: [product._id]
+        ancestors: [product._id],
+        inventoryQuantity: 5
       });
-      Meteor.call("rentalProducts/createInventoryVariant", variant._id, {}, 5);
       const inventoryVariants = InventoryVariants.find({productId: variant._id}).fetch();
       const iv1 = inventoryVariants[0];
       const iv2 = inventoryVariants[1];

@@ -85,7 +85,6 @@ Package.onUse(function (api) {
     "client/templates/dashboard/rentalProducts/availability/availability.html",
     "client/templates/dashboard/rentalProducts/availability/availability.js"
   ], ["client"]);
-
 });
 
 Package.onTest(function (api) {
