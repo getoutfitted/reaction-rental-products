@@ -70,5 +70,9 @@ ReactionCore.Schemas.RentalProduct = new SimpleSchema([
       index: 1,
       optional: true
     }
+    // , pricePerDayRange: {
+    //   type: ReactionCore.Schemas.PriceRange,
+    //   label: "Price Per Day Range"
+    // }
   }
 ]);

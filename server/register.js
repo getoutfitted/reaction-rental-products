@@ -25,7 +25,7 @@ ReactionCore.registerPackage({
   }, {
     route: "/dashboard/rental-products/availability/:_id",
     name: "rentalProducts.availabilityById",
-    template: "dashbaordRentalProductAvailability"
+    template: "dashboardRentalProductAvailability"
   }],
   layout: []
 });

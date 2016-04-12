@@ -1,14 +1,12 @@
 <template name="dashboardRentalProducts">
-  {{!-- navbar --}}
   <div class='container'>
     <h1>Rental Products</h1>
   </div>
   <div class='container'>
     <table class="table table-hover">
       <thead>
-        <th>Title</th>
+        <th>Product</th>
         <th>ID</th>
-        <th>Variants</th>
       </thead>
       <tbody>
         {{#each rentalProducts}}
@@ -21,9 +19,8 @@
 
 <template name="dashboardRentalProduct">
   {{! context is rentalProducts }}
-  <tr>
-    <th scope="row">{{title}}</th>
+  <tr class="inventory-row">
+    <td>{{vendor}} {{gender}} {{title}} {{productType}}</td>
     <td>{{_id}}</td>
-    <td>{{variants.length}}</td>
   </tr>
 </template>
