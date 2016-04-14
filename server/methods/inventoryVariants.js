@@ -125,8 +125,8 @@ Meteor.methods({
     let inventoryVariant = ReactionCore.Collections.InventoryVariants.findOne(inventoryVariantId);
     let requestedDates = [];
     let requestedDetails = [];
-    const shippingDays = 1;
-    const turnaroundTime = 1;
+    const shippingDays = 0;
+    const turnaroundTime = 0;
     let reservation = moment(
       moment(reservationRequest.startTime).subtract(transitTime + shippingDays, "days")
     ).twix(
