@@ -125,10 +125,12 @@ Meteor.methods({
     let inventoryVariant = ReactionCore.Collections.InventoryVariants.findOne(inventoryVariantId);
     let requestedDates = [];
     let requestedDetails = [];
+    const shippingDays = 1;
+    const turnaroundTime = 1;
     let reservation = moment(
-      moment(reservationRequest.startTime).subtract(transitTime + 1, "days")
+      moment(reservationRequest.startTime).subtract(transitTime + shippingDays, "days")
     ).twix(
-      moment(reservationRequest.endTime).add(transitTime + 2, "days"
+      moment(reservationRequest.endTime).add(transitTime + shippingDays + turnaroundTime, "days"
     ), {allDay: true});
 
     let reservationLength = reservation.count("days");
