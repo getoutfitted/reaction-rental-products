@@ -5,12 +5,18 @@
   <div class='container'>
     <table class="table table-hover">
       <thead>
+        <th>Gender</th>
+        <th>Vendor</th>
         <th>Product</th>
-        <th>ID</th>
+        <th>Type</th>
+        <th>Color</th>
+        <th>Size</th>
+        <th>SKU</th>
+        <th>QTY</th>
       </thead>
       <tbody>
         {{#each rentalProducts}}
-          {{> dashboardRentalProduct}}
+          {{> dashboardRentalProduct }}
         {{/each}}
       </tbody>
     </table>
@@ -20,7 +26,13 @@
 <template name="dashboardRentalProduct">
   {{! context is rentalProducts }}
   <tr class="inventory-row">
-    <td>{{vendor}} {{gender}} {{title}} {{productType}}</td>
-    <td>{{_id}}</td>
+    <td>{{parent.gender}}</td>
+    <td>{{parent.vendor}}</td>
+    <td>{{parent.title}}</td>
+    <td>{{parent.productType}}</td>
+    <td>{{color}}</td>
+    <td>{{size}}</td>
+    <td>{{sku}}</td>
+    <td>{{inventoryQuantity}}</td>
   </tr>
 </template>

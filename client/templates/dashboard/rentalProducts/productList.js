@@ -4,13 +4,13 @@ Template.dashboardRentalProducts.onCreated(function () {
 
 Template.dashboardRentalProducts.helpers({
   rentalProducts: function () {
-    return ReactionCore.Collections.Products.find({functionalType: "rental"});
+    return ReactionCore.Collections.Products.find({functionalType: "rentalVariant"});
   }
 });
 
 Template.dashboardRentalProduct.helpers({
-  variants: function () {
-    return ReactionCore.getVariants(this._id);
+  parent: function () {
+    return ReactionCore.Collections.Products.findOne(this.ancestors[0]);
   }
 });
 

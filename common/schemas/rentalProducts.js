@@ -18,6 +18,10 @@ ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
       type: String,
       optional: true
     },
+    numberSize: { // For sorting purposes
+      type: Number,
+      optional: true
+    },
     gender: {
       type: String,
       optional: true

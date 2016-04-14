@@ -1,49 +1,88 @@
+Template.dashboardRentalProductAvailability.onRendered(function () {
+  let instance = this;
+  const productId = ReactionRouter.getParam("_id");
+
+  instance.autorun(() => {
+    instance.subscribe("inventoryVariantsById", productId);
+    instance.subscribe("Product", productId);
+    instance.subscribe("ParentProduct", productId);
+  });
+});
+
 Template.dashboardRentalProductAvailability.helpers({
-  skus: function () {
-    let skus = _.filter(this.variants, function (variant) {
-      return variant.sku;
-    });
-    return skus;
+  currentMonth: () => {
+    Session.setDefault("dashboardViewStart", moment().startOf("month").toDate());
+    Session.setDefault("dashboardViewEnd", moment().endOf("month").toDate());
+    return moment(Session.get("dashboardViewStart")).format("MMMM");
+  },
+  inventoryVariants: () => {
+    const productId = ReactionRouter.getParam("_id");
+    return ReactionCore.Collections.InventoryVariants.find({productId: productId});
+  },
+  product: () => {
+    const productId = ReactionRouter.getParam("_id");
+    return ReactionCore.Collections.Products.findOne(productId);
+  },
+  parent: () => {
+    const productId = ReactionRouter.getParam("_id");
+    const product = ReactionCore.Collections.Products.findOne(productId);
+    if (product) {
+      return ReactionCore.Collections.Products.findOne(product.ancestors[0]);
+    }
+    return {};
+  },
+  viewStart: () => {
+    return Session.get("dashboardViewStart");
+  },
+  viewEnd: () => {
+    Session.get("dashboardViewEnd");
+  },
+  days: () => {
+    let viewStart = Session.get("dashboardViewStart");
+    let viewEnd = Session.get("dashboardViewEnd");
+    return moment(viewStart).twix(moment(viewEnd)).split(1, "day");
   }
 });
 
+// TODO: This could be made MUCH more efficient by calculating
+// each inventory variant a month/view start-view end at a time
+// rather than each day independently
 Template.dashboardVariantAvailability.helpers({
   viewStart: Session.get('dashboardViewStart'),
   viewEnd: Session.get('dashboardViewEnd'),
   currentMonth: moment(Session.get('dashboardViewStart')).format('MMMM'),
   days: function () {
-    Session.setDefault('dashboardViewStart', moment().startOf('month').toDate());
-    Session.setDefault('dashboardViewEnd', moment().endOf('month').toDate());
     let viewStart = Session.get('dashboardViewStart');
     let viewEnd = Session.get('dashboardViewEnd');
     return moment(viewStart).twix(moment(viewEnd)).split(1, 'day');
   },
-  inventoryVariants: function () {
-    let variants = Template.parentData().variants;
-    let _id = this._id;
-    let inventoryVariants = _.filter(variants, function (variant) {
-      return variant.parentId === _id;
-    });
-    if (inventoryVariants.length > 0) {
-      return inventoryVariants;
+  reservationStatus: function (day, unavailableDetails) {
+    let icons = {
+      "In Transit - Delivery Shipped": "fa fa-upload delivery-brown",
+      "In Transit - Delivery": "fa fa-truck delivery-brown",
+      "In Transit - Return Shipped": "fa fa-download returning-green",
+      "In Transit - Returning": "fa fa-truck fa-flip-horizontal returning-green",
+      "In Transit - Rush Delivery": "fa fa-plane rush-delivery-orange",
+      "In Transit - Rush Returning": "fa fa-plane fa-flip-horizontal rush-delivery-orange",
+      "Return Processing": "fa fa-refresh",
+      "In Use": "fa fa-user primary-color"
+    };
+
+    if (!unavailableDetails || unavailableDetails.length === 0) {
+      return "hide";
     }
-    return [this];
-  },
-  isDayBooked: function (day, unavailableDates) {
-    if (unavailableDates.length === 0) {
-      return 'hide';
+    let pos =  _.sortedIndex(unavailableDetails, {date: day.start.toDate()}, "date");
+    if (unavailableDetails[pos]
+      && +day.start === +moment(unavailableDetails[pos].date).startOf("day")) {
+      return icons[unavailableDetails[pos].reason];
     }
-    let pos =  _.sortedIndex(unavailableDates, day.start.toDate());
-    if (+day.start === +moment(unavailableDates[pos]).startOf('day')) {
-      return 'success';
-    }
-    return 'hide';
+    return "hide";
   }
 });
 
 Template.dashboardCalendarDay.helpers({
   formattedDay: function (d) {
-    return d.format('DD');
+    return d.format("dd DD");
   },
   inventoryVariants: function () {
   }

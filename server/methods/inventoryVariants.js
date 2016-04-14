@@ -110,22 +110,55 @@ Meteor.methods({
     throw new Meteor.Error(304, "Something went wrong, no inventoryVariants were deleted!");
   },
 
-  "rentalProducts/reserveInventoryVariantForDates": function (inventoryVariantId, reservationRequest) {
+  "rentalProducts/reserveInventoryVariantForDates": function (inventoryVariantId, reservationRequest, transitTime = 0, orderId) {
     check(inventoryVariantId, String);
     check(reservationRequest, {
       startTime: Date,
       endTime: Date
     });
+    check(transitTime, Match.Optional(Number));
+    check(orderId, Match.Optional(String));
     if (!ReactionCore.hasPermission("createProduct")) {
       throw new Meteor.Error(403, "Access Denied");
     }
 
     let inventoryVariant = ReactionCore.Collections.InventoryVariants.findOne(inventoryVariantId);
     let requestedDates = [];
-    let iter = moment(reservationRequest.startTime).twix(reservationRequest.endTime, {
-      allDay: true
-    }).iterate("days");
-    while (iter.hasNext()) { requestedDates.push(iter.next().toDate()); }
+    let requestedDetails = [];
+    let reservation = moment(
+      moment(reservationRequest.startTime).subtract(transitTime + 1, "days")
+    ).twix(
+      moment(reservationRequest.endTime).add(transitTime + 2, "days"
+    ), {allDay: true});
+
+    let reservationLength = reservation.count("days");
+    let iter = reservation.iterate("days");
+    let counter = 0;
+    while (iter.hasNext()) {
+      let reason = "In Use";
+      let requestedDate = iter.next().toDate();
+      requestedDates.push(requestedDate);
+
+      // Insert into Unavailable Details
+      if (counter === 0) {
+        reason = "In Transit - Delivery Shipped";
+      } else if (counter - 1 < transitTime) {
+        reason = "In Transit - Delivery";
+      } else if (counter === reservationLength - transitTime - 2) {
+        reason = "In Transit - Return Shipped";
+      } else if (counter === reservationLength - 1) {
+        reason = "Return Processing";
+      } else if (counter >= reservationLength - transitTime - 1) {
+        reason = "In Transit - Returning";
+      }
+
+      requestedDetails.push({
+        date: requestedDate,
+        reason: reason,
+        orderId: orderId
+      });
+      counter++;
+    }
 
     if (inventoryVariant
       && RentalProducts.checkAvailability(inventoryVariant.unavailableDates, requestedDates)) {
@@ -145,6 +178,10 @@ Meteor.methods({
         $push: {
           unavailableDates: {
             $each: requestedDates,
+            $position: positionToInsert
+          },
+          unavailableDetails: {
+            $each: requestedDetails,
             $position: positionToInsert
           }
         }
