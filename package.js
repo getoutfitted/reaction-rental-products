@@ -6,7 +6,7 @@ Package.describe({
 });
 
 Package.onUse(function (api) {
-  api.versionsFrom("METEOR@1.2.1");
+  api.versionsFrom("METEOR@1.3.1");
 
   // meteor base packages
   api.use("meteor-base");
@@ -31,8 +31,10 @@ Package.onUse(function (api) {
 
   // community packages
   api.use("reactioncommerce:reaction-router@1.1.0");
-  api.use("reactioncommerce:core@0.12.0");
+  api.use("reactioncommerce:core@0.13.0");
+  api.use("reactioncommerce:reaction-logger@0.2.0");
   api.use("reactioncommerce:reaction-product-variant@1.0.0");
+  api.use("getoutfitted:reaction-advanced-fulfillment"); // TODO: Remove this dependency
   api.use("matb33:collection-hooks");
 
   // Collection packages
@@ -42,7 +44,6 @@ Package.onUse(function (api) {
   // Rental Specific Packages
   api.use("momentjs:moment@2.10.6");
   api.use("momentjs:twix@0.7.0");
-  api.use("rajit:bootstrap3-datepicker@1.4.1", ["client"]);
 
   // register package
   api.addFiles("server/register.js", "server");
@@ -52,6 +53,7 @@ Package.onUse(function (api) {
 
   // Methods
   api.addFiles([
+    "server/logger.js",
     "server/methods/rentalProducts.js",
     "server/methods/inventoryVariants.js",
     "server/methods/orders.js",
