@@ -40,7 +40,7 @@
   <tr>
     <th>{{barcode}}<br><small style="font-weight: 400">{{_id}}</small></th>
     {{#each day in days}}
-      <td>
+      <td class="{{isWeekendDay day}}">
         <i class="{{reservationStatus day unavailableDetails}}"></i>
       </td>
     {{/each}}
@@ -48,6 +48,6 @@
 </template>
 
 <template name="dashboardCalendarDay">
-  <th>{{formattedDay start}}</th>
+  <th class="{{isWeekendDay start}}">{{formattedDay start}}</th>
   {{inventoryVariants}}
 </template>

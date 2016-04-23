@@ -58,10 +58,12 @@ Template.dashboardVariantAvailability.helpers({
   },
   reservationStatus: function (day, unavailableDetails) {
     let icons = {
-      "In Transit - Delivery Shipped": "fa fa-upload delivery-brown",
-      "In Transit - Delivery": "fa fa-truck delivery-brown",
-      "In Transit - Return Shipped": "fa fa-download returning-green",
-      "In Transit - Returning": "fa fa-truck fa-flip-horizontal returning-green",
+      "Shipped": "fa fa-upload fa-rotate-90 delivery-brown",
+      "In Transit": "fa fa-truck fa-flip-horizontal delivery-brown",
+      "Delivered": "fa fa-download fa-rotate-270 delivery-brown",
+      "Return Shipped": "fa fa-upload fa-rotate-90 returning-green",
+      "Return In Transit": "fa fa-truck fa-flip-horizontal returning-green",
+      "Return Delivered": "fa fa-download fa-rotate-270 returning-green",
       "In Transit - Rush Delivery": "fa fa-plane rush-delivery-orange",
       "In Transit - Rush Returning": "fa fa-plane fa-flip-horizontal rush-delivery-orange",
       "Return Processing": "fa fa-refresh",
@@ -77,6 +79,12 @@ Template.dashboardVariantAvailability.helpers({
       return icons[unavailableDetails[pos].reason];
     }
     return "hide";
+  },
+  isWeekendDay: function (day) {
+    if (day.start.isoWeekday() >= 6) {
+      return "inventory-day-weekend";
+    }
+    return "inventory-day-weekday";
   }
 });
 
@@ -84,7 +92,11 @@ Template.dashboardCalendarDay.helpers({
   formattedDay: function (d) {
     return d.format("dd DD");
   },
-  inventoryVariants: function () {
+  isWeekendDay: function (day) {
+    if (day.isoWeekday() >= 6) {
+      return "inventory-day-weekend";
+    }
+    return "inventory-day-weekday";
   }
 });
 

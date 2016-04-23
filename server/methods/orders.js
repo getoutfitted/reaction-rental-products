@@ -13,22 +13,24 @@ Meteor.methods({
     // TODO: Add store buffer days into dates to reserve;
     let datesToReserve = [];
     let detailsToReserve = [];
-    const shippingDays = 0; // Shipping Days are built into current model
-    const turnaroundTime = 1; // Turnaround Time is defaulted to 1
-    let transitTime = 4; // Try / Catch to see if advancedFulfillment is installed
+    const turnaroundTime = 1; // Turnaround Time is defaulted to 1d
+    let shippingTime = 6; // total days, not business days
+    let returnTime = 6;
     let counter = 0;
     try {
-      transitTime = AdvancedFulfillment.calculateTransitTime(order);
-      RentalProducts.Log.info(`Transit time calculated to be ${transitTime} days`);
+      shippingTime = TransitTimes.calculateTotalShippingDays(order);
+      returnTime = TransitTimes.calculateTotalReturnDays(order);
+      RentalProducts.Log.info(`Transit time calculated to be ${shippingTime} shipping days and ${returnTime} return days`);
     } catch (e) {
-      RentalProducts.Log.warn("AdvancedFulfillment is not installed, transit time will be defaulted");
-      transitTime = 4;
+      RentalProducts.Log.warn("TransitTimes is not installed, transit time will be defaulted");
+      shippingTime = 4;
+      returnTime = 4;
     }
 
     let reservation = moment(
-      AdvancedFulfillment.calculateShippingDay(order)
+      TransitTimes.calculateShippingDay(order)
     ).twix(
-      moment(AdvancedFulfillment.calculateReturnDay(order)).add(turnaroundTime, "days"), { allDay: true });
+      moment(TransitTimes.calculateReturnDay(order)).add(turnaroundTime, "days"), { allDay: true });
     let reservationLength = reservation.count("days");
     let iter = reservation.iterate("days"); // Momentjs iterator
     while (iter.hasNext()) {
@@ -38,15 +40,19 @@ Meteor.methods({
 
       // Insert into Unavailable Details
       if (counter === 0) {
-        reason = "In Transit - Delivery Shipped"; // First reservation day is when order is shipped from warehouse
-      } else if (counter - 1 < transitTime) {
-        reason = "In Transit - Delivery";         // Second day through transitTime is delivery
-      } else if (counter === reservationLength - transitTime - 2) {
-        reason = "In Transit - Return Shipped";
-      } else if (counter === reservationLength - turnaroundTime) {
+        reason = "Shipped"; // First reservation day is when order is shipped from warehouse
+      } else if (counter === shippingTime) {
+        reason = "Delivered";         // Second day through transitTime is delivery
+      } else if (counter - 1 < shippingTime) {
+        reason = "In Transit";         // Second day through transitTime is delivery
+      } else if (counter === reservationLength - returnTime - turnaroundTime - 1) {
+        reason = "Return Shipped";
+      } else if (counter === reservationLength - turnaroundTime - 1) {
+        reason = "Return Delivered";
+      } else if (counter >= reservationLength - turnaroundTime) {
         reason = "Return Processing";
-      } else if (counter >= reservationLength - transitTime - turnaroundTime) {
-        reason = "In Transit - Returning";
+      } else if (counter >= reservationLength - returnTime - turnaroundTime) {
+        reason = "Return In Transit";
       }
 
       detailsToReserve.push({
