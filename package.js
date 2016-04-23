@@ -65,8 +65,9 @@ Package.onUse(function (api) {
 
   // Schemas, Collections, and Hooks
   api.addFiles([
+    "common/schemas/package.js",
     "common/schemas/inventoryVariants.js",
-    "common/schemas/rentalProducts.js", // Schema for rental products
+    "common/schemas/rentalProducts.js",
     "common/schemas/rentalShops.js",
     "common/schemas/orders.js",
     "common/schemas/cart.js",

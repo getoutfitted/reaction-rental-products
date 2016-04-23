@@ -1,22 +1,23 @@
-Template.rentalProductsSettings.onCreated(function () {
-  this.subscribe("Shops");
-});
-
 Template.rentalProductsSettings.helpers({
-  shop: function () {
-    return ReactionCore.Collections.Shops.findOne();
+  packageData: function () {
+    return ReactionCore.Collections.Packages.findOne({
+      name: 'reaction-rental-products',
+      shopId: ReactionCore.getShopId()
+    });
   }
 });
 
 AutoForm.hooks({
-  rentalShopEditForm: {
-    onSuccess: function () {
-      return Alerts.add('Shop rental settings saved.', 'success', {
+  'rental-products-update-form': {
+    onSuccess: function (operation, result, template) {
+      Alerts.removeSeen();
+      return Alerts.add('Rental Products settings saved.', 'success', {
         autoHide: true
       });
     },
-    onError: function (operation, error) {
-      return Alerts.add('Shop rental settings update failed. ' + error, 'danger');
+    onError: function (operation, error, template) {
+      Alerts.removeSeen();
+      return Alerts.add('Rental Products settings update failed. ' + error, 'danger');
     }
   }
 });

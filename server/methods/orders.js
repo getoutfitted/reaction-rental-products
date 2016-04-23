@@ -13,7 +13,7 @@ Meteor.methods({
     // TODO: Add store buffer days into dates to reserve;
     let datesToReserve = [];
     let detailsToReserve = [];
-    const turnaroundTime = 1; // Turnaround Time is defaulted to 1d
+    const turnaroundTime = RentalProducts.getTurnaroundTime; // Turnaround Time is defaulted to 1d
     let shippingTime = 6; // total days, not business days
     let returnTime = 6;
     let counter = 0;

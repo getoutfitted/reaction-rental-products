@@ -41,5 +41,23 @@ RentalProducts = {
       }
     }
     return true;
+  },
+
+  _getSettings: function () {
+    const tt = ReactionCore.Collections.Packages.findOne({
+      name: 'reaction-rental-products',
+      shopId: ReactionCore.getShopId()
+    });
+
+    if (!tt) {
+      throw new Meteor.Error(500, "Rental Products package not found ");
+    }
+
+    return tt.settings;
+  },
+
+  getTurnaroundTime: function () {
+    const settings = RentalProducts._getSettings();
+    return settings.turnaroundTime || 1; // Changed from `selectedShipping`
   }
 };

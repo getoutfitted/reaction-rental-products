@@ -1,20 +1,15 @@
-<template name="rentalProductsSettings">
-  <div class="panel-group" id="shopSettingsAccordian" role="tablist" aria-multiselectable="true">
-    <div class="panel panel-default">
-      <!-- <div class="panel-heading">
-        <div class="panel-title">
-          <a href="#rental" aria-controls="rental" aria-expanded="true" role="button" data-toggle="collapse" data-parent="#shopSettingsAccordian" data-i18n="shopSettings.rental" >Rental</a>
-        </div>
-      </div> -->
-      <div id="rental" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="Rental">
-        <div class="panel-body">
-          {{#autoForm collection="ReactionCore.Collections.Shops" doc=shop id="rentalShopEditForm" type="update"}}
-            {{> afQuickField name='rentalShippingBuffer' label="Shipping Buffer" placeholder="Shipping Buffer"}}
-            {{> afQuickField name='rentalReturnBuffer' label="Return Buffer" placeholder="Rental Return Buffer"}}
-            {{> shopSettingsSubmitButton}}
-          {{/autoForm}}
-        </div>
-      </div>
-    </div>
+<template name='rentalProductsSettings'>
+    <div class="panel-body">
+    {{#autoForm
+        collection="ReactionCore.Collections.Packages"
+        schema="ReactionCore.Schemas.RentalProductsPackageConfig"
+        doc=packageData
+        type="update"
+        id="rental-products-update-form"
+        }}
+      <p>How many days should we hold the product for cleaning / fixing after each rental</p>
+      {{>afQuickField  name='settings.turnaroundTime'}}
+      <button type="submit" class="btn btn-primary pull-right">Save Changes</button>
+    {{/autoForm}}
   </div>
 </template>
