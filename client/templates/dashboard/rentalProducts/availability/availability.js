@@ -60,8 +60,8 @@ Template.dashboardVariantAvailability.helpers({
     let icons = {
       "Shipped": "fa fa-upload fa-rotate-90 delivery-brown",
       "In Transit": "fa fa-truck fa-flip-horizontal delivery-brown",
-      "Delivered": "fa fa-download fa-rotate-270 delivery-brown",
-      "Return Shipped": "fa fa-upload fa-rotate-90 returning-green",
+      "Delivered": "fa fa-download fa-rotate-270 primary-color",
+      "Return Shipped": "fa fa-upload fa-rotate-90 primary-color",
       "Return In Transit": "fa fa-truck fa-flip-horizontal returning-green",
       "Return Delivered": "fa fa-download fa-rotate-270 returning-green",
       "In Transit - Rush Delivery": "fa fa-plane rush-delivery-orange",

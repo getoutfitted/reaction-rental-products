@@ -13,19 +13,12 @@ Meteor.methods({
     // TODO: Add store buffer days into dates to reserve;
     let datesToReserve = [];
     let detailsToReserve = [];
-    const turnaroundTime = RentalProducts.getTurnaroundTime; // Turnaround Time is defaulted to 1d
-    let shippingTime = 6; // total days, not business days
-    let returnTime = 6;
+    const turnaroundTime = RentalProducts.getTurnaroundTime(); // Turnaround Time is defaulted to 1d
+    let shippingTime = TransitTimes.calculateTotalShippingDays(order); // Total days not business days
+    let returnTime = TransitTimes.calculateTotalReturnDays(order);
+    let firstDayToReserve = TransitTimes.calculateShippingDay(order);
+    let lastDayToReserve = moment(TransitTimes.calculateReturnDay(order)).add(turnaroundTime, "days").toDate();
     let counter = 0;
-    try {
-      shippingTime = TransitTimes.calculateTotalShippingDays(order);
-      returnTime = TransitTimes.calculateTotalReturnDays(order);
-      RentalProducts.Log.info(`Transit time calculated to be ${shippingTime} shipping days and ${returnTime} return days`);
-    } catch (e) {
-      RentalProducts.Log.warn("TransitTimes is not installed, transit time will be defaulted");
-      shippingTime = 4;
-      returnTime = 4;
-    }
 
     let reservation = moment(
       TransitTimes.calculateShippingDay(order)
@@ -71,12 +64,19 @@ Meteor.methods({
          */
         let variantIds = Meteor.call("rentalProducts/checkInventoryAvailability",
                                       item.variants._id,
-                                      {endTime: order.endTime, startTime: order.startTime},
+                                      {endTime: lastDayToReserve, startTime: firstDayToReserve},
                                       item.quantity, false);
-        RentalProducts.Log.info(`Checked to see if ${item.variants._id} had ${item.quantity} available and it had ${variantIds.length} available`);
-        RentalProducts.Log.info(`${variantIds} were the variants that should be reserved from ${order.startTime} to ${order.endTime}`);
+        // Log details about booking item
+        RentalProducts.Log.info(`Checked to see if ${item.variants._id} had ${item.quantity} available and it had`
+          + ` ${variantIds.length} available`);
+        RentalProducts.Log.info(`${variantIds} were the variants that should be reserved from`
+          + ` ${firstDayToReserve} to ${lastDayToReserve} inclusive of shipping and turnaround time`);
+
+        // This should be caught before getting to this point. It's too late here.
         if (variantIds.length !== item.quantity) {
-          throw new Meteor.Error(403, "Requested " + item.quantity + " but only " + variantIds.length + " were available.");
+          RentalProducts.Log.error(`Requested ${item.quantity} of ${item.variants._id}, but only ${variantIds.length} were available.`);
+          // Bail
+          throw new Meteor.Error(403, `Requested quantity not available to book for ${item.variants._id}`);
         }
 
         // Not using $in because we need to determine the correct position
