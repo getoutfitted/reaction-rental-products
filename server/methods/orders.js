@@ -14,16 +14,16 @@ Meteor.methods({
     let datesToReserve = [];
     let detailsToReserve = [];
     const turnaroundTime = RentalProducts.getTurnaroundTime(); // Turnaround Time is defaulted to 1d
-    let shippingTime = TransitTimes.calculateTotalShippingDays(order); // Total days not business days
-    let returnTime = TransitTimes.calculateTotalReturnDays(order);
-    let firstDayToReserve = TransitTimes.calculateShippingDay(order);
-    let lastDayToReserve = moment(TransitTimes.calculateReturnDay(order)).add(turnaroundTime, "days").toDate();
+    let shippingTime = TransitTimes.calculateTotalShippingDaysByOrder(order); // Total days not business days
+    let returnTime = TransitTimes.calculateTotalReturnDaysByOrder(order);
+    let firstDayToReserve = TransitTimes.calculateShippingDayByOrder(order);
+    let lastDayToReserve = moment(TransitTimes.calculateReturnDayByOrder(order)).add(turnaroundTime, "days").toDate();
     let counter = 0;
 
     let reservation = moment(
-      TransitTimes.calculateShippingDay(order)
+      TransitTimes.calculateShippingDayByOrder(order)
     ).twix(
-      moment(TransitTimes.calculateReturnDay(order)).add(turnaroundTime, "days"), { allDay: true });
+      moment(TransitTimes.calculateReturnDayByOrder(order)).add(turnaroundTime, "days"), { allDay: true });
     let reservationLength = reservation.count("days");
     let iter = reservation.iterate("days"); // Momentjs iterator
     while (iter.hasNext()) {

@@ -38,3 +38,18 @@ Meteor.publish("inventoryVariantsById", function (productId) {
   }
   return this.ready();
 });
+
+Meteor.publish("productReservationStatus", function (productId) {
+  check(productId, Match.OptionalOrNull(String));
+  if (!productId) {
+    ReactionCore.Log.info("ignoring null request on productReservationStatus subscription");
+    return this.ready();
+  }
+  return ReactionCore.Collections.InventoryVariants.find({
+    productId: productId,
+    active: true
+  }, {
+    fields: {productId: 1, unavailableDates: 1, numberOfDatesBooked: 1},
+    sort: {unavailableDates: -1}
+  });
+});

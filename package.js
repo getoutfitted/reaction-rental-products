@@ -33,7 +33,8 @@ Package.onUse(function (api) {
   api.use("reactioncommerce:reaction-router@1.1.0");
   api.use("reactioncommerce:core@0.13.0");
   api.use("reactioncommerce:reaction-logger@0.2.0");
-  api.use("reactioncommerce:reaction-product-variant@1.0.0");
+  // api.use("reactioncommerce:reaction-product-variant@1.0.0");
+  // TODO: DECOUPLE reaction-rental-products from reaction-product-variant
   api.use("getoutfitted:reaction-advanced-fulfillment"); // TODO: Remove this dependency
   api.use("matb33:collection-hooks");
 
@@ -88,6 +89,8 @@ Package.onUse(function (api) {
     "client/templates/dashboard/rentalProducts/availability/availability.html",
     "client/templates/dashboard/rentalProducts/availability/availability.js"
   ], ["client"]);
+  
+  api.export("RentalProducts");
 });
 
 Package.onTest(function (api) {
