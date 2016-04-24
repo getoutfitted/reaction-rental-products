@@ -1,0 +1,38 @@
+<template name="dashboardRentalProducts">
+  <div class='container'>
+    <h1>Rental Products</h1>
+  </div>
+  <div class='container'>
+    <table class="table table-hover">
+      <thead>
+        <th>Gender</th>
+        <th>Vendor</th>
+        <th>Product</th>
+        <th>Type</th>
+        <th>Color</th>
+        <th>Size</th>
+        <th>SKU</th>
+        <th>QTY</th>
+      </thead>
+      <tbody>
+        {{#each rentalProducts}}
+          {{> dashboardRentalProduct }}
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+</template>
+
+<template name="dashboardRentalProduct">
+  {{! context is rentalProducts }}
+  <tr class="inventory-row">
+    <td>{{parent.gender}}</td>
+    <td>{{parent.vendor}}</td>
+    <td>{{parent.title}}</td>
+    <td>{{parent.productType}}</td>
+    <td>{{color}}</td>
+    <td>{{size}}</td>
+    <td>{{sku}}</td>
+    <td>{{inventoryQuantity}}</td>
+  </tr>
+</template>

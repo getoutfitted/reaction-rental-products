@@ -110,19 +110,57 @@ Meteor.methods({
     throw new Meteor.Error(304, "Something went wrong, no inventoryVariants were deleted!");
   },
 
-  "rentalProducts/reserveInventoryVariantForDates": function (inventoryVariantId, reservationRequest) {
+  "rentalProducts/reserveInventoryVariantForDates": function (inventoryVariantId, reservationRequest, transitTime = 0, orderId) {
     check(inventoryVariantId, String);
     check(reservationRequest, {
       startTime: Date,
       endTime: Date
     });
+    check(transitTime, Match.Optional(Number));
+    check(orderId, Match.Optional(String));
+    if (!ReactionCore.hasPermission("createProduct")) {
+      throw new Meteor.Error(403, "Access Denied");
+    }
 
     let inventoryVariant = ReactionCore.Collections.InventoryVariants.findOne(inventoryVariantId);
     let requestedDates = [];
-    let iter = moment(reservationRequest.startTime).twix(reservationRequest.endTime, {
-      allDay: true
-    }).iterate("days");
-    while (iter.hasNext()) { requestedDates.push(iter.next().toDate()); }
+    let requestedDetails = [];
+    const shippingDays = 0;
+    const turnaroundTime = 0;
+    let reservation = moment(
+      moment(reservationRequest.startTime).subtract(transitTime + shippingDays, "days")
+    ).twix(
+      moment(reservationRequest.endTime).add(transitTime + shippingDays + turnaroundTime, "days"
+    ), {allDay: true});
+
+    let reservationLength = reservation.count("days");
+    let iter = reservation.iterate("days");
+    let counter = 0;
+    while (iter.hasNext()) {
+      let reason = "In Use";
+      let requestedDate = iter.next().toDate();
+      requestedDates.push(requestedDate);
+
+      // Insert into Unavailable Details
+      if (counter === 0) {
+        reason = "In Transit - Delivery Shipped";
+      } else if (counter - 1 < transitTime) {
+        reason = "In Transit - Delivery";
+      } else if (counter === reservationLength - transitTime - 2) {
+        reason = "In Transit - Return Shipped";
+      } else if (counter === reservationLength - 1) {
+        reason = "Return Processing";
+      } else if (counter >= reservationLength - transitTime - 1) {
+        reason = "In Transit - Returning";
+      }
+
+      requestedDetails.push({
+        date: requestedDate,
+        reason: reason,
+        orderId: orderId
+      });
+      counter++;
+    }
 
     if (inventoryVariant
       && RentalProducts.checkAvailability(inventoryVariant.unavailableDates, requestedDates)) {
@@ -143,6 +181,10 @@ Meteor.methods({
           unavailableDates: {
             $each: requestedDates,
             $position: positionToInsert
+          },
+          unavailableDetails: {
+            $each: requestedDetails,
+            $position: positionToInsert
           }
         }
       });
@@ -152,5 +194,91 @@ Meteor.methods({
     }
     throw new Meteor.Error(404, `Could not insert reservation ${reservationRequest} `
       + `for Inventory Variant: ${inventoryVariantId} - Inventory Variant not found!`);
+  },
+  /**
+   * rentalProducts/registerInventory
+   * @summary check a product and update Inventory collection with inventory documents.
+   * @param {Object} product - valid ReactionCore.Schemas.Product object
+   * @return {Number} - returns the total amount of new inventory created
+   */
+  "rentalProducts/registerInventory": function (product) {
+    let type;
+    switch (product.type) {
+    case "variant":
+      check(product, ReactionCore.Schemas.ProductVariant);
+      type = "variant";
+      break;
+    default:
+      check(product, ReactionCore.Schemas.Product);
+      type = "simple";
+    }
+    // user needs createProduct permission to register new inventory
+    if (!ReactionCore.hasPermission("createProduct")) {
+      throw new Meteor.Error(403, "Access Denied");
+    }
+    // this.unblock();
+
+    let totalNewInventory = 0;
+    const productId = type === "variant" ? product.ancestors[0] : product._id;
+    const variants = ReactionCore.getVariants(productId);
+
+    // we'll check each variant to see if it has been fully registered
+    for (let variant of variants) {
+      if (variant.functionalType === "rentalVariant") { // Only add rentalVariants for bottom-most children
+        let inventoryVariants = ReactionCore.Collections.InventoryVariants.find({
+          productId: variant._id
+        });
+        // we'll return this as well
+        let inventoryVariantCount = inventoryVariants.count();
+        // if the variant exists already we remove it from the inventoryVariants
+        // so that we don't process it as an insert
+        if (inventoryVariantCount < variant.inventoryQuantity) {
+          let newQty = variant.inventoryQuantity || 0;
+          let i = inventoryVariantCount + 1;
+
+          ReactionCore.Log.info(
+            `inserting ${newQty - inventoryVariantCount
+            } new inventory variants ${variant._id}`
+          );
+
+          const bulk = ReactionCore.Collections.InventoryVariants._collection.rawCollection().initializeUnorderedBulkOp();
+          while (i <= newQty) {
+            let id = ReactionCore.Collections.InventoryVariants._makeNewID();
+            let sku = variant.sku || "";
+            bulk.insert({
+              _id: id,
+              productId: variant._id,
+              shopId: product.shopId,
+              createdAt: new Date,
+              updatedAt: new Date,
+              unavailableDates: [],
+              unavailableDetails: [],
+              events: [],
+              active: true,
+              sku: sku,
+              barcode: sku + "_" + i,
+              workflow: { // we add this line because `batchInsert` doesn't know
+                status: "active" // about SimpleSchema, so `defaultValue` will not
+              }
+            });
+            i++;
+          }
+
+          // took from: http://guide.meteor.com/collections.html#bulk-data-changes
+          let execute = Meteor.wrapAsync(bulk.execute, bulk);
+          let inventoryItem = execute();
+          let inserted = inventoryItem.nInserted;
+
+          if (!inserted) { // or maybe `inventory.length === 0`?
+            // throw new Meteor.Error("Inventory Anomaly Detected. Abort! Abort!");
+            return totalNewInventory;
+          }
+          ReactionCore.Log.debug(`registered ${inserted}`);
+          totalNewInventory += inserted;
+        }
+      }
+    }
+    // returns the total amount of new inventory created
+    return totalNewInventory;
   }
 });

@@ -1,3 +1,26 @@
+ReactionCore.Schemas.UnavailableDay = new SimpleSchema({
+  date: {
+    label: "Unavailable Date",
+    type: Date
+  },
+  reason: {
+    label: "Unavailable Reason",
+    type: String,
+    optional: true,
+    defaultValue: "In Use" // "In Transit - Delivery", "In Transit - Return", "Return Processing"
+  },
+  orderId: {
+    label: "Order ID",
+    type: String,
+    optional: true
+  },
+  orderNumber: {
+    label: "Human Readable Order Number",
+    type: Number,
+    optional: true
+  }
+});
+
 ReactionCore.Schemas.Location = new SimpleSchema({
   address1: {
     label: 'Address 1',
@@ -126,7 +149,7 @@ ReactionCore.Schemas.InventoryVariants = new SimpleSchema({
     defaultValue: 0
   },
   unavailableDetails: {
-    type: [Object],
+    type: [ReactionCore.Schemas.UnavailableDay],
     optional: true,
     defaultValue: []
   },
@@ -147,6 +170,10 @@ ReactionCore.Schemas.InventoryVariants = new SimpleSchema({
     autoValue: function () {
       return new Date;
     },
+    optional: true
+  },
+  workflow: {
+    type: ReactionCore.Schemas.Workflow,
     optional: true
   }
 });

@@ -1,0 +1,53 @@
+<template name="dashboardRentalProductAvailability">
+  {{!-- navbar --}}
+{{#if Template.subscriptionsReady}}
+  <div class='container'>
+    <h1 class="availability-header"><a href="{{pathFor 'rentalProducts'}}"><i class="fa fa-chevron-left"></i> Inventory List</a> | {{parent.vendor}} {{parent.gender}} {{parent.title}} {{product.color}} {{product.size}}</h1>
+  </div>
+  <span class="pull-left viewPrevCalendar"><i class="fa fa-3x fa-chevron-left"></i> Prev Month</span>
+  <span>{{currentMonth}}</span>
+  <span class="pull-right viewNextCalendar"><i class="fa fa-3x fa-chevron-right"></i> Next Month</span>
+  <div class='container'>
+    <div class="row">
+      <div class="col-md-12">
+        <h2>{{product.sku}}</h2>
+      </div>
+    </div>
+    <table class="table table-hover table-striped availability-table">
+      <thead>
+        <th>Barcode</th>
+        {{#each days}}
+          {{> dashboardCalendarDay}}
+        {{/each}}
+      </thead>
+      <tbody>
+        {{#each inventoryVariants}}
+          {{> dashboardVariantAvailability}}
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+{{else}}
+  <div class="text-center">
+    Loading<br>
+    <i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i>
+  </div>
+{{/if}}
+</template>
+
+<template name="dashboardVariantAvailability">
+  {{! context is inventoryVariant }}
+  <tr>
+    <th>{{barcode}}<br><small style="font-weight: 400">{{_id}}</small></th>
+    {{#each day in days}}
+      <td class="{{isWeekendDay day}}">
+        <i class="{{reservationStatus day unavailableDetails}}"></i>
+      </td>
+    {{/each}}
+  </tr>
+</template>
+
+<template name="dashboardCalendarDay">
+  <th class="{{isWeekendDay start}}">{{formattedDay start}}</th>
+  {{inventoryVariants}}
+</template>

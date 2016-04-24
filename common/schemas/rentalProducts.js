@@ -18,6 +18,10 @@ ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
       type: String,
       optional: true
     },
+    numberSize: { // For sorting purposes
+      type: Number,
+      optional: true
+    },
     gender: {
       type: String,
       optional: true
@@ -70,5 +74,9 @@ ReactionCore.Schemas.RentalProduct = new SimpleSchema([
       index: 1,
       optional: true
     }
+    // , pricePerDayRange: {
+    //   type: ReactionCore.Schemas.PriceRange,
+    //   label: "Price Per Day Range"
+    // }
   }
 ]);

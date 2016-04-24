@@ -31,8 +31,6 @@ Meteor.methods({
     let requestedDates = [];
     let sortDirection = searchLeastBookedFirst ? 1 : -1;
 
-    // TODO: Add shipping, return, and cleaning buffers into dates to reserve
-    // @PaulGrever
     let iter = moment(reservationRequest.startTime).twix(reservationRequest.endTime, {
       allDay: true
     }).iterate("days");
