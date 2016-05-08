@@ -6,7 +6,9 @@ ReactionCore.MethodHooks.beforeMethods({
 
     Meteor.call("rentalProducts/inventoryAdjust", orderId);
 
-    return false; // Don't move on with the original call.
+    return options;
+    // Returned false before, but there is no longer an `adjust inventory method in core`
+    // so this is probably never called any more.
   }
 });
 
@@ -14,11 +16,10 @@ ReactionCore.MethodHooks.afterMethods({
   "cart/addToCart": function (options) {
     check(options.arguments[0], String);
     check(options.arguments[1], String);
-
     const variantId = options.arguments[1];
-    const cart = ReactionCore.Collections.Cart.findOne({ userId: Meteor.userId });
+    const cart = ReactionCore.Collections.Cart.findOne({ userId: Meteor.userId() });
     if (!cart) {
-      return true;
+      return options;
     }
     if (cart.items && cart.items.length > 0) {
       _.map(cart.items, function (item) {
@@ -27,7 +28,15 @@ ReactionCore.MethodHooks.afterMethods({
           && cart.rentalDays) {
             // TODO: update qty to verified rental qty available
           // Set price to calculated rental price;
-          item.variants.price = item.variants.pricePerDay * cart.rentalDays;
+          let priceBucket = _.find(item.variants.rentalPriceBuckets, (bucket) => {
+            return bucket.duration === cart.rentalDays;
+          });
+          if (priceBucket) {
+            item.variants.price = priceBucket.price;
+          } else {
+            // remove from cart
+            // Throw error
+          }
         }
         return item;
       });
@@ -42,7 +51,8 @@ ReactionCore.MethodHooks.afterMethods({
         items: cart.items
       }
     });
-    return true; // Continue with other hooks;
-    // TODO: Figure out what I should be returning
+    return options; // Continue with other hooks;
+    // was returning true before. After chatting with @paulgrever we decided it was proabably better to return
+    // the options object
   }
 });

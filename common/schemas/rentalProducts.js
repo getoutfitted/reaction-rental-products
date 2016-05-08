@@ -1,3 +1,39 @@
+GetOutfitted = GetOutfitted || {};
+GetOutfitted.Schemas = GetOutfitted.Schemas || {};
+GetOutfitted.Schemas.RentalPriceBucket = new SimpleSchema({
+  // Moment time unit
+  timeUnit: {
+    label: "Time Unit",
+    type: String,
+    optional: true,
+    defaultValue: "days",
+    allowedValues: [
+      "years",
+      "quarters",
+      "months",
+      "weeks",
+      "days",
+      "hours",
+      "minutes",
+      "seconds",
+      "milliseconds"
+    ]
+  },
+  duration: {
+    label: "Amount of specified time periods",
+    type: Number,
+    optional: true,
+    defaultValue: 6
+  },
+  price: {
+    label: "Rental price for this duration",
+    type: Number,
+    optional: true,
+    decimal: true,
+    defaultValue: 150
+  }
+});
+
 ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
   ReactionCore.Schemas.ProductVariant, {
     functionalType: { // functionalType allows us to add-on to the schema for the `simple` and `variant` types
@@ -34,10 +70,11 @@ ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
       min: 0,
       optional: true
     },
-    // rentalPriceBucket: {
-    //   type: [ReactionCore.Schemas.rentalPriceBucket],
-    //   optional: true,
-    // },
+    rentalPriceBuckets: {
+      label: "Rental Prices",
+      type: [ReactionCore.Schemas.RentalPriceBucket],
+      optional: true
+    },
     workflow: { // XXX: Not 100% certain we need this here, definitely need it on inventory and product
       type: ReactionCore.Schemas.Workflow,
       optional: true
@@ -74,9 +111,5 @@ ReactionCore.Schemas.RentalProduct = new SimpleSchema([
       index: 1,
       optional: true
     }
-    // , pricePerDayRange: {
-    //   type: ReactionCore.Schemas.PriceRange,
-    //   label: "Price Per Day Range"
-    // }
   }
 ]);
