@@ -48,7 +48,7 @@ Meteor.publish("productReservationStatus", function (productId) {
   return ReactionCore.Collections.InventoryVariants.find({
     productId: productId,
     active: true,
-    workflow.status: "active"
+    "workflow.status": "active"
   }, {
     fields: {productId: 1, unavailableDates: 1, numberOfDatesBooked: 1, "workflow.status": 1},
     sort: {unavailableDates: -1}
