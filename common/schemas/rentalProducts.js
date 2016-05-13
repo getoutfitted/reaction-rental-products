@@ -1,35 +1,49 @@
-ReactionCore.Schemas.Coordinates = new SimpleSchema({
-  x: {
-    label: 'Longitude',
-    type: Number,
-    decimal: true
+GetOutfitted = GetOutfitted || {};
+GetOutfitted.Schemas = GetOutfitted.Schemas || {};
+GetOutfitted.Schemas.RentalPriceBucket = new SimpleSchema({
+  // Moment time unit
+  timeUnit: {
+    label: "Time Unit",
+    type: String,
+    optional: true,
+    defaultValue: "days",
+    allowedValues: [
+      "years",
+      "quarters",
+      "months",
+      "weeks",
+      "days",
+      "hours",
+      "minutes",
+      "seconds",
+      "milliseconds"
+    ]
   },
-  y: {
-    label: 'Latitude',
+  duration: {
+    label: "Amount of specified time periods",
     type: Number,
-    decimal: true
+    optional: true,
+    defaultValue: 6
+  },
+  price: {
+    label: "Rental price for this duration",
+    type: Number,
+    optional: true,
+    decimal: true,
+    defaultValue: 150
   }
 });
 
 ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
   ReactionCore.Schemas.ProductVariant, {
-    _id: {
-      type: String,
-      autoValue: RentalProducts.schemaIdAutoValue,
-      index: 1,
-      label: 'Variant ID'
-    },
-    status: {
-      type: String,
-      optional: true
+    functionalType: { // functionalType allows us to add-on to the schema for the `simple` and `variant` types
+      type: String,   // and still maintain opportunity to have unique product types.
+      optional: true,
+      defaultValue: "variant" // "rentalVariant"
     },
     location: {
-      label: 'Warehouse Storage Location',
+      label: "Warehouse Storage Location",
       type: String,
-      optional: true
-    },
-    currentLocation: {
-      type: ReactionCore.Schemas.Location,
       optional: true
     },
     color: {
@@ -40,31 +54,29 @@ ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
       type: String,
       optional: true
     },
-    alternateSize: {
-      type: String,
+    numberSize: { // For sorting purposes
+      type: Number,
       optional: true
     },
-    manufacturerSku: {
-      type: String,
-      optional: true
-    },
-    shopifyTitle: {
+    gender: {
       type: String,
       optional: true
     },
     pricePerDay: {
-      label: 'Daily Rate',
+      label: "Daily Rate",
       type: Number,
       defaultValue: 0.0,
       decimal: true,
       min: 0,
       optional: true
     },
-    pricePerWeek: {
-      label: 'Weekly Rate',
-      type: Number,
-      decimal: true,
-      min: 0,
+    rentalPriceBuckets: {
+      label: "Rental Prices",
+      type: [ReactionCore.Schemas.RentalPriceBucket],
+      optional: true
+    },
+    workflow: { // XXX: Not 100% certain we need this here, definitely need it on inventory and product
+      type: ReactionCore.Schemas.Workflow,
       optional: true
     }
   }
@@ -72,27 +84,20 @@ ReactionCore.Schemas.RentalProductVariant = new SimpleSchema([
 
 ReactionCore.Schemas.RentalProduct = new SimpleSchema([
   ReactionCore.Schemas.Product, {
-    variants: {
-      type: [ReactionCore.Schemas.RentalProductVariant]
-    },
-    type: {
-      type: String,
-      defaultValue: 'rental'
-    },
-    shopifyTitle: {
-      type: String,
-      optional: true
+    functionalType: { // functionalType allows us to add-on to the schema for the `simple` and `variant` types
+      type: String,   // and still maintain opportunity to have unique product types.
+      optional: true,
+      defaultValue: "simple" // "rental"
     },
     gender: {
       type: String,
       optional: true
     },
-    productType: {
-      type: String,
-      index: 1,
+    colors: {
+      type: [String],
       optional: true
     },
-    colors: {
+    sizes: {
       type: [String],
       optional: true
     },
@@ -101,28 +106,10 @@ ReactionCore.Schemas.RentalProduct = new SimpleSchema([
       defaultValue: 0,
       optional: true
     },
-    shopifyId: {
+    productType: { // E.g. product category (Tent, Jacket)
       type: String,
-      optional: true
-    },
-    handle: {
-      type: String,
-      optional: true,
       index: 1,
-      autoValue: function () {
-        let slug = getSlug(this.siblingField('title').value || this.siblingField('_id').value || '');
-        if (this.isInsert && !this.value) {
-          return slug;
-        } else if (this.isUpsert && !this.value) {
-          return {
-            $setOnInsert: slug
-          };
-        }
-      }
+      optional: true
     }
   }
 ]);
-
-// Update ProductVariant because it's checked against in core in certain methods.
-ReactionCore.Schemas.ProductVariant = ReactionCore.Schemas.RentalProductVariant;
-ReactionCore.Schemas.Product = ReactionCore.Schemas.RentalProduct;

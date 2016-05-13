@@ -6,24 +6,24 @@ Meteor.methods({
    * @param   {Date}   startTime - Datetime of start of rental
    * @param   {Date}   endTime   - Datetime of end of rental
    */
-
-  'rentalProducts/setRentalPeriod': function (cartId, startTime, endTime) {
+  "rentalProducts/setRentalPeriod": function (cartId, startTime, endTime) {
     check(cartId, String);
     check(startTime, Date);
     check(endTime, Date);
     const cart = ReactionCore.Collections.Cart.findOne(cartId);
     // Make sure that cart is owned by current user.
-    if (cart.userId !== Meteor.userId() && !ReactionCore.hasPermission('editUserCart')) {
-      throw new Meteor.Error('User Id and Cart userId don\'t match');
+    if (cart.userId !== Meteor.userId() && !ReactionCore.hasPermission("editUserCart")) {
+      throw new Meteor.Error("User Id and Cart userId don\'t match");
     }
     const rental = moment(startTime).twix(endTime);
 
     // If cart has items in it - update the price for those items
     if (cart.items && cart.items.length > 0) {
       // Update price of each item in cart based on rental lengthInDays
+      // TODO: Make sure that all products are still available
       _.map(cart.items, function (item) {
-        if (item.type === 'rental') {
-          item.variants.price = item.variants.pricePerDay * rental.count('days');
+        if (item.variants.functionalType === "rentalVariant") { // TODO: future if item.type === rental
+          item.variants.price = item.variants.pricePerDay * rental.count("days");
         }
         return item;
       });
@@ -31,36 +31,37 @@ Meteor.methods({
       cart.items = [];
     }
 
-    Cart.update({
+    ReactionCore.Collections.Cart.update({
       _id: cartId
     }, {
       $set: {
         startTime: startTime,
         endTime: endTime,
-        rentalMonths: rental.count('months'),
-        rentalWeeks: rental.count('weeks'),
-        rentalDays: rental.count('days'),
-        rentalHours: rental.count('hours'),
-        rentalMinutes: rental.count('minutes'),
+        rentalMonths: rental.count("months"),
+        rentalWeeks: rental.count("weeks"),
+        rentalDays: rental.count("days"),
+        rentalHours: rental.count("hours"),
+        rentalMinutes: rental.count("minutes"),
         items: cart.items
       }
     });
   },
 
-  'rentalProducts/setRentalLength': function (cartId, rentalLength, units) {
+  // Deprecate this function? Or figure out what it's for.
+  "rentalProducts/setRentalLength": function (cartId, rentalLength, units) {
     check(cartId, String);
     check(rentalLength, Number);
-    check(units, Match.OneOf('months', 'weeks', 'days', 'hours', 'minutes'));
+    check(units, Match.OneOf("months", "weeks", "days", "hours", "minutes"));
     const cart = ReactionCore.Collections.Cart.findOne(cartId);
     if (cart.userId !== Meteor.userId()) {
       return false;
     }
 
     let opts = {};
-    const fieldToSet = 'rental' + units[0].toUpperCase() + units.substr(1); // Make sure that units is correct
+    const fieldToSet = "rental" + units[0].toUpperCase() + units.substr(1); // Make sure that units is correct
     opts[fieldToSet] = rentalLength;
 
-    Cart.update({
+    ReactionCore.Collections.Cart.update({
       _id: cartId
     }, {
       $set: updateObj

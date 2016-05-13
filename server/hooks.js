@@ -1,26 +1,58 @@
 ReactionCore.MethodHooks.beforeMethods({
-  'cart/addToCart': function (options) {
-    check(options.arguments, [Match.Any]);
-    product = ReactionCore.Collections.Products.findOne(options.arguments[1]);
-
-    // mutate price of object if rental
-    if (product.type === 'rental') {
-      cart = ReactionCore.Collections.Cart.findOne(options.arguments[0]);
-      if (!cart.rentalDays) {
-        cart.rentalDays = 1;
-      }
-      options.arguments[2] = _.omit(options.arguments[2], ['unavailableDates', 'active']);
-      options.arguments[2].price = options.arguments[2].pricePerDay * cart.rentalDays;
-    }
-    return true;
-  },
-  'orders/inventoryAdjust': function (options) {
+  "orders/inventoryAdjust": function (options) {
     check(options.arguments, [Match.Any]);
     const orderId = options.arguments[0];
     if (!orderId) { return true; }
 
-    Meteor.call('rentalProducts/inventoryAdjust', orderId);
+    Meteor.call("rentalProducts/inventoryAdjust", orderId);
 
-    return false;
+    return options;
+    // Returned false before, but there is no longer an `adjust inventory method in core`
+    // so this is probably never called any more.
+  }
+});
+
+ReactionCore.MethodHooks.afterMethods({
+  "cart/addToCart": function (options) {
+    check(options.arguments[0], String);
+    check(options.arguments[1], String);
+    const variantId = options.arguments[1];
+    const cart = ReactionCore.Collections.Cart.findOne({ userId: Meteor.userId() });
+    if (!cart) {
+      return options;
+    }
+    if (cart.items && cart.items.length > 0) {
+      _.map(cart.items, function (item) {
+        if (item.variants._id === variantId
+          && item.variants.functionalType === "rentalVariant" // TODO: future if item.type === rental
+          && cart.rentalDays) {
+            // TODO: update qty to verified rental qty available
+          // Set price to calculated rental price;
+          let priceBucket = _.find(item.variants.rentalPriceBuckets, (bucket) => {
+            return bucket.duration === cart.rentalDays;
+          });
+          if (priceBucket) {
+            item.variants.price = priceBucket.price;
+          } else {
+            // remove from cart
+            // Throw error
+          }
+        }
+        return item;
+      });
+    } else {
+      cart.items = [];
+    }
+
+    ReactionCore.Collections.Cart.update({
+      _id: cart._id
+    }, {
+      $set: {
+        items: cart.items
+      }
+    });
+    return options; // Continue with other hooks;
+    // was returning true before. After chatting with @paulgrever we decided it was proabably better to return
+    // the options object
   }
 });

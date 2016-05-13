@@ -1,3 +1,26 @@
+ReactionCore.Schemas.UnavailableDay = new SimpleSchema({
+  date: {
+    label: "Unavailable Date",
+    type: Date
+  },
+  reason: {
+    label: "Unavailable Reason",
+    type: String,
+    optional: true,
+    defaultValue: "In Use" // "In Transit - Delivery", "In Transit - Return", "Return Processing"
+  },
+  orderId: {
+    label: "Order ID",
+    type: String,
+    optional: true
+  },
+  orderNumber: {
+    label: "Human Readable Order Number",
+    type: Number,
+    optional: true
+  }
+});
+
 ReactionCore.Schemas.Location = new SimpleSchema({
   address1: {
     label: 'Address 1',
@@ -72,13 +95,10 @@ ReactionCore.Schemas.InventoryVariants = new SimpleSchema({
     label: 'Shop ID',
     optional: true
   },
-  parentId: {
+  productId: { // 'Product / Variant that owns this inventory'
     type: String,
-    optional: true
-  },
-  productId: {
-    type: String,
-    optional: true
+    optional: true,
+    index: 1
   },
   sku: {
     type: String,
@@ -88,14 +108,18 @@ ReactionCore.Schemas.InventoryVariants = new SimpleSchema({
     type: String,
     optional: true
   },
-  color: {
+  nickname: {
     type: String,
     optional: true
   },
-  size: {
-    type: String,
-    optional: true
-  },
+  // color: {
+  //   type: String,
+  //   optional: true
+  // },
+  // size: {
+  //   type: String,
+  //   optional: true
+  // },
   active: {
     type: Boolean,
     optional: true,
@@ -119,6 +143,16 @@ ReactionCore.Schemas.InventoryVariants = new SimpleSchema({
     optional: true,
     defaultValue: []
   },
+  numberOfDatesBooked: {
+    type: Number,
+    optional: true,
+    defaultValue: 0
+  },
+  unavailableDetails: {
+    type: [ReactionCore.Schemas.UnavailableDay],
+    optional: true,
+    defaultValue: []
+  },
   createdAt: {
     type: Date,
     autoValue: function () {
@@ -136,6 +170,10 @@ ReactionCore.Schemas.InventoryVariants = new SimpleSchema({
     autoValue: function () {
       return new Date;
     },
+    optional: true
+  },
+  workflow: {
+    type: ReactionCore.Schemas.Workflow,
     optional: true
   }
 });

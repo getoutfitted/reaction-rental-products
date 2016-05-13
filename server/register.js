@@ -1,34 +1,31 @@
 ReactionCore.registerPackage({
-  label: 'Rental Products',
-  name: 'rental-products',
+  label: "Rental Products",
+  name: "reaction-rental-products",
+  icon: "fa fa-calendar",
   autoEnable: true,
-  registry: [
-    {
-      provides: 'dashboard',
-      label: 'Rental Products',
-      route: 'dashboard.rentalProducts',
-      description: 'Enables Rental / For Hire Products',
-      icon: 'fa fa-calendar',
-      cycle: '3',
-      container: 'rental-products'
-    }, {
-      provides: 'settings',
-      label: 'Rental Product Settings',
-      route: 'dashboard.rentalShopSettings',
-      template: 'rentalShopSettings',
-      container: 'rental-products'
-    }, {
-      route: 'createRentalType',
-      label: 'Create Rental Product',
-      icon: 'fa fa-plus',
-      provides: 'shortcut'
-    }
-  ],
-  permissions: [
-    {
-      label: 'Rentals',
-      permission: 'ReactionCore.Collections.RentalTypes',
-      group: 'Shop Settings'
-    }
-  ]
+  settings: {
+    name: "Rental Products"
+  },
+  registry: [{
+    route: "/dashboard/rental-products",
+    name: "rentalProducts",
+    template: "dashboardRentalProducts",
+    label: "Rental Products",
+    description: "Rental Products and Rental Inventory Tracking",
+    container: "getoutfitted",
+    icon: "fa fa-calendar",
+    provides: "dashboard",
+    priority: 2
+  }, {
+    route: "/dashboard/rental-products/settings",
+    name: "rentalProducts.settings",
+    template: "rentalProductsSettings",
+    label: "Rental Products Settings",
+    provides: "settings"
+  }, {
+    route: "/dashboard/rental-products/availability/:_id",
+    name: "rentalProducts.availabilityById",
+    template: "dashboardRentalProductAvailability"
+  }],
+  layout: []
 });
