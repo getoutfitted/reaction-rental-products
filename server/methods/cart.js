@@ -19,14 +19,33 @@ Meteor.methods({
 
     // If cart has items in it - update the price for those items
     if (cart.items && cart.items.length > 0) {
-      // Update price of each item in cart based on rental lengthInDays
-      // TODO: Make sure that all products are still available
-      _.map(cart.items, function (item) {
-        if (item.variants.functionalType === "rentalVariant") { // TODO: future if item.type === rental
-          item.variants.price = item.variants.pricePerDay * rental.count("days");
+      cart.items = cart.items.reduce(function (newCart, item) {
+        console.log("newCart", newCart);
+        if (item.variants.functionalType === "rentalVariant" // TODO: future if item.type === rental
+          && cart.rentalDays) {
+            // TODO: update qty to verified rental qty available
+          // Set price to calculated rental price;
+          // if qty not available available, remove from cart
+          if (true) { // TODO: Check to ensure that qty is available for new dates before pushing back into cart
+            let priceBucket = _.find(item.variants.rentalPriceBuckets, (bucket) => {
+              return bucket.duration === cart.rentalDays;
+            });
+            if (priceBucket) {
+              // ensure price is correct and re-add to cart.
+              item.variants.price = priceBucket.price;
+              newCart.push(item);
+            } else {
+              // remove from cart (don't push)
+              ReactionCore.Log.error(`Price bucket not found: ${item.variants._id} for ${cart.rentalDays} rental days`);
+            }
+          }
+        } else {
+          // item is not a rental - push it back to the cart
+          newCart.push(item);
         }
-        return item;
-      });
+        return newCart;
+      }, []);
+      
     } else {
       cart.items = [];
     }
