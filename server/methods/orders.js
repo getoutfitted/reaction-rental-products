@@ -27,7 +27,7 @@ Meteor.methods({
     let firstDayToReserve = TransitTimes.calculateShippingDayByOrder(order);
     let lastDayToReserve = moment(TransitTimes.calculateReturnDayByOrder(order)).add(turnaroundTime, "days").toDate();
     let counter = 0;
-
+    
     let reservation = moment(
       TransitTimes.calculateShippingDayByOrder(order)
     ).twix(
