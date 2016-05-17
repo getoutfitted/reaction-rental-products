@@ -1,3 +1,21 @@
+import moment from "moment";
+import "moment-timezone";
+import "twix";
+
+function adjustLocalToDenverTime(time) {
+  let here = moment(time);
+  let denver = here.clone().tz("America/Denver");
+  denver.add(here.utcOffset() - denver.utcOffset(), "minutes");
+  return denver.toDate();
+}
+
+function adjustDenverToLocalTime(time) {
+  let denver = moment(time).tz("America/Denver");
+  let here = moment(time);
+  here.add(denver.utcOffset() - here.utcOffset(), "minutes");
+  return here.toDate();
+}
+
 Meteor.methods({
   /**
    * rentalProducts/setRentalPeriod sets or updates the startTime and endTime for a users cart.

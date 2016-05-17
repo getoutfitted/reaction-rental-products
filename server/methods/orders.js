@@ -1,3 +1,11 @@
+function adjustLocalToDenverTime(time) {
+  let here = moment(time);
+  let denver = here.clone().tz("America/Denver");
+  denver.add(here.utcOffset() - denver.utcOffset(), "minutes");
+  return denver.toDate();
+}
+
+
 Meteor.methods({
   /*
    * adjust inventory when an order is placed
@@ -29,7 +37,8 @@ Meteor.methods({
     while (iter.hasNext()) {
       let reason = "In Use";
       let requestedDate = iter.next().toDate();
-      datesToReserve.push(requestedDate);
+      let denverRequestedDate = adjustLocalToDenverTime(requestedDate);
+      datesToReserve.push(denverRequestedDate);
 
       // Insert into Unavailable Details
       if (counter === 0) {
@@ -49,7 +58,7 @@ Meteor.methods({
       }
 
       detailsToReserve.push({
-        date: requestedDate,
+        date: denverRequestedDate,
         reason: reason,
         orderId: orderId
       });
