@@ -81,7 +81,6 @@ Template.dashboardVariantAvailability.helpers({
       return "hide";
     }
     let denverDay = adjustLocalToDenverTime(day.start);
-    console.log("day", denverDay);
     let pos =  _.sortedIndex(unavailableDetails, {date: denverDay}, "date");
     if (unavailableDetails[pos]
       && +denverDay === +unavailableDetails[pos].date) {
