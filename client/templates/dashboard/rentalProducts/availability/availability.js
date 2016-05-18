@@ -1,3 +1,10 @@
+function adjustLocalToDenverTime(time) {
+  let here = moment(time);
+  let denver = here.clone().tz("America/Denver");
+  denver.add(here.utcOffset() - denver.utcOffset(), "minutes");
+  return denver.toDate();
+}
+
 Template.dashboardRentalProductAvailability.onRendered(function () {
   let instance = this;
   const productId = ReactionRouter.getParam("_id");
@@ -73,9 +80,10 @@ Template.dashboardVariantAvailability.helpers({
     if (!unavailableDetails || unavailableDetails.length === 0) {
       return "hide";
     }
-    let pos =  _.sortedIndex(unavailableDetails, {date: day.start.toDate()}, "date");
+    let denverDay = adjustLocalToDenverTime(day.start);
+    let pos =  _.sortedIndex(unavailableDetails, {date: denverDay}, "date");
     if (unavailableDetails[pos]
-      && +day.start === +moment(unavailableDetails[pos].date).startOf("day")) {
+      && +denverDay === +unavailableDetails[pos].date) {
       return icons[unavailableDetails[pos].reason];
     }
     return "hide";

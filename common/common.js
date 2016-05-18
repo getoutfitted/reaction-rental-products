@@ -1,3 +1,10 @@
+function adjustLocalToDenverTime(time) {
+  let here = moment(time);
+  let denver = here.clone().tz("America/Denver");
+  denver.add(here.utcOffset() - denver.utcOffset(), "minutes");
+  return denver.toDate();
+}
+
 RentalProducts = {
   /**
    * RentalProducts.schemaIdAutoValue
@@ -62,7 +69,10 @@ RentalProducts = {
       allDay: true
     }).iterate("days");
 
-    while (iter.hasNext()) { requestedDates.push(iter.next().toDate()); }
+    while (iter.hasNext()) {
+      let requestedDate = adjustLocalToDenverTime(iter.next());
+      requestedDates.push(requestedDate);
+    }
 
     // Sort by length of inventory variants unavailableDates array
     let inventoryVariants = InventoryVariants.find({productId: variantId, "workflow.status": "active"}, {sort: {numberOfDatesBooked: sortDirection}}).fetch();

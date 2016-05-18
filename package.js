@@ -5,6 +5,12 @@ Package.describe({
   documentation: "README.md"
 });
 
+Npm.depends({
+  "moment": "2.12.0",
+  "moment-timezone": "0.5.3",
+  "twix": "0.9.0"
+});
+
 Package.onUse(function (api) {
   api.versionsFrom("METEOR@1.3.1");
 
