@@ -1,3 +1,10 @@
+function adjustLocalToDenverTime(time) {
+  let here = moment(time);
+  let denver = here.clone().tz("America/Denver");
+  denver.add(here.utcOffset() - denver.utcOffset(), "minutes");
+  return denver.toDate();
+}
+
 /**
  *  RentalProduct Methods
  */
@@ -35,7 +42,9 @@ Meteor.methods({
       allDay: true
     }).iterate("days");
 
-    while (iter.hasNext()) { requestedDates.push(iter.next().toDate()); }
+    while (iter.hasNext()) {
+      requestedDates.push(adjustLocalToDenverTime(iter.next()));
+    }
 
     // Sort by length of inventory variants unavailableDates array
     let inventoryVariants = InventoryVariants.find({productId: variantId}, {sort: {numberOfDatesBooked: sortDirection}}).fetch();
