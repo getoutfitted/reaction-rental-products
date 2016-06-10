@@ -13,7 +13,7 @@
     "twix": {
       "version": "0.9.0",
       "resolved": "https://registry.npmjs.org/twix/-/twix-0.9.0.tgz",
-      "from": "twix@0.9.0"
+      "from": "https://registry.npmjs.org/twix/-/twix-0.9.0.tgz"
     }
   }
 }

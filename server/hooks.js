@@ -24,7 +24,8 @@ ReactionCore.MethodHooks.afterMethods({
     if (cart.items && cart.items.length > 0) {
       _.map(cart.items, function (item) {
         if (item.variants._id === variantId
-          && item.variants.functionalType === "rentalVariant" // TODO: future if item.type === rental
+          && (item.variants.functionalType === "rentalVariant"
+            || item.variants.functionalType === "bundleVariant") // TODO: future if item.type === rental
           && cart.rentalDays) {
             // TODO: update qty to verified rental qty available
           // Set price to calculated rental price;

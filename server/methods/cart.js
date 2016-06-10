@@ -38,7 +38,9 @@ Meteor.methods({
     // If cart has items in it - update the price for those items
     if (cart.items && cart.items.length > 0) {
       cart.items = cart.items.reduce(function (newCart, item) {
-        if (item.variants.functionalType === "rentalVariant" // TODO: future if item.type === rental
+         // TODO: future if item.type === rental
+        if ((item.variants.functionalType === "rentalVariant"
+          || item.variants.functionalType === "bundleVariant")
           && cart.rentalDays) {
             // TODO: update qty to verified rental qty available
           // Set price to calculated rental price;
