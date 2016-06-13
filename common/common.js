@@ -75,7 +75,14 @@ RentalProducts = {
     }
 
     // Sort by length of inventory variants unavailableDates array
-    let inventoryVariants = InventoryVariants.find({productId: variantId, "workflow.status": "active"}, {sort: {numberOfDatesBooked: sortDirection}}).fetch();
+    let inventoryVariants = InventoryVariants.find(
+      {
+        productId: variantId,
+        active: true,
+        "workflow.status": "active"
+      }, {
+        sort: {numberOfDatesBooked: sortDirection}
+      }).fetch();
 
     if (inventoryVariants.length > 0) {
       // if this variant has multiple inventory

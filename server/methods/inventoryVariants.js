@@ -165,7 +165,8 @@ Meteor.methods({
     if (inventoryVariant
       && RentalProducts.checkAvailability(inventoryVariant.unavailableDates, requestedDates)) {
       let reservedDates = InventoryVariants.findOne({
-        _id: inventoryVariant._id
+        _id: inventoryVariant._id,
+        active: true,
       }, {fields: {unavailableDates: 1}}).unavailableDates;
 
       // We take the time to insert unavailable dates in ascending date order
