@@ -27,7 +27,7 @@ Meteor.methods({
     let firstDayToReserve = TransitTimes.calculateShippingDayByOrder(order);
     let lastDayToReserve = moment(TransitTimes.calculateReturnDayByOrder(order)).add(turnaroundTime, "days").toDate();
     let counter = 0;
-    
+
     let reservation = moment(
       TransitTimes.calculateShippingDayByOrder(order)
     ).twix(
@@ -118,5 +118,32 @@ Meteor.methods({
         }
       }
     }
+  },
+  "rentalProducts/inventoryUnbook": function (orderId) {
+    check(orderId, String);
+    const impactedInventory = InventoryVariants.find({"unavailableDetails.orderId": orderId}).fetch();
+    _.each(impactedInventory, function (inventory) {
+      let removalDetails = _.where(inventory.unavailableDetails, {orderId: orderId});
+      // grab these for the arrays
+      let firstDate = removalDetails[0].date;
+      let lastDate = removalDetails[removalDetails.length - 1].date;
+      // this will return an array of objects without the ones that have an orderId
+      let updatedUnavailableDetails = _.difference(inventory.unavailableDetails, removalDetails);
+      // turn the unavailable dates to Numbers array, then get index of first and last date
+      let firstIndex = inventory.unavailableDates.map(Number).indexOf(+firstDate);
+      let lastIndex = inventory.unavailableDates.map(Number).indexOf(+lastDate);
+      let spliceAmount = lastIndex - firstIndex + 1; // to be inclusvie;
+      inventory.unavailableDates.splice(firstIndex, spliceAmount);
+      InventoryVariants.update({
+        _id: inventory._id
+      }, {
+        $set: {
+          unavailableDetails: updatedUnavailableDetails,
+          unavailableDates: inventory.unavailableDates,
+          numberOfDatesBooked: inventory.unavailableDates.length
+        }
+      });
+      ReactionCore.Log.warn(`Canceled Order #${orderId} removed inventory dates for Inventory item ${inventory._id}`);
+    });
   }
 });
