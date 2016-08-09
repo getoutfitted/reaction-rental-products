@@ -1,8 +1,17 @@
+import { Template } from 'meteor/templating';
+import { Reaction } from '/client/api';
+import { Packages } from '/lib/collections';
+import { RentalProductsPackageConfig } from '../../../lib/collections/schemas';
+import './rentalProductsSettings.html';
+
 Template.rentalProductsSettings.helpers({
+  RentalProductsPackageConfig() {
+    return RentalProductsPackageConfig;
+  },
   packageData: function () {
-    return ReactionCore.Collections.Packages.findOne({
+    return Packages.findOne({
       name: 'reaction-rental-products',
-      shopId: ReactionCore.getShopId()
+      shopId: Reaction.getShopId()
     });
   }
 });

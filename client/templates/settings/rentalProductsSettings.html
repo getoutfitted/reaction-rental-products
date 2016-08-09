@@ -1,8 +1,8 @@
 <template name='rentalProductsSettings'>
     <div class="panel-body">
     {{#autoForm
-        collection="ReactionCore.Collections.Packages"
-        schema="ReactionCore.Schemas.RentalProductsPackageConfig"
+        collection=Collections.Packages
+        schema=RentalProductsPackageConfig
         doc=packageData
         type="update"
         id="rental-products-update-form"

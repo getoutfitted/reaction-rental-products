@@ -1,16 +1,17 @@
-ReactionCore.registerPackage({
-  label: "Rental Products",
+import { Reaction } from "/server/api";
+Reaction.registerPackage({
+  label: "Scout",
   name: "reaction-rental-products",
   icon: "fa fa-calendar",
   autoEnable: true,
   settings: {
-    name: "Rental Products"
+    name: "Scout"
   },
   registry: [{
     route: "/dashboard/rental-products",
     name: "rentalProducts",
     template: "dashboardRentalProducts",
-    label: "Rental Products",
+    label: "Scout",
     description: "Rental Products and Rental Inventory Tracking",
     container: "getoutfitted",
     icon: "fa fa-calendar",
@@ -20,7 +21,7 @@ ReactionCore.registerPackage({
     route: "/dashboard/rental-products/settings",
     name: "rentalProducts.settings",
     template: "rentalProductsSettings",
-    label: "Rental Products Settings",
+    label: "Scout Settings",
     provides: "settings"
   }, {
     route: "/dashboard/rental-products/availability/:_id",
