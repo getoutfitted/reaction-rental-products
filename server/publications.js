@@ -1,6 +1,14 @@
+import { Meteor } from 'meteor/meteor';
+import { check } from 'meteor/check';
+import { Reaction, Logger } from '/server/api';
+import { Products } from '/lib/collections';
+import { RentalProducts } from './rentalProducts';
+import { InventoryVariants } from '../lib/collections';
+
+
 Meteor.publish("rentalProducts", function () {
-  if (Roles.userIsInRole(this.userId, RentalProducts.server.permissions, ReactionCore.getShopId())) {
-    return ReactionCore.Collections.Products.find({
+  if (Roles.userIsInRole(this.userId, RentalProducts.server.permissions, Reaction.getShopId())) {
+    return Products.find({
       functionalType: {$in: ["rentalVariant", "rental"]}
     }, {
       sort: {"ancestors.0": 1, "color": 1, "numberSize": -1}
@@ -12,25 +20,25 @@ Meteor.publish("rentalProducts", function () {
 Meteor.publish("ParentProduct", function (productId) {
   check(productId, Match.OptionalOrNull(String));
   if (!productId) {
-    ReactionCore.Log.info("ignoring null request on ParentProduct subscription");
+    Logger.info("ignoring null request on ParentProduct subscription");
     return this.ready();
   }
-  if (Roles.userIsInRole(this.userId, RentalProducts.server.permissions, ReactionCore.getShopId())) {
-    const product = ReactionCore.Collections.Products.findOne(productId);
-    return ReactionCore.Collections.Products.find(product.ancestors[0]);
+  if (Roles.userIsInRole(this.userId, RentalProducts.server.permissions, Reaction.getShopId())) {
+    const product = Products.findOne(productId);
+    return Products.find(product.ancestors[0]);
   }
-  ReactionCore.Log.warn("ParentProduct subscription requested by unauthorized user");
+  Logger.warn("ParentProduct subscription requested by unauthorized user");
   return this.ready();
 });
 
 Meteor.publish("inventoryVariantsById", function (productId) {
   check(productId, Match.OptionalOrNull(String));
   if (!productId) {
-    ReactionCore.Log.info("ignoring null request on inventoryVariantsById subscription");
+    Logger.info("ignoring null request on inventoryVariantsById subscription");
     return this.ready();
   }
-  if (Roles.userIsInRole(this.userId, RentalProducts.server.permissions, ReactionCore.getShopId())) {
-    return ReactionCore.Collections.InventoryVariants.find({
+  if (Roles.userIsInRole(this.userId, RentalProducts.server.permissions, Reaction.getShopId())) {
+    return InventoryVariants.find({
       productId: productId
     }, {
       sort: {barcode: -1}
@@ -42,10 +50,10 @@ Meteor.publish("inventoryVariantsById", function (productId) {
 Meteor.publish("productReservationStatus", function (productId) {
   check(productId, Match.OptionalOrNull(String));
   if (!productId) {
-    ReactionCore.Log.info("ignoring null request on productReservationStatus subscription");
+    Logger.info("ignoring null request on productReservationStatus subscription");
     return this.ready();
   }
-  return ReactionCore.Collections.InventoryVariants.find({
+  return InventoryVariants.find({
     productId: productId,
     active: true,
     "workflow.status": "active"

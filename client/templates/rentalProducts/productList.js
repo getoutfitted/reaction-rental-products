@@ -1,21 +1,27 @@
+import { Template } from 'meteor/templating';
+import { Products } from '/lib/collections';
+import { Reaction } from '/client/api';
+
+import './productList.html';
+
 Template.dashboardRentalProducts.onCreated(function () {
-  Meteor.subscribe("rentalProducts");
+  this.subscribe("rentalProducts");
 });
 
 Template.dashboardRentalProducts.helpers({
   rentalProducts: function () {
-    return ReactionCore.Collections.Products.find({functionalType: "rentalVariant"});
+    return Products.find({functionalType: "rentalVariant"});
   }
 });
 
 Template.dashboardRentalProduct.helpers({
   parent: function () {
-    return ReactionCore.Collections.Products.findOne(this.ancestors[0]);
+    return Products.findOne(this.ancestors[0]);
   }
 });
 
 Template.dashboardRentalProduct.events({
   "click tr": function () {
-    ReactionRouter.go("rentalProducts.availabilityById", {_id: this._id});
+    Reaction.Router.go("rentalProducts.availabilityById", {_id: this._id});
   }
 });
