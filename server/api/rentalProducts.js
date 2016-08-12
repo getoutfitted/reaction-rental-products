@@ -1,6 +1,5 @@
-import { RentalProducts as commonRentalProducts } from '../lib/api';
+import RentalProducts from '../../lib/api';
 
-export const RentalProducts = commonRentalProducts;
 
 RentalProducts.server = {};
 
@@ -10,3 +9,5 @@ RentalProducts.server.permissions = [
   "dashboard/rental-products",
   "reaction-rental-products"
 ];
+
+export default RentalProducts;

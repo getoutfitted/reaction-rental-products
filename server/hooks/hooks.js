@@ -2,10 +2,11 @@ import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { _ } from 'meteor/underscore';
 import { MethodHooks } from "/server/api";
-import { Cart } from '/lib/collections';
+import { Cart, Products } from '/lib/collections';
 
 MethodHooks.beforeMethods({
   "orders/inventoryAdjust": function (options) {
+    console.log('we are in the hook');
     check(options.arguments, [Match.Any]);
     const orderId = options.arguments[0];
     if (!orderId) { return true; }
@@ -62,4 +63,14 @@ MethodHooks.afterMethods({
     // was returning true before. After chatting with @paulgrever we decided it was proabably better to return
     // the options object
   }
+});
+
+Products.after.insert(function (userId, doc) {
+  console.log('we got here');
+  if (doc.functionalType === "rentalVariant") {
+    console.log('it calling the mthod', doc);
+    return Meteor.call("rentalProducts/registerInventory", doc);
+  }
+  console.log('we shouldnt be her');
+  return false;
 });

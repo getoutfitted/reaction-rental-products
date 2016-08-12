@@ -2,8 +2,8 @@ import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { Reaction, Logger } from '/server/api';
 import { Products } from '/lib/collections';
-import { RentalProducts } from './rentalProducts';
-import { InventoryVariants } from '../lib/collections';
+import RentalProducts from '../api';
+import { InventoryVariants } from '../../lib/collections';
 
 
 Meteor.publish("rentalProducts", function () {

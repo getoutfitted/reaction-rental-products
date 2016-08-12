@@ -6,8 +6,8 @@ import { InventoryVariants } from '../../lib/collections';
 import { EJSON } from 'meteor/ejson';
 import moment from 'moment';
 import 'moment-timezone';
-import { RentalProducts } from '../rentalProducts';
-import { * as Schemas } from '/lib/collections/schemas';
+import  RentalProducts from '../api';
+import * as Schemas from '/lib/collections/schemas';
 
 Meteor.methods({
   /**
@@ -214,7 +214,7 @@ Meteor.methods({
    * @return {Number} - returns the total amount of new inventory created
    */
   "rentalProducts/registerInventory": function (product) {
-    check(product, Object)
+    check(product, Object);
     let type = product.type;
     // TODO: reimplement argument checks against correct schema
     // switch (product.type) {
@@ -229,19 +229,19 @@ Meteor.methods({
 
 
     // user needs createProduct permission to register new inventory
-    if (!ReactionCore.hasPermission("createProduct")) {
+    if (!Reaction.hasPermission("createProduct")) {
       throw new Meteor.Error(403, "Access Denied");
     }
     // this.unblock();
 
     let totalNewInventory = 0;
     const productId = type === "variant" ? product.ancestors[0] : product._id;
-    const variants = ReactionCore.getVariants(productId);
+    const variants = Reaction.getVariants(productId);
 
     // we'll check each variant to see if it has been fully registered
     for (let variant of variants) {
       if (variant.functionalType === "rentalVariant") { // Only add rentalVariants for bottom-most children
-        let inventoryVariants = ReactionCore.Collections.InventoryVariants.find({
+        let inventoryVariants = InventoryVariants.find({
           productId: variant._id
         });
         // we'll return this as well
@@ -257,9 +257,9 @@ Meteor.methods({
             } new inventory variants ${variant._id}`
           );
 
-          const bulk = ReactionCore.Collections.InventoryVariants._collection.rawCollection().initializeUnorderedBulkOp();
+          const bulk = InventoryVariants._collection.rawCollection().initializeUnorderedBulkOp();
           while (i <= newQty) {
-            let id = ReactionCore.Collections.InventoryVariants._makeNewID();
+            let id = InventoryVariants._makeNewID();
             let sku = variant.sku || "";
             bulk.insert({
               _id: id,

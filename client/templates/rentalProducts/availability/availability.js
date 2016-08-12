@@ -1,3 +1,14 @@
+import { Template } from 'meteor/templating';
+import { Session } from 'meteor/session';
+import { Reaction } from '/client/api';
+import { Products } from '/lib/collections';
+import { InventoryVariants } from '../../../../lib/collections';
+import moment from 'moment';
+import 'moment-timezone';
+import 'twix';
+
+import './availability.html';
+
 function adjustLocalToDenverTime(time) {
   let here = moment(time);
   let denver = here.clone().tz("America/Denver");
@@ -7,7 +18,7 @@ function adjustLocalToDenverTime(time) {
 
 Template.dashboardRentalProductAvailability.onRendered(function () {
   let instance = this;
-  const productId = ReactionRouter.getParam("_id");
+  const productId = Reaction.Router.getParam("_id");
 
   instance.autorun(() => {
     instance.subscribe("inventoryVariantsById", productId);
@@ -23,18 +34,18 @@ Template.dashboardRentalProductAvailability.helpers({
     return moment(Session.get("dashboardViewStart")).format("MMMM");
   },
   inventoryVariants: () => {
-    const productId = ReactionRouter.getParam("_id");
-    return ReactionCore.Collections.InventoryVariants.find({productId: productId});
+    const productId = Reaction.Router.getParam("_id");
+    return InventoryVariants.find({productId: productId});
   },
   product: () => {
     const productId = ReactionRouter.getParam("_id");
-    return ReactionCore.Collections.Products.findOne(productId);
+    return Products.findOne(productId);
   },
   parent: () => {
-    const productId = ReactionRouter.getParam("_id");
-    const product = ReactionCore.Collections.Products.findOne(productId);
+    const productId = Reaction.Router.getParam("_id");
+    const product = Products.findOne(productId);
     if (product) {
-      return ReactionCore.Collections.Products.findOne(product.ancestors[0]);
+      return Products.findOne(product.ancestors[0]);
     }
     return {};
   },
