@@ -1,1 +1,0 @@
-RentalProducts.Log = Logger;

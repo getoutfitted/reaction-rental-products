@@ -1,4 +1,10 @@
-ReactionCore.MethodHooks.beforeMethods({
+import { Meteor } from 'meteor/meteor';
+import { check } from 'meteor/check';
+import { _ } from 'meteor/underscore';
+import { MethodHooks } from "/server/api";
+import { Cart } from '/lib/collections';
+
+MethodHooks.beforeMethods({
   "orders/inventoryAdjust": function (options) {
     check(options.arguments, [Match.Any]);
     const orderId = options.arguments[0];
@@ -12,12 +18,12 @@ ReactionCore.MethodHooks.beforeMethods({
   }
 });
 
-ReactionCore.MethodHooks.afterMethods({
+MethodHooks.afterMethods({
   "cart/addToCart": function (options) {
     check(options.arguments[0], String);
     check(options.arguments[1], String);
     const variantId = options.arguments[1];
-    const cart = ReactionCore.Collections.Cart.findOne({ userId: Meteor.userId() });
+    const cart = Cart.findOne({ userId: Meteor.userId() });
     if (!cart) {
       return options;
     }
@@ -45,7 +51,7 @@ ReactionCore.MethodHooks.afterMethods({
       cart.items = [];
     }
 
-    ReactionCore.Collections.Cart.update({
+    Cart.update({
       _id: cart._id
     }, {
       $set: {
