@@ -8,6 +8,7 @@ import moment from 'moment';
 import 'moment-timezone';
 import  RentalProducts from '../api';
 import * as Schemas from '/lib/collections/schemas';
+import { ReactionProduct } from '/lib/api';
 
 Meteor.methods({
   /**
@@ -236,7 +237,7 @@ Meteor.methods({
 
     let totalNewInventory = 0;
     const productId = type === "variant" ? product.ancestors[0] : product._id;
-    const variants = Reaction.getVariants(productId);
+    const variants = ReactionProduct.getVariants(productId);
 
     // we'll check each variant to see if it has been fully registered
     for (let variant of variants) {

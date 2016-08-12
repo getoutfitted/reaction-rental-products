@@ -6,7 +6,6 @@ import { Cart, Products } from '/lib/collections';
 
 MethodHooks.beforeMethods({
   "orders/inventoryAdjust": function (options) {
-    console.log('we are in the hook');
     check(options.arguments, [Match.Any]);
     const orderId = options.arguments[0];
     if (!orderId) { return true; }
@@ -66,11 +65,8 @@ MethodHooks.afterMethods({
 });
 
 Products.after.insert(function (userId, doc) {
-  console.log('we got here');
   if (doc.functionalType === "rentalVariant") {
-    console.log('it calling the mthod', doc);
     return Meteor.call("rentalProducts/registerInventory", doc);
   }
-  console.log('we shouldnt be her');
   return false;
 });

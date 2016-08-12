@@ -100,7 +100,7 @@ Template.dashboardVariantAvailability.helpers({
     return "hide";
   },
   isWeekendDay: function (day) {
-    if (day.start.isoWeekday() >= 6) {
+    if (day.start().isoWeekday() >= 6) {
       return "inventory-day-weekend";
     }
     return "inventory-day-weekday";
