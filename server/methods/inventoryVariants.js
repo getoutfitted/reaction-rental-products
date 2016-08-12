@@ -5,7 +5,7 @@ import { _ } from 'meteor/underscore';
 import { InventoryVariants } from '../../lib/collections';
 import { EJSON } from 'meteor/ejson';
 import moment from 'moment';
-import 'twix';
+import 'moment-timezone';
 import { RentalProducts } from '../rentalProducts';
 import { * as Schemas } from '/lib/collections/schemas';
 
