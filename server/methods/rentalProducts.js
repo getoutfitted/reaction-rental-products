@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { Reaction } from '/server/api';
-import { RentalProducts } from '../api';
+import { RentalProducts } from '../rentalProducts';
 import { _ } from 'meteor/underscore';
 import { InventoryVariants } from '../../lib/collections';
 import { Products } from '/lib/collections';

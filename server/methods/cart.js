@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { Cart } from '/lib/collections';
-import { Reaction, Logger } from '/sever/api';
+import { Reaction, Logger } from '/server/api';
 import { _ } from 'meteor/underscore';
 import moment from "moment";
 import "moment-timezone";
