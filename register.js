@@ -16,6 +16,7 @@ Reaction.registerPackage({
     container: "getoutfitted",
     icon: "fa fa-calendar",
     provides: "dashboard",
+    workflow: "rentalProductsWorkflow",
     priority: 2
   }, {
     route: "/dashboard/rental-products/settings",
@@ -28,5 +29,31 @@ Reaction.registerPackage({
     name: "rentalProducts.availabilityById",
     template: "dashboardRentalProductAvailability"
   }],
-  layout: []
+  layout: [{
+    workflow: "rentalProductsWorkflow",
+    layout: "coreLayout",
+    theme: "default",
+    enabled: true,
+    structure: {
+      template: "dashboardRentalProducts",
+      layoutHeader: "goLayoutHeader",
+      layoutFooter: "goLayoutFooter",
+      notFound: "goNotFound",
+      dashboardControls: "dashboardControls",
+      adminControlsFooter: "adminControlsFooter"
+    }
+  }, {
+    workflow: "rentalProductsWorkflow",
+    layout: "getoutfittedLayout",
+    theme: "default",
+    enabled: true,
+    structure: {
+      template: "dashboardRentalProducts",
+      layoutHeader: "goLayoutHeader",
+      layoutFooter: "goLayoutFooter",
+      notFound: "goNotFound",
+      dashboardControls: "dashboardControls",
+      adminControlsFooter: "adminControlsFooter"
+    }
+  }]
 });
