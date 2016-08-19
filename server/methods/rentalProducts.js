@@ -1,3 +1,15 @@
+import { Meteor } from 'meteor/meteor';
+import { check } from 'meteor/check';
+import { Reaction } from '/server/api';
+import  RentalProducts from '../api';
+import { _ } from 'meteor/underscore';
+import { InventoryVariants } from '../../lib/collections';
+import { Products } from '/lib/collections';
+import moment from 'moment';
+import 'moment-timezone';
+import 'twix';
+import { Random } from 'meteor/random';
+
 function adjustLocalToDenverTime(time) {
   let here = moment(time);
   let denver = here.clone().tz("America/Denver");
@@ -32,7 +44,7 @@ Meteor.methods({
     check(quantity, Number);
     check(searchLeastBookedFirst, Match.Optional(Boolean));
 
-    let InventoryVariants = ReactionCore.Collections.InventoryVariants;
+    // let InventoryVariants = ReactionCore.Collections.InventoryVariants;
 
     let requestedVariants = [];
     let requestedDates = [];
@@ -105,7 +117,7 @@ Meteor.methods({
       description: Match.Optional(String)
     });
 
-    if (!ReactionCore.hasPermission("createProductEvent")) {
+    if (!Reaction.hasPermission("createProductEvent")) {
       throw new Meteor.Error(403, "Access Denied");
     }
 
@@ -116,7 +128,7 @@ Meteor.methods({
       createdAt: new Date()
     });
 
-    InventoryVariants = ReactionCore.Collections.InventoryVariants;
+    // InventoryVariants = InventoryVariants;
 
     const inventoryVariant = InventoryVariants.findOne({
       _id: inventoryVariantId
@@ -149,20 +161,20 @@ Meteor.methods({
     check(productId, String);
     check(productType, String);
     // user needs create product permission to change type.
-    if (!ReactionCore.hasPermission("createProduct")) {
+    if (!Reaction.hasPermission("createProduct")) {
       throw new Meteor.Error(403, "Access Denied");
     }
 
-    const product = ReactionCore.Collections.Products.findOne(productId);
+    const product = Products.findOne(productId);
     // if product type is rental, setup variants.
     if (productType === "rental") {
-      let variants = ReactionCore.Collections.Products.find({
+      let variants = Products.find({
         ancestors: { $in: [productId] },
         type: "variant"
       }).fetch();
 
       _.each(variants, function (variant) {
-        let childVariants = ReactionCore.Collections.Products.find({
+        let childVariants = Products.find({
           ancestors: { $in: [variant._id] },
           type: "variant"
         }).fetch();
@@ -180,7 +192,7 @@ Meteor.methods({
 
         // If this variant is a parent, no inventory children. Only inventory children childmost variants
         if (childVariants.length === 0) {
-          let existingInventoryVariantQty = ReactionCore.Collections.InventoryVariants.find({productId: variant._id}).count();
+          let existingInventoryVariantQty = InventoryVariants.find({productId: variant._id}).count();
           let count = variant.inventoryQuantity - existingInventoryVariantQty;
           if (count > 0) {
             _(variant.inventoryQuantity - existingInventoryVariantQty).times(function (n) {
@@ -191,21 +203,21 @@ Meteor.methods({
               inventoryVariant.color = variant.color;
               inventoryVariant.size = variant.size;
 
-              ReactionCore.Collections.InventoryVariants.insert(inventoryVariant);
+              InventoryVariants.insert(inventoryVariant);
             });
           }
         }
-        ReactionCore.Collections.Products.update({_id: variant._id}, {$set: variant});
-        ReactionCore.Collections.Products.findOne({_id: variant._id});
+        Products.update({_id: variant._id}, {$set: variant});
+        Products.findOne({_id: variant._id});
       });
-      return ReactionCore.Collections.Products.update({_id: productId}, {$set: {type: "rental"}});
+      return Products.update({_id: productId}, {$set: {type: "rental"}});
     }
-    let variants = ReactionCore.Collections.Products.find({
+    let variants = Products.find({
       ancestors: { $in: [productId] }
     }).fetch();
     _.each(variants, function (variant) {
-      ReactionCore.Collections.Products.update({_id: variant._id}, {$set: {type: "variant"}});
+      Products.update({_id: variant._id}, {$set: {type: "variant"}});
     });
-    return ReactionCore.Collections.Products.update({_id: productId}, {$set: {type: "simple"}});
+    return Products.update({_id: productId}, {$set: {type: "simple"}});
   }
 });

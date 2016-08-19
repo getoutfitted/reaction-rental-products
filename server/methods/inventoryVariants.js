@@ -1,3 +1,15 @@
+import { Meteor } from 'meteor/meteor';
+import { check } from 'meteor/check';
+import { Reaction, Logger } from '/server/api';
+import { _ } from 'meteor/underscore';
+import { InventoryVariants } from '../../lib/collections';
+import { EJSON } from 'meteor/ejson';
+import moment from 'moment';
+import 'moment-timezone';
+import  RentalProducts from '../api';
+import * as Schemas from '/lib/collections/schemas';
+import { ReactionProduct } from '/lib/api';
+
 Meteor.methods({
   /**
    * rentalProducts/createInventoryVariant
@@ -11,7 +23,7 @@ Meteor.methods({
     check(inventoryVariant, Match.Optional(Object));
     check(qty, Match.Optional(Number));
     // must have createProduct permissions
-    if (!ReactionCore.hasPermission("createProduct")) {
+    if (!Reaction.hasPermission("createProduct")) {
       throw new Meteor.Error(403, "Access Denied");
     }
     let inventoryVariantIds = [];
@@ -31,7 +43,7 @@ Meteor.methods({
         barcode: barcode
       });
 
-      ReactionCore.Collections.InventoryVariants.insert(assembledInventoryVariant,
+      InventoryVariants.insert(assembledInventoryVariant,
         (error, result) => {
           if (result) {
             ReactionCore.Log.info(
@@ -40,7 +52,7 @@ Meteor.methods({
             );
           }
           if (error) {
-            ReactionCore.Log.error(`rentalProducts/createInventoryVariant error
+            Logger.error(`rentalProducts/createInventoryVariant error
               while creating inventory variant: ${inventoryVariantId} for ${productId}`, error);
           }
         }
@@ -63,7 +75,7 @@ Meteor.methods({
     check(field, String);
     check(value, Match.OneOf(String, Object, Array, Boolean));
     // must have createProduct permission
-    if (!ReactionCore.hasPermission("createProduct")) {
+    if (!Reaction.hasPermission("createProduct")) {
       throw new Meteor.Error(403, "Access Denied");
     }
 
@@ -71,7 +83,7 @@ Meteor.methods({
     let update = EJSON.parse("{\"" + field + "\":" + stringValue + "}");
 
     // we need to use sync mode here, to return correct error and result to UI
-    const result = ReactionCore.Collections.InventoryVariants.update(inventoryVariantId, {
+    const result = InventoryVariants.update(inventoryVariantId, {
       $set: update
     });
     return result;
@@ -98,7 +110,7 @@ Meteor.methods({
       inventoryVariantIds = inventoryVariantId;
     }
 
-    const numRemoved = ReactionCore.Collections.InventoryVariants.remove({
+    const numRemoved = InventoryVariants.remove({
       _id: {
         $in: inventoryVariantIds
       }
@@ -118,11 +130,11 @@ Meteor.methods({
     });
     check(transitTime, Match.Optional(Number));
     check(orderId, Match.Optional(String));
-    if (!ReactionCore.hasPermission("createProduct")) {
+    if (!Reaction.hasPermission("createProduct")) {
       throw new Meteor.Error(403, "Access Denied");
     }
 
-    let inventoryVariant = ReactionCore.Collections.InventoryVariants.findOne(inventoryVariantId);
+    let inventoryVariant = InventoryVariants.findOne(inventoryVariantId);
     let requestedDates = [];
     let requestedDetails = [];
     const shippingDays = 0;
@@ -203,30 +215,34 @@ Meteor.methods({
    * @return {Number} - returns the total amount of new inventory created
    */
   "rentalProducts/registerInventory": function (product) {
-    let type;
-    switch (product.type) {
-    case "variant":
-      check(product, ReactionCore.Schemas.ProductVariant);
-      type = "variant";
-      break;
-    default:
-      check(product, ReactionCore.Schemas.Product);
-      type = "simple";
-    }
+    check(product, Object);
+    let type = product.type;
+    // TODO: reimplement argument checks against correct schema
+    // switch (product.type) {
+    // case "variant":
+    //   check(product, Object.assign(Schemas.ProductVariant, Schemas.RentalProductVariant));
+    //   type = "variant";
+    //   break;
+    // default:
+    //   check(product, Schemas.Product);
+    //   type = "simple";
+    // }
+
+
     // user needs createProduct permission to register new inventory
-    if (!ReactionCore.hasPermission("createProduct")) {
+    if (!Reaction.hasPermission("createProduct")) {
       throw new Meteor.Error(403, "Access Denied");
     }
     // this.unblock();
 
     let totalNewInventory = 0;
     const productId = type === "variant" ? product.ancestors[0] : product._id;
-    const variants = ReactionCore.getVariants(productId);
+    const variants = ReactionProduct.getVariants(productId);
 
     // we'll check each variant to see if it has been fully registered
     for (let variant of variants) {
       if (variant.functionalType === "rentalVariant") { // Only add rentalVariants for bottom-most children
-        let inventoryVariants = ReactionCore.Collections.InventoryVariants.find({
+        let inventoryVariants = InventoryVariants.find({
           productId: variant._id
         });
         // we'll return this as well
@@ -237,14 +253,14 @@ Meteor.methods({
           let newQty = variant.inventoryQuantity || 0;
           let i = inventoryVariantCount + 1;
 
-          ReactionCore.Log.info(
+          Logger.info(
             `inserting ${newQty - inventoryVariantCount
             } new inventory variants ${variant._id}`
           );
 
-          const bulk = ReactionCore.Collections.InventoryVariants._collection.rawCollection().initializeUnorderedBulkOp();
+          const bulk = InventoryVariants._collection.rawCollection().initializeUnorderedBulkOp();
           while (i <= newQty) {
-            let id = ReactionCore.Collections.InventoryVariants._makeNewID();
+            let id = InventoryVariants._makeNewID();
             let sku = variant.sku || "";
             bulk.insert({
               _id: id,
@@ -274,7 +290,7 @@ Meteor.methods({
             // throw new Meteor.Error("Inventory Anomaly Detected. Abort! Abort!");
             return totalNewInventory;
           }
-          ReactionCore.Log.debug(`registered ${inserted}`);
+          Logger.debug(`registered ${inserted}`);
           totalNewInventory += inserted;
         }
       }

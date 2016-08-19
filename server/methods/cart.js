@@ -1,3 +1,8 @@
+import { Meteor } from 'meteor/meteor';
+import { check } from 'meteor/check';
+import { Cart } from '/lib/collections';
+import { Reaction, Logger } from '/server/api';
+import { _ } from 'meteor/underscore';
 import moment from "moment";
 import "moment-timezone";
 import "twix";
@@ -28,9 +33,9 @@ Meteor.methods({
     check(cartId, String);
     check(startTime, Date);
     check(endTime, Date);
-    const cart = ReactionCore.Collections.Cart.findOne(cartId);
+    const cart = Cart.findOne(cartId);
     // Make sure that cart is owned by current user.
-    if (cart.userId !== Meteor.userId() && !ReactionCore.hasPermission("editUserCart")) {
+    if (cart.userId !== Meteor.userId() && !Reaction.hasPermission("editUserCart")) {
       throw new Meteor.Error("User Id and Cart userId don\'t match");
     }
     const rental = moment(startTime).twix(endTime);
@@ -55,7 +60,7 @@ Meteor.methods({
               newCart.push(item);
             } else {
               // remove from cart (don't push)
-              ReactionCore.Log.error(`Price bucket not found: ${item.variants._id} for ${cart.rentalDays} rental days`);
+              Logger.error(`Price bucket not found: ${item.variants._id} for ${cart.rentalDays} rental days`);
             }
           }
         } else {
@@ -64,12 +69,12 @@ Meteor.methods({
         }
         return newCart;
       }, []);
-      
+
     } else {
       cart.items = [];
     }
 
-    ReactionCore.Collections.Cart.update({
+    Cart.update({
       _id: cartId
     }, {
       $set: {
@@ -90,7 +95,7 @@ Meteor.methods({
     check(cartId, String);
     check(rentalLength, Number);
     check(units, Match.OneOf("months", "weeks", "days", "hours", "minutes"));
-    const cart = ReactionCore.Collections.Cart.findOne(cartId);
+    const cart = Cart.findOne(cartId);
     if (cart.userId !== Meteor.userId()) {
       return false;
     }
@@ -99,7 +104,7 @@ Meteor.methods({
     const fieldToSet = "rental" + units[0].toUpperCase() + units.substr(1); // Make sure that units is correct
     opts[fieldToSet] = rentalLength;
 
-    ReactionCore.Collections.Cart.update({
+    Cart.update({
       _id: cartId
     }, {
       $set: updateObj

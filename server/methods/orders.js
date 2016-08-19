@@ -1,3 +1,14 @@
+import { Meteor } from 'meteor/meteor';
+import { check } from 'meteor/check';
+import { Reaction, Logger } from '/server/api';
+import { _ } from 'meteor/underscore';
+import { InventoryVariants } from '../../lib/collections';
+import { Orders } from '/lib/collections';
+import moment from 'moment';
+import 'moment-timezone';
+import 'twix';
+import { TransitTimes } from '/imports/plugins/custom/transit-times/server/api';
+
 function adjustLocalToDenverTime(time) {
   let here = moment(time);
   let denver = here.clone().tz("America/Denver");
@@ -13,9 +24,9 @@ Meteor.methods({
   "rentalProducts/inventoryAdjust": function (orderId) {
     check(orderId, String);
     // let Products = ReactionCore.Collections.Products;
-    RentalProducts.Log.info(`adjusting rental inventory for order: ${orderId}`);
-    let InventoryVariants = ReactionCore.Collections.InventoryVariants;
-    let Orders = ReactionCore.Collections.Orders;
+    Logger.info(`adjusting rental inventory for order: ${orderId}`);
+    // let InventoryVariants = ReactionCore.Collections.InventoryVariants;
+    // let Orders = ReactionCore.Collections.Orders;
     const order = Orders.findOne(orderId);
     if (!order) { return false; } // If we can't find an order, exit.
     // TODO: Add store buffer days into dates to reserve;
@@ -76,14 +87,14 @@ Meteor.methods({
                                       {endTime: lastDayToReserve, startTime: firstDayToReserve},
                                       item.quantity, false);
         // Log details about booking item
-        RentalProducts.Log.info(`Checked to see if ${item.variants._id} had ${item.quantity} available and it had`
+        Logger.info(`Checked to see if ${item.variants._id} had ${item.quantity} available and it had`
           + ` ${variantIds.length} available`);
-        RentalProducts.Log.info(`${variantIds} were the variants that should be reserved from`
+        Logger.info(`${variantIds} were the variants that should be reserved from`
           + ` ${firstDayToReserve} to ${lastDayToReserve} inclusive of shipping and turnaround time`);
 
         // This should be caught before getting to this point. It's too late here.
         if (variantIds.length !== item.quantity) {
-          RentalProducts.Log.error(`Requested ${item.quantity} of ${item.variants._id}, but only ${variantIds.length} were available.`);
+          Logger.error(`Requested ${item.quantity} of ${item.variants._id}, but only ${variantIds.length} were available.`);
           // Bail
           throw new Meteor.Error(403, `Requested quantity not available to book for ${item.variants._id}`);
         }
@@ -143,7 +154,7 @@ Meteor.methods({
           numberOfDatesBooked: inventory.unavailableDates.length
         }
       });
-      ReactionCore.Log.warn(`Canceled Order #${orderId} removed inventory dates for Inventory item ${inventory._id}`);
+      Logger.warn(`Canceled Order #${orderId} removed inventory dates for Inventory item ${inventory._id}`);
     });
   }
 });

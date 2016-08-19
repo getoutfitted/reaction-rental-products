@@ -1,0 +1,15 @@
+<template name='rentalProductsSettings'>
+    <div class="panel-body">
+    {{#autoForm
+        collection=Collections.Packages
+        schema=RentalProductsPackageConfig
+        doc=packageData
+        type="update"
+        id="rental-products-update-form"
+        }}
+      <p>How many days should we hold the product for cleaning / fixing after each rental</p>
+      {{>afQuickField  name='settings.turnaroundTime'}}
+      <button type="submit" class="btn btn-primary pull-right">Save Changes</button>
+    {{/autoForm}}
+  </div>
+</template>
